@@ -1,31 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
-import { COLORS } from "@/constants/theme";
 
 export default function NavbarLogo() {
     return (
         <Link
             href="/"
-            className="felx items-center gap-3"
+            className="flex items-center gap-3"
             aria-label="StudioOS Home"
         >
             <Image
                 src="/images/logo.png"
                 alt="Studioos logo"
-                width={40}
-                height={40}
+                width={32}
+                height={32}
                 priority
             />
 
-            <span 
-                className="text-2xl font-bold tracking-tight"
-                style={{
-                    color: COLORS.text.primary
-                }}
-            >
+            <span className="text-xl font-semibold tracking-tight text-[#f1f1f1]">
                 StudioOS
             </span>
 
         </Link>
-    )
+    );
 }

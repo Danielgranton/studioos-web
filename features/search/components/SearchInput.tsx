@@ -23,82 +23,96 @@ export default function SearchInput({
     onClear,
 }: SearchInputProps) {
     return (
-        <div className="relative w-full">
+        <div className="flex w-full">
 
-            {/* Search Icon */}
-            <Search
-                size={18}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-            />
+            <div className="relative flex-1">
 
-            {/* Input */}
-            <input
-                ref={inputRef}
-                type="text"
-                value={value}
-                placeholder={placeholder}
-                onFocus={onFocus}
-                onChange={(e) => onChange(e.target.value)}
-                className="
-                    w-full
-                    rounded-full
-                    border
-                    border-slate-700
-                    bg-slate-800
-                    py-3
-                    pl-11
-                    pr-20
-                    text-sm
-                    text-white
-                    placeholder:text-slate-400
-                    outline-none
-                    transition-all
-                    focus:border-blue-500
-                    focus:ring-2
-                    focus:ring-blue-500/20
-                "
-            />
+                <input
+                    ref={inputRef}
+                    type="text"
+                    value={value}
+                    placeholder={placeholder}
+                    onFocus={onFocus}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="
+                        w-full
+                        rounded-l-full
+                        border
+                        border-[#3f3f3f]
+                        bg-[#121212]
+                        py-2.5
+                        pl-5
+                        pr-16
+                        text-sm
+                        text-white
+                        placeholder:text-[#717171]
+                        outline-none
+                        transition-all
+                        focus:border-[#3ea6ff]
+                    "
+                />
 
-            <div className="absolute right-4 top-1/2 flex -translate-y-1/2 items-center">
+                <div className="absolute right-4 top-1/2 flex -translate-y-1/2 items-center">
 
-                {loading ? (
+                    {loading ? (
 
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-blue-500" />
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#5a5a5a] border-t-[#3ea6ff]" />
 
-                ) : value ? (
+                    ) : value ? (
 
-                    <button
-                        type="button"
-                        onClick={onClear}
-                        className="text-slate-400 transition hover:text-white"
-                    >
-                        <X size={18} />
-                    </button>
+                        <button
+                            type="button"
+                            onClick={onClear}
+                            className="text-[#717171] transition hover:text-white"
+                        >
+                            <X size={18} />
+                        </button>
 
-                ) : (
+                    ) : (
 
-                    <kbd
-                        className="
-                            hidden
-                            rounded-md
-                            border
-                            border-slate-600
-                            bg-slate-900
-                            px-2
-                            py-1
-                            text-[10px]
-                            font-medium
-                            tracking-wide
-                            text-slate-400
-                            md:inline-flex
-                        "
-                    >
-                        Ctrl&nbsp;K
-                    </kbd>
+                        <kbd
+                            className="
+                                hidden
+                                rounded-md
+                                border
+                                border-[#3f3f3f]
+                                px-2
+                                py-1
+                                text-[10px]
+                                font-medium
+                                tracking-wide
+                                text-[#717171]
+                                md:inline-flex
+                            "
+                        >
+                            Ctrl&nbsp;K
+                        </kbd>
 
-                )}
+                    )}
+
+                </div>
 
             </div>
+
+            <button
+                type="button"
+                aria-label="Search"
+                className="
+                    flex
+                    items-center
+                    justify-center
+                    rounded-r-full
+                    border
+                    border-l-0
+                    border-[#3f3f3f]
+                    bg-[#222222]
+                    px-6
+                    transition
+                    hover:bg-[#3f3f3f]
+                "
+            >
+                <Search size={18} className="text-[#f1f1f1]" />
+            </button>
 
         </div>
     );

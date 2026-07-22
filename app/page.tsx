@@ -6,7 +6,6 @@ export default function HomePage() {
 
             <h1 className="text-5xl font-bold">
 
-                StudioOS
 
             </h1>
 

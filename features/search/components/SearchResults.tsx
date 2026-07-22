@@ -7,6 +7,16 @@ interface SearchResultsProps {
     results: SearchResponse | null;
 }
 
+const ENTITY_LABELS: Record<SearchEntityType, string> = {
+    [SearchEntityType.STUDIO]: "Studio",
+    [SearchEntityType.PRODUCER]: "Producer",
+    [SearchEntityType.BEAT]: "Beat",
+    [SearchEntityType.ADVERTISEMENT]: "Ad",
+    [SearchEntityType.PROJECT]: "Project",
+    [SearchEntityType.SESSION]: "Session",
+    [SearchEntityType.USER]: "User",
+};
+
 export default function SearchResults({
     results,
 }: SearchResultsProps) {
@@ -16,7 +26,7 @@ export default function SearchResults({
     }
 
     return (
-        <div className="p-4 space-y-2">
+        <div className="space-y-1 p-2">
 
             {results.results.map((item) => (
 
@@ -27,29 +37,29 @@ export default function SearchResults({
                         w-full
                         items-center
                         gap-3
-                        rounded-xl
+                        rounded-lg
                         px-3
                         py-2
                         transition
-                        hover:bg-slate-800
+                        hover:bg-[#272727]
                     "
                 >
 
                     <Image
-                        src="/images/avatar.png"
+                        src={item.imageUrl || "/images/avatar.png"}
                         alt={item.title}
                         width={40}
                         height={40}
-                        className="rounded-lg object-cover"
+                        className="rounded-md object-cover"
                     />
 
                     <div className="flex-1 text-left">
 
-                        <p className="font-medium text-white">
+                        <p className="text-sm font-medium text-white">
                             {item.title}
                         </p>
 
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs text-[#aaaaaa]">
                             {item.subtitle}
                         </p>
 
@@ -58,22 +68,16 @@ export default function SearchResults({
                     <span
                         className="
                             rounded-full
-                            bg-slate-800
+                            bg-[#272727]
                             px-2
                             py-1
                             text-[10px]
                             font-semibold
                             uppercase
-                            text-slate-300
+                            text-[#aaaaaa]
                         "
                     >
-                        {item.entityType === SearchEntityType.STUDIO && "Studio"}
-                        {item.entityType === SearchEntityType.PRODUCER && "Producer"}
-                        {item.entityType === SearchEntityType.BEAT && "Beat"}
-                        {item.entityType === SearchEntityType.ADVERTISEMENT && "Ad"}
-                        {item.entityType === SearchEntityType.PROJECT && "Project"}
-                        {item.entityType === SearchEntityType.SESSION && "Session"}
-                        {item.entityType === SearchEntityType.USER && "User"}
+                        {ENTITY_LABELS[item.entityType]}
                     </span>
 
                 </button>

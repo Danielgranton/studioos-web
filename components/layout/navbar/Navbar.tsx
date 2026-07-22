@@ -25,21 +25,22 @@ export default function Navbar() {
                     sticky
                     top-0
                     z-50
-                    border-b
-                    border-slate-800
-                    bg-slate-950/90
+                    bg-[#0f0f0f]/95
                     backdrop-blur-xl
                 "
             >
+
+                {/* Row 1 — Logo / Search / Actions */}
 
                 <div
                     className="
                         mx-auto
                         flex
-                        h-20
+                        h-16
                         max-w-[1600px]
                         items-center
                         justify-between
+                        gap-6
                         px-6
                     "
                 >
@@ -63,42 +64,29 @@ export default function Navbar() {
                             w-full
                             items-center
                             justify-between
-                            gap-8
+                            gap-6
                             lg:flex
                         "
                     >
 
-                        {/* Left */}
-
-                        <div
-                            className="
-                                flex
-                                items-center
-                                gap-10
-                            "
-                        >
+                        <div className="shrink-0">
 
                             <NavbarLogo />
 
-                            <NavbarLinks />
-
                         </div>
 
-                        {/* Center */}
-
-                        <div className="flex flex-1 justify-center">
+                        <div className="flex flex-1 justify-center px-8">
 
                             <NavbarSearch />
 
                         </div>
 
-                        {/* Right */}
-
                         <div
                             className="
                                 flex
+                                shrink-0
                                 items-center
-                                gap-3
+                                gap-2
                             "
                         >
 
@@ -107,6 +95,35 @@ export default function Navbar() {
                             <NavbarProfile />
 
                         </div>
+
+                    </div>
+
+                </div>
+
+                {/* Row 2 — Nav links */}
+
+                <div
+                    className="
+                        hidden
+                        border-b
+                        border-[#3f3f3f]/60
+                        lg:block
+                    "
+                >
+
+                    <div
+                        className="
+                            mx-auto
+                            flex
+                            h-12
+                            max-w-[1600px]
+                            items-center
+                            justify-center
+                            px-6
+                        "
+                    >
+
+                        <NavbarLinks />
 
                     </div>
 
@@ -128,7 +145,7 @@ export default function Navbar() {
                         fixed
                         inset-0
                         z-[60]
-                        bg-slate-950
+                        bg-[#0f0f0f]
                         p-6
                         lg:hidden
                     "
@@ -139,11 +156,15 @@ export default function Navbar() {
                         <button
                             onClick={() => setSearchOpen(false)}
                             className="
-                                rounded-lg
-                                bg-slate-800
+                                rounded-full
+                                bg-[#272727]
                                 px-4
                                 py-2
+                                text-sm
+                                font-medium
                                 text-white
+                                transition
+                                hover:bg-[#3f3f3f]
                             "
                         >
                             Close

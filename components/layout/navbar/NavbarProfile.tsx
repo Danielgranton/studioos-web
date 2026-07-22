@@ -36,15 +36,7 @@ export default function NavbarProfile() {
                     p-1
                 "
             >
-
-                <Image
-                    src="/images/avatar.png"
-                    alt="Profile"
-                    width={40}
-                    height={40}
-                    className="rounded-full object-cover"
-                />
-
+                <User size={25}/>
                 <ChevronDown
                     size={16}
                     className="text-slate-400"
@@ -71,13 +63,7 @@ export default function NavbarProfile() {
 
                     <div className="border-b border-slate-700 p-5">
 
-                        <Image
-                            src="/images/avatar.png"
-                            alt="Profile"
-                            width={40}
-                            height={40}
-                            className="rounded-full object-cover"
-                        />
+                       <User size={25} />
 
                         <h3 className="font-semibold text-white">
 

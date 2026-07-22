@@ -53,10 +53,7 @@ export default function SearchDropdown({
                 w-full
                 overflow-hidden
                 rounded-2xl
-                border
-                border-slate-700
-                bg-slate-900
-                shadow-2xl
+                border-[#303030] bg-[#0F0F0F]/95 backdrop-blur-xl
                 z-50
             "
         >
