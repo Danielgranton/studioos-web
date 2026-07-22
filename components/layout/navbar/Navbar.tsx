@@ -11,7 +11,11 @@ import NavbarMobile from "./NavbarMobile";
 import NavbarMobileMenu from "./NavbarMobileMenu";
 import { ArrowLeft } from "lucide-react";
 
-export default function Navbar() {
+interface MenuProps {
+    onMenuOpen: () => void;
+}
+
+export default function Navbar({onMenuOpen}: MenuProps) {
 
     const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -93,7 +97,7 @@ export default function Navbar() {
 
                             <NavbarNotifications />
 
-                            <NavbarProfile />
+                            <NavbarProfile onMenuOpen={onMenuOpen}/>
 
                         </div>
 

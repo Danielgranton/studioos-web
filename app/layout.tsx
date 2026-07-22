@@ -36,15 +36,13 @@ export default function RootLayout({
             <body
                 className="
                     min-h-screen
-                    
                     text-white
-                    antialiased
                 "
             >
 
                 <Navbar />
 
-                <main className="flex-1">
+                <main className="flex-1 ">
 
                     {children}
 

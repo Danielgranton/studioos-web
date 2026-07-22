@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 
 import {
@@ -14,18 +14,14 @@ import {
     BadgeCheck,
 } from "lucide-react";
 
+import { useClickOutside } from "@/features/search/hooks/useClickOutside";
+
 interface Notification {
-
     id: string;
-
     title: string;
-
     description: string;
-
     time: string;
-
     read: boolean;
-
     type:
         | "booking"
         | "payment"
@@ -33,11 +29,10 @@ interface Notification {
         | "message"
         | "follow"
         | "system";
-
 }
 
+// TODO: replace with real data from NotificationService (GET /notifications, GET /notifications/unread-count)
 const notifications: Notification[] = [
-
     {
         id: "1",
         title: "Booking Confirmed",
@@ -46,7 +41,6 @@ const notifications: Notification[] = [
         read: false,
         type: "booking",
     },
-
     {
         id: "2",
         title: "Beat Sold",
@@ -55,7 +49,6 @@ const notifications: Notification[] = [
         read: false,
         type: "beat",
     },
-
     {
         id: "3",
         title: "Payment Received",
@@ -64,7 +57,6 @@ const notifications: Notification[] = [
         read: true,
         type: "payment",
     },
-
     {
         id: "4",
         title: "New Follower",
@@ -73,7 +65,6 @@ const notifications: Notification[] = [
         read: true,
         type: "follow",
     },
-
     {
         id: "5",
         title: "Advertisement Approved",
@@ -82,58 +73,48 @@ const notifications: Notification[] = [
         read: true,
         type: "system",
     },
-
 ];
+
+const TYPE_ICON: Record<Notification["type"], React.ReactNode> = {
+    booking: <Calendar size={18} />,
+    payment: <Wallet size={18} />,
+    beat: <Music2 size={18} />,
+    message: <MessageSquare size={18} />,
+    follow: <UserPlus size={18} />,
+    system: <BadgeCheck size={18} />,
+};
 
 export default function NavbarNotifications() {
 
     const [open, setOpen] = useState(false);
 
-    const unread = notifications.filter(n => !n.read).length;
+    const containerRef = useRef<HTMLDivElement>(null);
 
-    const getIcon = (type: Notification["type"]) => {
+    useClickOutside(containerRef, () => setOpen(false));
 
-        switch (type) {
+    const unread = notifications.filter((n) => !n.read).length;
 
-            case "booking":
-                return <Calendar size={18} />;
-
-            case "payment":
-                return <Wallet size={18} />;
-
-            case "beat":
-                return <Music2 size={18} />;
-
-            case "message":
-                return <MessageSquare size={18} />;
-
-            case "follow":
-                return <UserPlus size={18} />;
-
-            default:
-                return <BadgeCheck size={18} />;
-
-        }
-
-    };
+    const unreadLabel = unread > 9 ? "9+" : unread;
 
     return (
 
-        <div className="relative">
+        <div ref={containerRef} className="relative">
 
             <button
-                onClick={() => setOpen(!open)}
+                onClick={() => setOpen((v) => !v)}
+                aria-label="Notifications"
+                aria-expanded={open}
                 className="
                     relative
                     rounded-full
                     p-2
                     transition
-                    hover:bg-slate-800
+                    hover:bg-[#272727]
                 "
             >
 
                 <Bell
-                    className="text-slate-300"
+                    className="text-[#f1f1f1]"
                     size={22}
                 />
 
@@ -142,22 +123,22 @@ export default function NavbarNotifications() {
                     <span
                         className="
                             absolute
-                            -right-1
-                            -top-1
+                            -right-0.5
+                            -top-0.5
                             flex
                             h-5
                             min-w-5
                             items-center
                             justify-center
                             rounded-full
-                            bg-red-500
+                            bg-blue-500
                             px-1
                             text-[10px]
                             font-semibold
                             text-white
                         "
                     >
-                        {unread}
+                        {unreadLabel}
                     </span>
 
                 )}
@@ -175,9 +156,10 @@ export default function NavbarNotifications() {
                         overflow-hidden
                         rounded-2xl
                         border
-                        border-slate-700
-                        bg-slate-900
+                        border-[#3f3f3f]
+                        bg-[#181818]
                         shadow-2xl
+                        
                     "
                 >
 
@@ -187,144 +169,117 @@ export default function NavbarNotifications() {
                             items-center
                             justify-between
                             border-b
-                            border-slate-700
+                            border-[#3f3f3f]
                             px-5
                             py-4
                         "
                     >
 
-                        <h3
-                            className="
-                                text-lg
-                                font-semibold
-                                text-white
-                            "
-                        >
+                        <h3 className="text-base font-semibold text-white">
                             Notifications
                         </h3>
 
-                        <button
-                            className="
-                                flex
-                                items-center
-                                gap-2
-                                text-xs
-                                text-blue-400
-                                hover:text-blue-300
-                            "
-                        >
-
-                            <CheckCheck size={15} />
-
-                            Mark all read
-
-                        </button>
-
-                    </div>
-
-                    <div
-                        className="
-                            max-h-[450px]
-                            overflow-y-auto
-                        "
-                    >
-
-                        {notifications.map(notification => (
+                        {unread > 0 && (
 
                             <button
-                                key={notification.id}
-                                className={`
+                                className="
                                     flex
-                                    w-full
-                                    gap-4
-                                    px-5
-                                    py-4
-                                    text-left
+                                    items-center
+                                    gap-1.5
+                                    text-xs
+                                    font-medium
+                                    text-[#3ea6ff]
                                     transition
-                                    hover:bg-slate-800
-                                    ${
-                                        !notification.read
-                                            ? "bg-slate-800/40"
-                                            : ""
-                                    }
-                                `}
+                                    hover:text-white
+                                "
                             >
-
-                                <div
-                                    className="
-                                        mt-1
-                                        text-blue-400
-                                    "
-                                >
-                                    {getIcon(notification.type)}
-                                </div>
-
-                                <div className="flex-1">
-
-                                    <p
-                                        className="
-                                            font-medium
-                                            text-white
-                                        "
-                                    >
-                                        {notification.title}
-                                    </p>
-
-                                    <p
-                                        className="
-                                            mt-1
-                                            text-sm
-                                            text-slate-400
-                                        "
-                                    >
-                                        {notification.description}
-                                    </p>
-
-                                    <p
-                                        className="
-                                            mt-2
-                                            text-xs
-                                            text-slate-500
-                                        "
-                                    >
-                                        {notification.time}
-                                    </p>
-
-                                </div>
-
-                                {!notification.read && (
-
-                                    <div
-                                        className="
-                                            mt-2
-                                            h-2
-                                            w-2
-                                            rounded-full
-                                            bg-blue-500
-                                        "
-                                    />
-
-                                )}
-
+                                <CheckCheck size={15} />
+                                Mark all read
                             </button>
 
-                        ))}
+                        )}
 
                     </div>
+
+                    {notifications.length === 0 ? (
+
+                        <div className="px-5 py-12 text-center">
+
+                            <Bell size={28} className="mx-auto mb-3 text-[#5a5a5a]" />
+
+                            <p className="text-sm text-[#aaaaaa]">
+                                You&rsquo;re all caught up
+                            </p>
+
+                        </div>
+
+                    ) : (
+
+                        <div className="max-h-[420px] overflow-y-auto">
+
+                            {notifications.map((notification) => (
+
+                                <button
+                                    key={notification.id}
+                                    className={`
+                                        flex
+                                        w-full
+                                        gap-4
+                                        px-5
+                                        py-4
+                                        text-left
+                                        transition
+                                        hover:bg-[#272727]
+                                        ${!notification.read ? "bg-[#272727]/40" : ""}
+                                    `}
+                                >
+
+                                    <div className="mt-0.5 text-[#3ea6ff]">
+                                        {TYPE_ICON[notification.type]}
+                                    </div>
+
+                                    <div className="min-w-0 flex-1">
+
+                                        <p className="truncate text-sm font-medium text-white">
+                                            {notification.title}
+                                        </p>
+
+                                        <p className="mt-0.5 line-clamp-2 text-xs text-[#aaaaaa]">
+                                            {notification.description}
+                                        </p>
+
+                                        <p className="mt-1.5 text-[11px] text-[#717171]">
+                                            {notification.time}
+                                        </p>
+
+                                    </div>
+
+                                    {!notification.read && (
+                                        <div className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[#3ea6ff]" />
+                                    )}
+
+                                </button>
+
+                            ))}
+
+                        </div>
+
+                    )}
 
                     <Link
                         href="/dashboard/notifications"
+                        onClick={() => setOpen(false)}
                         className="
                             block
                             border-t
-                            border-slate-700
-                            py-4
+                            border-[#3f3f3f]
+                            py-3.5
                             text-center
                             text-sm
                             font-medium
-                            text-blue-400
+                            text-[#3ea6ff]
                             transition
-                            hover:bg-slate-800
+                            hover:bg-[#272727]
                         "
                     >
                         View all notifications

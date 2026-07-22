@@ -10,11 +10,14 @@ interface NavbarProfileProps {
 }
 
 export default function NavbarProfile({
+    onMenuOpen,
 }: NavbarProfileProps) {
     return (
         <div className="relative">
-            <div  
+            <button
+                type="button"
                 aria-label="Open profile menu"
+                onClick={onMenuOpen}
                 className="
                     flex
                     items-center
@@ -31,7 +34,7 @@ export default function NavbarProfile({
                     size={16}
                     className="text-slate-400"
                 />
-            </div>
+            </button>
         </div>
     );
 }
