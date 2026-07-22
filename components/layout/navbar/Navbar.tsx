@@ -9,6 +9,7 @@ import NavbarNotifications from "./NavbarNotification";
 import NavbarProfile from "./NavbarProfile";
 import NavbarMobile from "./NavbarMobile";
 import NavbarMobileMenu from "./NavbarMobileMenu";
+import { ArrowLeft } from "lucide-react";
 
 export default function Navbar() {
 
@@ -86,7 +87,7 @@ export default function Navbar() {
                                 flex
                                 shrink-0
                                 items-center
-                                gap-2
+                                gap-5
                             "
                         >
 
@@ -105,8 +106,6 @@ export default function Navbar() {
                 <div
                     className="
                         hidden
-                        border-b
-                        border-[#3f3f3f]/60
                         lg:block
                     "
                 >
@@ -146,34 +145,29 @@ export default function Navbar() {
                         inset-0
                         z-[60]
                         bg-[#0f0f0f]
-                        p-6
+                        p-4
                         lg:hidden
                     "
                 >
-
-                    <div className="mb-6 flex justify-end">
-
+                    <div className="flex items-center gap-3">
                         <button
                             onClick={() => setSearchOpen(false)}
                             className="
                                 rounded-full
                                 bg-[#272727]
-                                px-4
-                                py-2
-                                text-sm
-                                font-medium
+                                p-2
                                 text-white
                                 transition
                                 hover:bg-[#3f3f3f]
                             "
                         >
-                            Close
+                            <ArrowLeft size={20} />
                         </button>
 
+                        <div className="flex-1">
+                            <NavbarSearch />
+                        </div>
                     </div>
-
-                    <NavbarSearch />
-
                 </div>
 
             )}

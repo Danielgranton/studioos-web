@@ -1,6 +1,9 @@
 "use client";
 
-import { Menu, Search } from "lucide-react";
+import { Search } from "lucide-react";
+import NavbarLogo from "./NavbarLogo";
+import NavbarNotifications from "./NavbarNotification";
+import NavbarProfile from "./NavbarProfile";
 
 interface NavbarMobileProps {
 
@@ -29,32 +32,7 @@ export default function NavbarMobile({
             "
         >
 
-            <button
-                onClick={onMenuOpen}
-                className="
-                    rounded-lg
-                    p-2
-                    transition
-                    hover:bg-slate-800
-                "
-            >
-
-                <Menu
-                    size={24}
-                    className="text-white"
-                />
-
-            </button>
-
-            <h1
-                className="
-                    text-xl
-                    font-bold
-                    text-white
-                "
-            >
-                StudioOS
-            </h1>
+            <NavbarLogo/>
 
             <button
                 onClick={onSearchOpen}
@@ -72,6 +50,10 @@ export default function NavbarMobile({
                 />
 
             </button>
+
+            <NavbarNotifications />
+            
+            <NavbarProfile onMenuOpen={onMenuOpen} />
 
         </div>
 

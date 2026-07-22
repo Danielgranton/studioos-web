@@ -46,7 +46,7 @@ export default function SearchResults({
                 >
 
                     <Image
-                        src={item.imageUrl || "/images/avatar.png"}
+                        src={"/images/avatar.png"}
                         alt={item.title}
                         width={40}
                         height={40}

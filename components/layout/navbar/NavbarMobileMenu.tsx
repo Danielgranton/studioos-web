@@ -12,8 +12,6 @@ import {
 
     Mic2,
 
-    Music2,
-
     ShoppingBag,
 
     LayoutDashboard,
@@ -25,8 +23,12 @@ import {
     Settings,
 
     LogOut,
+    
+    CircleHelp,
+    User2
 
 } from "lucide-react";
+import Image from "next/image";
 
 interface NavbarMobileMenuProps {
 
@@ -72,7 +74,7 @@ export default function NavbarMobileMenu({
                     h-screen
                     w-80
                     flex-col
-                    bg-slate-900
+                    bg-[#0f0f0f]/95
                     shadow-2xl
                     lg:hidden
                 "
@@ -88,16 +90,13 @@ export default function NavbarMobileMenu({
                         p-6
                     "
                 >
-
-                    <h2
-                        className="
-                            text-xl
-                            font-bold
-                            text-white
-                        "
-                    >
-                        StudioOS
-                    </h2>
+                    <Image
+                        src="/images/logo1.png"
+                        alt="Studioos logo"
+                        width={40}
+                        height={40}
+                        priority
+                    />
 
                     <button
                         onClick={onClose}
@@ -122,9 +121,9 @@ export default function NavbarMobileMenu({
 
                     <MenuItem href="/producers" icon={<Mic2 size={20}/>}>Producers</MenuItem>
 
-                    <MenuItem href="/beats" icon={<Music2 size={20}/>}>Beats</MenuItem>
+                    <MenuItem href="/marketplace" icon={<ShoppingBag size={20}/>}>Beat Marketplace</MenuItem>
 
-                    <MenuItem href="/marketplace" icon={<ShoppingBag size={20}/>}>Marketplace</MenuItem>
+                    <MenuItem href="/helpcenter" icon={<CircleHelp size={18}/>}> Help Center </MenuItem>
 
                     <div className="my-4 border-t border-slate-700"/>
 
@@ -135,6 +134,8 @@ export default function NavbarMobileMenu({
                     <MenuItem href="/dashboard/sessions" icon={<Calendar size={20}/>}>Sessions</MenuItem>
 
                     <MenuItem href="/dashboard/settings" icon={<Settings size={20}/>}>Settings</MenuItem>
+
+                    <MenuItem href="/dashboard/profile" icon= {<User2 size={20}/>} >Profile</MenuItem>
 
                 </nav>
 

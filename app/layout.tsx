@@ -36,7 +36,7 @@ export default function RootLayout({
             <body
                 className="
                     min-h-screen
-                    bg-slate-950
+                    
                     text-white
                     antialiased
                 "

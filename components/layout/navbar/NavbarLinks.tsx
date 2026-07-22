@@ -7,8 +7,12 @@ const NAV_LINKS = [
     { label: "Explore", href: "/explore" },
     { label: "Studios", href: "/studios" },
     { label: "Producers", href: "/producers" },
-    { label: "Beats", href: "/beats" },
-    { label: "Beat Store", href: "/marketplace" },
+    { label: "Beat Marketplace", href: "/marketplace" },
+    { label: "Services", href: "/services" },
+    { label: "Bookings", href: "/bookings" },
+    { label: "Sponsored" , href: "sponsored"},
+    { label: "Help Center", href: "help"},
+    
 ];
 
 export default function NavbarLinks() {
