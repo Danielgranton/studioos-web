@@ -2,6 +2,10 @@ import Link from "next/link";
 
 const NAV_LINKS = [
     {
+        label : "Explore",
+        href : "/explore",
+    },
+    {
         label : "studios",
         href : "/studios", 
     },
@@ -16,10 +20,6 @@ const NAV_LINKS = [
     {
         label : "Beat Store",
         href : "/marketplace",
-    },
-    {
-        label : "pricing",
-        href : "/pricing",
     },
 ];
 

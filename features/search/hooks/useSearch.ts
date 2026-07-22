@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import SearchService from "../services/search.service";
+import SearchCache from "../cache/SearchCache";
 
 import {
     AutocompleteSuggestion,
@@ -10,7 +11,7 @@ import {
 } from "../types/search";
 
 export default function useSearch() {
-    
+
     // State
 
     const [query, setQuery] = useState("");
@@ -35,10 +36,32 @@ export default function useSearch() {
 
     const search = useCallback(async (value: string) => {
 
-        if (value.trim().length === 0) {
+        const normalized = value.trim();
+
+        if (!normalized) {
+
             setResults(null);
+
             setSuggestions([]);
+
             return;
+
+        }
+
+        // Check cache first
+
+        const cached = SearchCache.get(normalized);
+
+        if (cached) {
+
+            setResults(cached.results);
+
+            setSuggestions(cached.suggestions);
+
+            setError(null);
+
+            return;
+
         }
 
         try {
@@ -47,21 +70,41 @@ export default function useSearch() {
 
             setError(null);
 
-            const [searchResults, searchSuggestions] = await Promise.all([
+            const [
+
+                searchResults,
+
+                searchSuggestions,
+
+            ] = await Promise.all([
 
                 SearchService.search({
-                    q: value,
+                    q: normalized,
                 }),
 
-                SearchService.suggestions(value),
+                SearchService.suggestions(normalized),
 
             ]);
+
+            // Save to cache
+
+            SearchCache.set(
+
+                normalized,
+
+                searchResults,
+
+                searchSuggestions,
+
+            );
 
             setResults(searchResults);
 
             setSuggestions(searchSuggestions);
 
-        } catch {
+        } catch (err) {
+
+            console.error(err);
 
             setError("Failed to search.");
 
@@ -85,7 +128,7 @@ export default function useSearch() {
 
         debounceRef.current = setTimeout(() => {
 
-            search(query);
+            void search(query);
 
         }, 300);
 
@@ -144,4 +187,5 @@ export default function useSearch() {
         clear,
 
     };
+
 }

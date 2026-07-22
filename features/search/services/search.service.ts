@@ -3,7 +3,7 @@ import api from "@/lib/axios";
 import {
     AdvertisementSearchResult,
     AutocompleteSuggestion,
-    BeatSearchRequst,
+    BeatSearchRequest,
     BeatSearchResult,
     ProducerSearchResult,
     RecentSearch,
@@ -13,57 +13,82 @@ import {
     StudioSearchRequest,
     StudioSearchResult,
     TrendingSearch,
-} from "../types/search"
+} from "../types/search";
 
 class SearchService {
 
-    // global search 
+    // Global Search
     async search(request: SearchRequest): Promise<SearchResponse> {
-        const response = await api.get<SearchResponse>("/search", { params: request ,});
+
+        const response = await api.get<SearchResponse>(
+            "/search",
+            {
+                params: request,
+            }
+        );
+
+        console.log("Search response:", response.data);
 
         return response.data;
     }
 
-    // suggetions 
-    async suggestions(q: string): Promise<AutocompleteSuggestion[]>{
+    // Suggestions
+    async suggestions(q: string): Promise<AutocompleteSuggestion[]> {
+
         const response = await api.get<AutocompleteSuggestion[]>(
-            "/search/suggetions", { params: {q}, }
+            "/search/suggestions",
+            {
+                params: { q },
+            }
         );
 
         return response.data;
     }
 
-    // studios 
-    async studios(request: StudioSearchRequest): Promise<StudioSearchResult[]> {
+    // Studios
+    async studios(
+        request: StudioSearchRequest,
+    ): Promise<StudioSearchResult[]> {
+
         const response = await api.get<StudioSearchResult[]>(
-            "/search/studios", { params: request ,}
+            "/search/studios",
+            {
+                params: request,
+            }
         );
 
         return response.data;
     }
 
-    // beats
-    async beats(request: BeatSearchRequst): Promise<BeatSearchResult[]>{
+    // Beats
+    async beats(
+        request: BeatSearchRequest,
+    ): Promise<BeatSearchResult[]> {
+
         const response = await api.get<BeatSearchResult[]>(
-            "/search/beats", { params: request, }
+            "/search/beats",
+            {
+                params: request,
+            }
         );
 
         return response.data;
     }
 
-    // producers
+    // Producers
     async producers(
         q?: string,
         page = 0,
-        size = 20
+        size = 20,
     ): Promise<ProducerSearchResult[]> {
-        const response = await api.get<ProducerSearchResult[]> (
+
+        const response = await api.get<ProducerSearchResult[]>(
             "/search/producers",
             {
                 params: {
                     q,
                     page,
-                    size
+                    size,
                 },
             }
         );
@@ -71,20 +96,20 @@ class SearchService {
         return response.data;
     }
 
-    // advertisement
+    // Advertisements
     async advertisement(
         q?: string,
         page = 0,
         size = 20,
     ): Promise<AdvertisementSearchResult[]> {
-        const response = await api.get<AdvertisementSearchResult[]> (
-            "search/advertisements",
+
+        const response = await api.get<AdvertisementSearchResult[]>(
+            "/search/advertisements",
             {
                 params: {
                     q,
                     page,
                     size,
-
                 },
             }
         );
@@ -92,12 +117,13 @@ class SearchService {
         return response.data;
     }
 
-    // trending
+    // Trending
     async trending(
         entityType: SearchEntityType,
-        limit = 10
+        limit = 10,
     ): Promise<TrendingSearch[]> {
-        const response = await api.get<TrendingSearch[]> (
+
+        const response = await api.get<TrendingSearch[]>(
             "/search/trending",
             {
                 params: {
@@ -110,22 +136,25 @@ class SearchService {
         return response.data;
     }
 
-    // recent search 
+    // Recent Searches
     async recent(): Promise<RecentSearch[]> {
-        const response = await api.get<RecentSearch[]> (
+
+        const response = await api.get<RecentSearch[]>(
             "/search/recent"
         );
 
         return response.data;
     }
 
-    // clear recent 
+    // Clear Recent Searches
     async clearRecent(): Promise<void> {
+
         await api.delete("/search/recent");
     }
 
-    // reindex
-    async reindex(){
+    // Reindex Search
+    async reindex(): Promise<unknown> {
+
         const response = await api.post(
             "/search/reindex"
         );

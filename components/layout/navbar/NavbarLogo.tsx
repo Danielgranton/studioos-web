@@ -10,7 +10,7 @@ export default function NavbarLogo() {
             aria-label="StudioOS Home"
         >
             <Image
-                src="/images/logo.svg"
+                src="/images/logo.png"
                 alt="Studioos logo"
                 width={40}
                 height={40}

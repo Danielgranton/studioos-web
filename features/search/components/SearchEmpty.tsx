@@ -14,13 +14,9 @@ export default function SearchEmpty({
 
     if (!results) return null;
 
-    const hasResults =
-        results.studios.length > 0 ||
-        results.producers.length > 0 ||
-        results.beats.length > 0 ||
-        results.advertisements.length > 0;
-
-    if (hasResults) return null;
+    if (results.results.length > 0) {
+        return null;
+    }
 
     return (
         <div className="p-10 text-center">
@@ -30,7 +26,10 @@ export default function SearchEmpty({
             </p>
 
             <p className="mt-2 text-sm text-slate-400">
-                No matches for <span className="font-medium text-white">&ldquo;{query}&rdquo;</span>
+                No matches for{" "}
+                <span className="font-medium text-white">
+                    &ldquo;{query}&rdquo;
+                </span>
             </p>
 
         </div>

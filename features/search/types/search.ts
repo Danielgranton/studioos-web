@@ -1,118 +1,101 @@
+export enum SearchEntityType {
+    STUDIO = "STUDIO",
+    PRODUCER = "PRODUCER",
+    BEAT = "BEAT",
+    ADVERTISEMENT = "ADVERTISEMENT",
+    PROJECT = "PROJECT",
+    SESSION = "SESSION",
+    USER = "USER",
+}
 
 export interface SearchRequest {
-    q: string;
-    page? : number;
-    size? :number;
+    q?: string;
+    page?: number;
+    size?: number;
 }
 
-export interface StudioSearchRequest extends SearchRequest {
-    city?: string;
-    county?: string;
-    verified?: boolean;
+export interface SearchResultItem {
+    entityType: SearchEntityType;
+    id: string;
+    title: string;
+    subtitle: string;
+    score: number;
+    image?: string;
+    href?: string;
 }
 
-export interface BeatSearchRequst extends SearchRequest {
-    genre?: string;
-    bmpMin?: number;
-    bmpMax?: number;
-    minPrice?: number;
-    maxprice?: number;
-}
-
-export interface SearchPagination {
-    page : number;
-    size : number;
-    totalElements : number;
-    totalPages: number;
+export interface SearchResponse {
+    results: SearchResultItem[];
+    page: number;
+    size: number;
+    total: number;
 }
 
 export interface AutocompleteSuggestion {
-    id: string;
-    title: string;
-    type: SearchEntityType;
+    value: string;
+    entityType: SearchEntityType;
 }
 
 export interface RecentSearch {
     id: string;
     query: string;
-    searchedAt: string;
+    entityType: SearchEntityType;
 }
 
 export interface TrendingSearch {
-    keyword: string;
-    searchCount: number;
+    title: string;
     entityType: SearchEntityType;
+    score: number;
+}
+
+/* ---------- Entity Search DTOs ---------- */
+
+export interface StudioSearchRequest {
+    q?: string;
+    page?: number;
+    size?: number;
 }
 
 export interface StudioSearchResult {
     id: string;
-    name: string;
-    slug: string;
-
-    city: string;
-    county: string;
-
-    verified: boolean;
-
-    rating: number;
-
-    coverImage: string;
+    studioName: string;
+    location: string;
+    pricing: number;
+    averageRating: number;
+    score: number;
 }
 
-export interface ProducerSearchResult {
-    id: string;
-
-    name: string;
-
-    username: string;
-
-    verified: boolean;
-
-    profilePicture: string;
+export interface BeatSearchRequest {
+    q?: string;
+    page?: number;
+    size?: number;
 }
 
 export interface BeatSearchResult {
     id: string;
-
     title: string;
-
     producerName: string;
-
-    coverImage: string;
-
-    genre: string;
-
-    bpm: number;
-
     price: number;
+    genre: string;
+    coverImage: string;
+    score: number;
+}
+
+export interface ProducerSearchResult {
+    id: number;
+    name: string;
+    location: string;
+    genre: string;
+    bio: string;
+    profileImage: string;
+    averageRating: number;
+    reviewCount: number;
+    score: number;
 }
 
 export interface AdvertisementSearchResult {
     id: string;
-
     title: string;
-
-    thumbnail: string;
-
-    redirectUrl: string;
-}
-
-export interface SearchResponse {
-    studios: StudioSearchResult[];
-
-    producers: ProducerSearchResult[];
-
-    beats: BeatSearchResult[];
-
-    advertisements: AdvertisementSearchResult[];
-}
-
-export enum SearchEntityType {
-    STUDIO = "STUDIO",
-
-    PRODUCER = "PRODUCER",
-
-    BEAT = "BEAT",
-
-    ADVERTISEMENT = "ADVERTISEMENT",
+    company: string;
+    score: number;
 }
