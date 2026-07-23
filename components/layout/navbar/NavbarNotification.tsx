@@ -175,7 +175,8 @@ export default function NavbarNotifications() {
                         "
                     >
 
-                        <h3 className="text-base font-semibold text-white">
+                        <h3 className="text-base flex gap-2 font-semibold text-white">
+                            <Bell size={20} className="text-green-600"/>
                             Notifications
                         </h3>
 
