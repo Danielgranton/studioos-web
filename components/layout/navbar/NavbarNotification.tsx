@@ -215,7 +215,7 @@ export default function NavbarNotifications() {
 
                     ) : (
 
-                        <div className="max-h-[420px] overflow-y-auto">
+                        <div className="max-h-[420px] overflow-y-auto no-scrollbar">
 
                             {notifications.map((notification) => (
 

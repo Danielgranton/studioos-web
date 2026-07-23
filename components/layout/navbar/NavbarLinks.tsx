@@ -3,16 +3,26 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import {
+    Compass,
+    Building2,
+    Mic2,
+    ShoppingBag,
+    Wrench,
+    CalendarCheck,
+    Megaphone,
+    CircleHelp,
+} from "lucide-react";
+
 const NAV_LINKS = [
-    { label: "Explore", href: "/explore" },
-    { label: "Studios", href: "/studios" },
-    { label: "Producers", href: "/producers" },
-    { label: "Beat Marketplace", href: "/marketplace" },
-    { label: "Services", href: "/services" },
-    { label: "Bookings", href: "/bookings" },
-    { label: "Sponsored" , href: "sponsored"},
-    { label: "Help Center", href: "help"},
-    
+    { label: "Explore", href: "/explore", icon: Compass },
+    { label: "Studios", href: "/studios", icon: Building2 },
+    { label: "Producers", href: "/producers", icon: Mic2 },
+    { label: "Beat Marketplace", href: "/marketplace", icon: ShoppingBag },
+    { label: "Services", href: "/services", icon: Wrench },
+    { label: "Bookings", href: "/bookings", icon: CalendarCheck },
+    { label: "Sponsored", href: "/sponsored", icon: Megaphone },
+    { label: "Help Center", href: "/help", icon: CircleHelp },
 ];
 
 export default function NavbarLinks() {
@@ -25,11 +35,16 @@ export default function NavbarLinks() {
 
                 const active = pathname === link.href || pathname.startsWith(link.href + "/");
 
+                const Icon = link.icon;
+
                 return (
                     <Link
                         key={link.href}
                         href={link.href}
                         className={`
+                            flex
+                            items-center
+                            gap-1.5
                             rounded-full
                             px-4
                             py-1.5
@@ -43,6 +58,7 @@ export default function NavbarLinks() {
                             }
                         `}
                     >
+                        <Icon size={16} className="text-blue-500" />
                         {link.label}
                     </Link>
                 );

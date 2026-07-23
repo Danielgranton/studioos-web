@@ -1,59 +1,64 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, Menu } from "lucide-react";
+
 import NavbarLogo from "./NavbarLogo";
 import NavbarNotifications from "./NavbarNotification";
 import NavbarProfile from "./NavbarProfile";
 
 interface NavbarMobileProps {
-
     onMenuOpen: () => void;
-
     onSearchOpen: () => void;
-
 }
 
 export default function NavbarMobile({
-
     onMenuOpen,
-
     onSearchOpen,
-
 }: NavbarMobileProps) {
 
     return (
 
-        <div
-            className="
-                flex
-                items-center
-                justify-between
-                lg:hidden
-            "
-        >
+        <div className="flex w-full items-center justify-between">
 
-            <NavbarLogo/>
+            <div className="flex items-center gap-1">
 
-            <button
-                onClick={onSearchOpen}
-                className="
-                    rounded-lg
-                    p-2
-                    transition
-                    hover:bg-slate-800
-                "
-            >
+                <button
+                    onClick={onMenuOpen}
+                    aria-label="Open navigation menu"
+                    className="
+                        rounded-full
+                        p-2
+                        transition
+                        hover:bg-[#272727]
+                    "
+                >
+                    <Menu size={22} className="text-[#f1f1f1]" />
+                </button>
 
-                <Search
-                    size={22}
-                    className="text-white"
-                />
+                <NavbarLogo compact />
 
-            </button>
+            </div>
 
-            <NavbarNotifications />
-            
-            <NavbarProfile onMenuOpen={onMenuOpen} />
+            <div className="flex items-center gap-1">
+
+                <button
+                    onClick={onSearchOpen}
+                    aria-label="Search"
+                    className="
+                        rounded-full
+                        p-2
+                        transition
+                        hover:bg-[#272727]
+                    "
+                >
+                    <Search size={20} className="text-[#f1f1f1]" />
+                </button>
+
+                <NavbarNotifications />
+
+                <NavbarProfile />
+
+            </div>
 
         </div>
 

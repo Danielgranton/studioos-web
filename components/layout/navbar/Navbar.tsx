@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import NavbarLogo from "./NavbarLogo";
 import NavbarLinks from "./NavbarLinks";
@@ -9,30 +9,46 @@ import NavbarNotifications from "./NavbarNotification";
 import NavbarProfile from "./NavbarProfile";
 import NavbarMobile from "./NavbarMobile";
 import NavbarMobileMenu from "./NavbarMobileMenu";
-import { ArrowLeft } from "lucide-react";
 
-interface MenuProps {
-    onMenuOpen: () => void;
-}
+// Centralized so every overlay in the app can be reasoned about relative to each other.
+const Z = {
+    header: "z-50",
+    mobileSearch: "z-[60]",
+} as const;
 
-export default function Navbar({onMenuOpen}: MenuProps) {
+export default function Navbar() {
 
-    const [mobileOpen, setMobileOpen] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
 
     const [searchOpen, setSearchOpen] = useState(false);
+
+    // Close the mobile search overlay on Escape for keyboard users.
+    useEffect(() => {
+
+        if (!searchOpen) return;
+
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setSearchOpen(false);
+        };
+
+        window.addEventListener("keydown", onKeyDown);
+
+        return () => window.removeEventListener("keydown", onKeyDown);
+
+    }, [searchOpen]);
 
     return (
 
         <>
 
             <header
-                className="
+                className={`
                     sticky
                     top-0
-                    z-50
+                    ${Z.header}
                     bg-[#0f0f0f]/95
                     backdrop-blur-xl
-                "
+                `}
             >
 
                 {/* Row 1 — Logo / Search / Actions */}
@@ -55,7 +71,7 @@ export default function Navbar({onMenuOpen}: MenuProps) {
                     <div className="w-full lg:hidden">
 
                         <NavbarMobile
-                            onMenuOpen={() => setMobileOpen(true)}
+                            onMenuOpen={() => setMenuOpen(true)}
                             onSearchOpen={() => setSearchOpen(true)}
                         />
 
@@ -91,13 +107,13 @@ export default function Navbar({onMenuOpen}: MenuProps) {
                                 flex
                                 shrink-0
                                 items-center
-                                gap-5
+                                gap-2
                             "
                         >
 
                             <NavbarNotifications />
 
-                            <NavbarProfile onMenuOpen={onMenuOpen}/>
+                            <NavbarProfile />
 
                         </div>
 
@@ -107,9 +123,12 @@ export default function Navbar({onMenuOpen}: MenuProps) {
 
                 {/* Row 2 — Nav links */}
 
-                <div
+                <nav
+                    aria-label="Primary"
                     className="
                         hidden
+                        border-b
+                        border-[#3f3f3f]/60
                         lg:block
                     "
                 >
@@ -130,13 +149,13 @@ export default function Navbar({onMenuOpen}: MenuProps) {
 
                     </div>
 
-                </div>
+                </nav>
 
             </header>
 
             <NavbarMobileMenu
-                open={mobileOpen}
-                onClose={() => setMobileOpen(false)}
+                open={menuOpen}
+                onClose={() => setMenuOpen(false)}
             />
 
             {/* Mobile Search */}
@@ -144,34 +163,42 @@ export default function Navbar({onMenuOpen}: MenuProps) {
             {searchOpen && (
 
                 <div
-                    className="
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Search"
+                    className={`
                         fixed
                         inset-0
-                        z-[60]
+                        ${Z.mobileSearch}
                         bg-[#0f0f0f]
-                        p-4
+                        p-6
                         lg:hidden
-                    "
+                    `}
                 >
-                    <div className="flex items-center gap-3">
+
+                    <div className="mb-6 flex justify-end">
+
                         <button
                             onClick={() => setSearchOpen(false)}
                             className="
                                 rounded-full
                                 bg-[#272727]
-                                p-2
+                                px-4
+                                py-2
+                                text-sm
+                                font-medium
                                 text-white
                                 transition
                                 hover:bg-[#3f3f3f]
                             "
                         >
-                            <ArrowLeft size={20} />
+                            Close
                         </button>
 
-                        <div className="flex-1">
-                            <NavbarSearch />
-                        </div>
                     </div>
+
+                    <NavbarSearch />
+
                 </div>
 
             )}

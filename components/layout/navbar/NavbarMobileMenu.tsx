@@ -11,13 +11,10 @@ import {
     Building2,
     Mic2,
     ShoppingBag,
-    LayoutDashboard,
-    FolderKanban,
-    Calendar,
-    Settings,
-    LogOut,
+    Wrench,
+    CalendarCheck,
+    Megaphone,
     CircleHelp,
-    User2,
 } from "lucide-react";
 
 interface NavbarMobileMenuProps {
@@ -26,19 +23,14 @@ interface NavbarMobileMenuProps {
 }
 
 const BROWSE_LINKS = [
-    { href: "/", label: "Explore", icon: <Compass size={20} /> },
-    { href: "/studios", label: "Studios", icon: <Building2 size={20} /> },
-    { href: "/producers", label: "Producers", icon: <Mic2 size={20} /> },
-    { href: "/marketplace", label: "Beat Marketplace", icon: <ShoppingBag size={20} /> },
-    { href: "/helpcenter", label: "Help Center", icon: <CircleHelp size={20} /> },
-];
-
-const DASHBOARD_LINKS = [
-    { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
-    { href: "/dashboard/projects", label: "Projects", icon: <FolderKanban size={20} /> },
-    { href: "/dashboard/sessions", label: "Sessions", icon: <Calendar size={20} /> },
-    { href: "/dashboard/profile", label: "Profile", icon: <User2 size={20} /> },
-    { href: "/dashboard/settings", label: "Settings", icon: <Settings size={20} /> },
+    { href: "/explore", label: "Explore", icon: <Compass size={20} className="text-blue-500" /> },
+    { href: "/studios", label: "Studios", icon: <Building2 size={20} className="text-blue-500" /> },
+    { href: "/producers", label: "Producers", icon: <Mic2 size={20} className="text-blue-500" /> },
+    { href: "/marketplace", label: "Beat Marketplace", icon: <ShoppingBag size={20} className="text-blue-500" /> },
+    { href: "/services", label: "Services", icon: <Wrench size={20} className="text-blue-500" /> },
+    { href: "/bookings", label: "Bookings", icon: <CalendarCheck size={20} className="text-blue-500" /> },
+    { href: "/sponsored", label: "Sponsored", icon: <Megaphone size={20} className="text-blue-500" /> },
+    { href: "/help", label: "Help Center", icon: <CircleHelp size={20} className="text-blue-500" /> },
 ];
 
 export default function NavbarMobileMenu({
@@ -48,22 +40,30 @@ export default function NavbarMobileMenu({
 
     const pathname = usePathname();
 
-    // Lock body scroll while the drawer is open
+    // Lock body scroll while the drawer is open, compensating for the
+    // scrollbar's width so page content doesn't shift when it disappears.
     useEffect(() => {
 
         if (open) {
+
+            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
             document.body.style.overflow = "hidden";
+            document.body.style.paddingRight = `${scrollbarWidth}px`;
+
         } else {
+
             document.body.style.overflow = "";
+            document.body.style.paddingRight = "";
+
         }
 
         return () => {
             document.body.style.overflow = "";
+            document.body.style.paddingRight = "";
         };
 
     }, [open]);
-
-    if (!open) return null;
 
     return (
 
@@ -72,37 +72,44 @@ export default function NavbarMobileMenu({
             <div
                 onClick={onClose}
                 aria-hidden="true"
-                className="
+                className={`
                     fixed
                     inset-0
                     z-40
                     bg-black/60
                     backdrop-blur-sm
+                    transition-opacity
+                    duration-300
+                    ease-out
                     lg:hidden
-                "
+                    ${open ? "opacity-100" : "pointer-events-none opacity-0"}
+                `}
             />
 
             <aside
                 role="dialog"
                 aria-modal="true"
+                aria-hidden={!open}
                 aria-label="Navigation menu"
-                className="
+                className={`
                     fixed
-                    right-0
+                    left-0
                     top-0
-                    z-50
+                    z-70
                     flex
                     h-screen
-                    w-80
+                    w-60
                     max-w-[85vw]
                     flex-col
                     bg-[#0f0f0f]
                     shadow-2xl
+                    transition-transform
+                    duration-300
+                    ease-out
+                    will-change-transform
                     lg:hidden
-                    animate-in
-                    slide-in-from-left
-                    duration-200
-                "
+                    ${open ? "translate-x-0" : "-translate-x-full"}
+                `}
             >
 
                 <div
@@ -117,7 +124,7 @@ export default function NavbarMobileMenu({
                 >
 
                     <Image
-                        src="/images/logo1.png"
+                        src="/images/logo.png"
                         alt="StudioOS logo"
                         width={36}
                         height={36}
@@ -147,22 +154,6 @@ export default function NavbarMobileMenu({
                                 key={link.href}
                                 href={link.href}
                                 icon={link.icon}
-                                active={pathname === link.href}
-                                onNavigate={onClose}
-                            >
-                                {link.label}
-                            </MenuItem>
-                        ))}
-                    </MenuSection>
-
-                    <div className="my-3 border-t border-[#3f3f3f]" />
-
-                    <MenuSection label="Your workspace">
-                        {DASHBOARD_LINKS.map((link) => (
-                            <MenuItem
-                                key={link.href}
-                                href={link.href}
-                                icon={link.icon}
                                 active={pathname === link.href || pathname.startsWith(link.href + "/")}
                                 onNavigate={onClose}
                             >
@@ -172,30 +163,6 @@ export default function NavbarMobileMenu({
                     </MenuSection>
 
                 </nav>
-
-                <div className="border-t border-[#3f3f3f] p-3">
-
-                    <button
-                        className="
-                            flex
-                            w-full
-                            items-center
-                            gap-3
-                            rounded-lg
-                            px-4
-                            py-3
-                            text-sm
-                            font-medium
-                            text-red-400
-                            transition
-                            hover:bg-red-500/10
-                        "
-                    >
-                        <LogOut size={20} />
-                        Logout
-                    </button>
-
-                </div>
 
             </aside>
 
