@@ -30,7 +30,7 @@ export default function Hero() {
                     rounded-full
                     bg-blue-600/10
                     blur-[200px]
-                    py-10
+                    
                 "
             />
 
@@ -44,7 +44,6 @@ export default function Hero() {
                     items-center
                     gap-16
                     px-6
-                    py-10
                 "
             >
                 {/* Left */}
