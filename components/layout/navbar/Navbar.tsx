@@ -46,7 +46,7 @@ export default function Navbar() {
                     sticky
                     top-0
                     ${Z.header}
-                    bg-[#0f0f0f]/95
+                    bg-[#0f0f0f]/70
                     backdrop-blur-xl
                 `}
             >

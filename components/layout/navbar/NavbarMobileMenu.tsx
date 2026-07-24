@@ -15,6 +15,7 @@ import {
     CalendarCheck,
     Megaphone,
     CircleHelp,
+    User,
 } from "lucide-react";
 
 interface NavbarMobileMenuProps {
@@ -26,6 +27,7 @@ const BROWSE_LINKS = [
     { href: "/explore", label: "Explore", icon: <Compass size={20} className="text-blue-500" /> },
     { href: "/studios", label: "Studios", icon: <Building2 size={20} className="text-blue-500" /> },
     { href: "/producers", label: "Producers", icon: <Mic2 size={20} className="text-blue-500" /> },
+    { label: "Artists", href: "/artists", icon: <User  size={20} className="text-blue-500"/>},
     { href: "/marketplace", label: "Beat Marketplace", icon: <ShoppingBag size={20} className="text-blue-500" /> },
     { href: "/services", label: "Services", icon: <Wrench size={20} className="text-blue-500" /> },
     { href: "/bookings", label: "Bookings", icon: <CalendarCheck size={20} className="text-blue-500" /> },

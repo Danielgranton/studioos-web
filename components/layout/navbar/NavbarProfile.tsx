@@ -37,10 +37,10 @@ const FALLBACK_USER: NavbarUser = {
 };
 
 const WORKSPACE_LINKS = [
+    { href: "/dashboard/profile", label: "Profile", icon: <User2 size={18} /> },
     { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
     { href: "/dashboard/projects", label: "Projects", icon: <FolderKanban size={18} /> },
     { href: "/dashboard/sessions", label: "Sessions", icon: <Calendar size={18} /> },
-    { href: "/dashboard/profile", label: "Profile", icon: <User2 size={18} /> },
     { href: "/dashboard/settings", label: "Settings", icon: <Settings size={18} /> },
 ];
 

@@ -12,12 +12,14 @@ import {
     CalendarCheck,
     Megaphone,
     CircleHelp,
+    User,
 } from "lucide-react";
 
 const NAV_LINKS = [
     { label: "Explore", href: "/explore", icon: Compass },
     { label: "Studios", href: "/studios", icon: Building2 },
     { label: "Producers", href: "/producers", icon: Mic2 },
+    { label: "Artists", href: "/artists", icon: User},
     { label: "Beat Marketplace", href: "/marketplace", icon: ShoppingBag },
     { label: "Services", href: "/services", icon: Wrench },
     { label: "Bookings", href: "/bookings", icon: CalendarCheck },

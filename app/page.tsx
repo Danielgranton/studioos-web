@@ -6,7 +6,7 @@ export default function HomePage() {
 
     return (
 
-        <div className="p-10 h-screen  bg-[#0f0f0f]/95">
+        <div className="p-10 h-screen  bg-[#0f0f0f]/95 ">
             <Hero/>
             <ExploreSection />
         </div>

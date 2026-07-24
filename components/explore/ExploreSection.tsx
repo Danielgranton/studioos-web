@@ -2,7 +2,7 @@
 "use client";
 
 import ExploreCard from "./ExploreCard";
-import { exporeItems } from "./exploreData";
+import { exploreItems } from "./exploreData";
 
 export default function ExploreSection() {
     return (
@@ -10,82 +10,110 @@ export default function ExploreSection() {
             className="
                 relative
                 overflow-hidden
-                bg-[#0f0f0f]
-                py-28
+                py-15
             "
         >
-            {/* Background Glow */}
+            <div className="mx-auto max-w-[1600px] px-6">
 
-            <div
-                className="
-                    absolute
-                    left-1/2
-                    top-1/2
-                    h-[700px]
-                    w-[700px]
-                    -translate-x-1/2
-                    -translate-y-1/2
-                    rounded-full
-                    bg-blue-600/5
-                    blur-[180px]
-                "
-            />
+                {/* Header */}
 
-            <div
-                className="
-                    relative
-                    mx-auto
-                    max-w-[1600px]
-                    px-6
-                "
-            >
-                {/* Section Header */}
+                <div
+                    className="
+                        mb-10
+                        flex
+                        items-end
+                        justify-between
+                        gap-10
+                    "
+                >
+                    <div className="max-w-2xl">
 
-                <div className="mx-auto mb-16 max-w-3xl text-center">
+                        <span
+                            className="
+                                inline-flex
+                                items-center
+                                rounded-full
+                                border
+                                border-blue-500/20
+                                bg-blue-500/10
+                                px-3
+                                py-1
+                                text-xs
+                                font-medium
+                                uppercase
+                                tracking-widest
+                                text-blue-400
+                            "
+                        >
+                            Explore
+                        </span>
 
-                    <span
-                        className="
-                            inline-flex
-                            items-center
-                            rounded-full
-                            border
-                            border-blue-500/20
-                            bg-blue-500/10
-                            px-4
-                            py-2
-                            text-sm
-                            font-medium
-                            text-blue-400
-                        "
-                    >
-                        🚀 Everything You Need
-                    </span>
+                        <h2
+                            className="
+                                mt-3
+                                text-3xl
+                                font-bold
+                                tracking-tight
+                                text-white
+                                md:text-4xl
+                            "
+                        >
+                            Everything you need to create music.
+                        </h2>
 
-                    <h2
-                        className="
-                            mt-6
-                            text-4xl
-                            font-black
-                            tracking-tight
-                            text-white
-                            md:text-5xl
-                        "
-                    >
-                        Explore the Platform
-                    </h2>
+                        <p
+                            className="
+                                mt-2
+                                max-w-xl
+                                text-sm
+                                leading-7
+                                text-slate-400
+                            "
+                        >
+                            Discover studios, producers, artists, beats,
+                            creative services and promotional tools—all in
+                            one platform.
+                        </p>
 
-                    <p
-                        className="
-                            mt-6
-                            text-lg
-                            leading-8
-                            text-slate-400
-                        "
-                    >
-                        StudioOS brings every part of music creation into one
-                        place—from finding studios and producers to buying
-                        beats and growing your audience.
-                    </p>
+                    </div>
+<div
+    className="
+        hidden
+        lg:flex
+        items-center
+        gap-4
+        rounded-full
+        border
+        border-[#262626]
+        bg-[#171717]
+        px-4
+        py-2
+    "
+>
+    <div className="flex -space-x-2">
+
+        <div className="h-7 w-7 rounded-full border-2 border-[#171717] bg-blue-500" />
+
+        <div className="h-7 w-7 rounded-full border-2 border-[#171717] bg-purple-500" />
+
+        <div className="h-7 w-7 rounded-full border-2 border-[#171717] bg-green-500" />
+
+        <div className="h-7 w-7 rounded-full border-2 border-[#171717] bg-orange-500" />
+
+    </div>
+
+    <div>
+
+        <p className="text-xs font-semibold text-white">
+            Join 250K+ creators
+        </p>
+
+        <p className="text-[11px] text-slate-500">
+            Studios • Artists • Producers
+        </p>
+
+    </div>
+</div>
 
                 </div>
 
@@ -94,19 +122,23 @@ export default function ExploreSection() {
                 <div
                     className="
                         grid
-                        grid-cols-1
-                        gap-8
-                        md:grid-cols-2
+                        gap-5
+                        sm:grid-cols-2
+                        md:grid-cols-3
+                        xl:grid-cols-4
+                        
                     "
                 >
-                    {exporeItems.map((item) => (
+                    {exploreItems.map((item) => (
                         <ExploreCard
                             key={item.title}
                             {...item}
                         />
                     ))}
                 </div>
+
             </div>
         </section>
     );
 }
+
