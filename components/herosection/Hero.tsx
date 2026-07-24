@@ -11,7 +11,14 @@ export default function Hero() {
                 overflow-hidden
                 bg-[#0f0f0f]
             "
+            style={{
+                WebkitMaskImage:
+                    "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
+                maskImage:
+                    "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
+            }}
         >
+            {/* Background Glow */}
             <div
                 className="
                     absolute
@@ -21,7 +28,9 @@ export default function Hero() {
                     w-[900px]
                     -translate-x-1/2
                     rounded-full
+                    bg-blue-600/10
                     blur-[200px]
+                    py-10
                 "
             />
 
@@ -35,19 +44,19 @@ export default function Hero() {
                     items-center
                     gap-16
                     px-6
-                    py-16
+                    py-10
                 "
             >
+                {/* Left */}
                 <div className="w-1/2">
                     <HeroLeft />
                 </div>
 
+                {/* Right */}
                 <div className="hidden h-[600px] w-1/2 lg:block">
                     <HeroAds />
                 </div>
-
             </div>
-
         </section>
     );
 }

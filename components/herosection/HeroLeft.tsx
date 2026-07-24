@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Music2 } from "lucide-react";
+import HeroAudienceToggle from "./HeroAudienceToggle";
 
 const genres = ["Hip-Hop", "Afrobeat", "R&B", "Podcast", "Gospel"];
 
@@ -20,7 +21,7 @@ export default function HeroLeft() {
                     border-blue-500/20
                     bg-blue-500/10
                     px-3
-                    py-1.5
+                    py-1
                     text-xs
                     font-medium
                     text-blue-400
@@ -36,8 +37,8 @@ export default function HeroLeft() {
                     leading-none
                     tracking-tight
                     text-white
-                    md:text-5xl
-                    xl:text-6xl
+                    md:text-4xl
+                    xl:text-4xl
                 "
             >
                 CREATE MUSIC
@@ -109,6 +110,8 @@ export default function HeroLeft() {
                 </Link>
 
             </div>
+
+            <HeroAudienceToggle />
 
             {/* Genre pills */}
             <div className="mt-4 flex flex-wrap gap-2">
@@ -246,9 +249,10 @@ export default function HeroLeft() {
                         className="
                             rounded-xl
                             border
+                            border-b-blue-700
                             border-slate-800
                             bg-[#171717]
-                            p-3.5
+                            p-2
                         "
                     >
                         <p className="text-xl font-bold text-white">
