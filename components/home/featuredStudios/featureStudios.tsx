@@ -37,14 +37,14 @@ export default function FeaturedStudios() {
                                     rounded-full
                                     border
                                     border-blue-500/20
-                                    bg-green-500/10
+                                    bg-blue-500/10
                                     px-2
                                     py-1
                                     text-[9px]
                                     font-semibold
                                     uppercase
                                     tracking-[0.2em]
-                                    text-green-400
+                                    text-blue-400
                                 "
                             >
                                 <span className="relative flex h-1.5 w-1.5">
@@ -56,7 +56,7 @@ export default function FeaturedStudios() {
                                             w-full
                                             animate-ping
                                             rounded-full
-                                            bg-green-400
+                                            bg-blue-400
                                             opacity-60
                                         "
                                     />
@@ -194,14 +194,14 @@ export default function FeaturedStudios() {
                                 justify-center
                                 gap-2
                                 rounded-full
-                                bg-green-600/20
-                                px-3
-                                py-2
+                                bg-blue-600/20
+                                px-5
+                                py-2.5
                                 text-sm
                                 font-semibold
                                 text-white
                                 transition-all
-                                hover:bg-green-700/10
+                                hover:bg-blue-600/10
                                 hover:gap-3
                                 sm:w-auto
                                 sm:justify-start

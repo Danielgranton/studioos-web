@@ -2,11 +2,16 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { useState } from "react";
 
 import BeatCard from "./BeatCard";
 import { trendingBeats } from "./beatData";
 
+const filters = ["All", "Hip-Hop", "Afrobeat", "Trap", "Exclusive"];
+
 export default function TrendingBeats() {
+    const [activeFilter, setActiveFilter] = useState("All");
+
     return (
         <section
             className="
@@ -16,12 +21,18 @@ export default function TrendingBeats() {
         >
             {/* Glow */}
             <div
+                aria-hidden="true"
                 className="
+                    pointer-events-none
                     absolute
                     left-1/2
                     top-1/2
                     h-[700px]
                     w-[700px]
+                    -translate-x-1/2
+                    -translate-y-1/2
+                    rounded-full
+                    bg-emerald-500/[0.06]
                     blur-[180px]
                 "
             />
@@ -177,7 +188,7 @@ export default function TrendingBeats() {
 
                     </div>
 
-                    {/* CTA */}
+                    {/* Right — CTA + filter */}
                     <div
                         className="
                             flex
@@ -200,13 +211,13 @@ export default function TrendingBeats() {
                                 gap-2
                                 rounded-full
                                 bg-emerald-600/20
-                                px-4
+                                px-3
                                 py-2
                                 text-sm
                                 font-semibold
                                 text-white
                                 transition-all
-                                hover:bg-emerald-500/10
+                                hover:bg-emerald-600/10
                                 hover:gap-3
                                 sm:w-auto
                                 sm:justify-start
@@ -219,18 +230,48 @@ export default function TrendingBeats() {
                                 className="transition-transform duration-300 group-hover:translate-x-1"
                             />
                         </Link>
+
+                        {/* Quick filter chips */}
+                        <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                            {filters.map((filter) => (
+                                <button
+                                    key={filter}
+                                    onClick={() => setActiveFilter(filter)}
+                                    className={`
+                                        rounded-full
+                                        border
+                                        px-2.5
+                                        py-1
+                                        text-[11px]
+                                        font-medium
+                                        transition
+                                        sm:px-3
+                                        sm:py-1.5
+                                        sm:text-xs
+                                        ${
+                                            activeFilter === filter
+                                                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                                                : "border-[#272727] bg-[#171717] text-[#aaaaaa] hover:border-[#3f3f3f] hover:text-white"
+                                        }
+                                    `}
+                                >
+                                    {filter}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                 </div>
 
-                {/* Beat Grid */}
+                {/* Beat Grid — 2 mobile, 3 tablet, 4 desktop */}
                 <div
                     className="
                         grid
-                        sm:grid-cols-2
-                        gap-6
+                        grid-cols-2
+                        gap-4
+                        sm:gap-6
                         md:grid-cols-3
-                        xl:grid-cols-4
+                        lg:grid-cols-4
                     "
                 >
                     {trendingBeats.map((beat) => (
