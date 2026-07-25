@@ -18,45 +18,63 @@ export default function NavbarMobile({
 
     return (
 
-        <div className="flex w-full items-center justify-between">
+        <div className="flex w-full items-center justify-between ">
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5">
 
                 <button
                     onClick={onMenuOpen}
                     aria-label="Open navigation menu"
                     className="
+                        flex
+                        h-10
+                        w-10
+                        items-center
+                        justify-center
                         rounded-full
-                        p-2
-                        transition
-                        hover:bg-[#272727]
+                        text-[#f1f1f1]
+                        transition-colors
+                        duration-150
+                        hover:bg-white/10
+                        active:scale-95
+                        active:bg-white/15
                     "
                 >
-                    <Menu size={22} className="text-[#f1f1f1]" />
+                    <Menu size={22} strokeWidth={2} />
                 </button>
 
                 <NavbarLogo compact />
 
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5">
 
                 <button
                     onClick={onSearchOpen}
                     aria-label="Search"
                     className="
+                        flex
+                        h-10
+                        w-10
+                        items-center
+                        justify-center
                         rounded-full
-                        p-2
-                        transition
-                        hover:bg-[#272727]
+                        text-[#f1f1f1]
+                        transition-colors
+                        duration-150
+                        hover:bg-white/10
+                        active:scale-95
+                        active:bg-white/15
                     "
                 >
-                    <Search size={20} className="text-[#f1f1f1]" />
+                    <Search size={20} strokeWidth={2} />
                 </button>
 
                 <NavbarNotifications />
 
-                <NavbarProfile />
+                <div className="ml-0.5 pl-1.5">
+                    <NavbarProfile />
+                </div>
 
             </div>
 
