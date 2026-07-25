@@ -8,7 +8,7 @@ export const trendingBeats = [
 
         genre: "Afrobeats",
         bpm: 98,
-        key: "G Minor",
+        musicalKey: "G Minor",
 
         price: "KSh 3,500",
 
@@ -28,7 +28,7 @@ export const trendingBeats = [
 
         genre: "Drill",
         bpm: 142,
-        key: "F Minor",
+        musicalKey: "F Minor",
 
         price: "KSh 2,800",
 
@@ -48,7 +48,7 @@ export const trendingBeats = [
 
         genre: "Amapiano",
         bpm: 112,
-        key: "C Major",
+        musicalKey: "C Major",
 
         price: "KSh 4,000",
 
@@ -68,7 +68,7 @@ export const trendingBeats = [
 
         genre: "Hip Hop",
         bpm: 92,
-        key: "D Minor",
+        musicalKey: "D Minor",
 
         price: "KSh 2,200",
 
@@ -88,7 +88,7 @@ export const trendingBeats = [
 
         genre: "Dancehall",
         bpm: 100,
-        key: "A Minor",
+        musicalKey: "A Minor",
 
         price: "KSh 3,200",
 
@@ -108,7 +108,7 @@ export const trendingBeats = [
 
         genre: "R&B",
         bpm: 84,
-        key: "E Major",
+        musicalKey: "E Major",
 
         price: "KSh 2,500",
 

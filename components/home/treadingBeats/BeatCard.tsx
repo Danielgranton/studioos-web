@@ -21,7 +21,7 @@ interface BeatCardProps {
     thumbnail: string;
     genre: string;
     bpm: number;
-    key: string;
+    musicalKey: string;
     price: string;
     plays: number;
     likes: number;
@@ -37,7 +37,7 @@ export default function BeatCard({
     thumbnail,
     genre,
     bpm,
-    key,
+    musicalKey,
     price,
     plays,
     likes,
@@ -343,7 +343,7 @@ export default function BeatCard({
                 {/* Footer — identical structure to FeaturedStudioCard's */}
                 <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-[#232323] pt-2.5">
                     <span className="truncate text-[10px] text-[#717171]">
-                        {key}
+                        {musicalKey}
                     </span>
 
                     <div
