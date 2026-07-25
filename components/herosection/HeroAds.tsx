@@ -259,12 +259,12 @@ export default function HeroAds() {
                             items-center
                             gap-1.5
                             rounded-full
-                            bg-white
+                            bg-blue-500
                             px-4
                             py-2
                             text-xs
                             font-semibold
-                            text-black
+                            text-white
                             transition
                             hover:bg-white/90
                             sm:flex

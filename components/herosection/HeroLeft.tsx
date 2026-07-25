@@ -127,14 +127,14 @@ export default function HeroLeft() {
                         justify-center
                         gap-2
                         rounded-full
-                        bg-blue-600
+                        bg-orange-600
                         px-4
                         py-2.5
                         text-xs
                         font-semibold
                         text-white
                         transition-all
-                        hover:bg-blue-500
+                        hover:bg-orange-700
                         hover:gap-3
                         sm:flex-none
                         sm:px-5

@@ -119,8 +119,80 @@ export default function Hero() {
                 </div>
 
                 {/* Right — video panel */}
-                <div className="h-[380px] w-full sm:h-[460px] lg:h-auto lg:w-1/2">
-                    <HeroAds />
+                <div className="flex h-[420px] w-full flex-col gap-4 sm:h-[500px] lg:h-auto lg:w-1/2">
+
+                    <div className="flex items-end justify-between gap-4 px-1">
+
+                        <div>
+                            <div
+                                className="
+                                    mb-2
+                                    inline-flex
+                                    items-center
+                                    gap-1.5
+                                    rounded-full
+                                    border
+                                    border-blue-500/20
+                                    bg-blue-500/10
+                                    px-2.5
+                                    py-1
+                                    text-[9px]
+                                    font-semibold
+                                    uppercase
+                                    tracking-[0.2em]
+                                    text-blue-400
+                                "
+                            >
+                                <span className="relative flex h-1.5 w-1.5">
+                                    <span
+                                        className="
+                                            absolute
+                                            inline-flex
+                                            h-full
+                                            w-full
+                                            animate-ping
+                                            rounded-full
+                                            bg-blue-400
+                                            opacity-60
+                                        "
+                                    />
+                                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-blue-400" />
+                                </span>
+                                Sponsored
+                            </div>
+
+                            <h2 className="text-xl font-black leading-none tracking-tight text-white sm:text-3xl">
+                                Studios On
+                                {" "}
+                                <span
+                                    className="
+                                        bg-gradient-to-r
+                                        from-blue-400
+                                        via-blue-500
+                                        to-blue-600
+                                        bg-clip-text
+                                        text-transparent
+                                    "
+                                >
+                                    The Rise
+                                </span>
+                            </h2>
+                        </div>
+
+                        <div className="hidden shrink-0 items-center gap-1.5 text-[11px] text-slate-500 sm:flex">
+                            <span className="relative flex h-1.5 w-1.5">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                            </span>
+                            Live
+                        </div>
+
+                    </div>
+
+                    <div className="min-h-0 flex-1">
+                        <HeroAds />
+                    </div>
+
                 </div>
             </div>
         </section>

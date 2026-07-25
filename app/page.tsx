@@ -1,6 +1,7 @@
 import ExploreSection from "@/components/explore/ExploreSection";
 import FeaturedStudios from "@/components/featuredStudios/featureStudios";
 import Hero from "@/components/herosection/Hero";
+import { TopProducers } from "@/components/producers";
 
 
 export default function HomePage() {
@@ -11,6 +12,7 @@ export default function HomePage() {
             <Hero/>
             <ExploreSection />
             <FeaturedStudios />
+            <TopProducers />
         </div>
 
     );
