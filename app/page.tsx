@@ -1,7 +1,8 @@
-import ExploreSection from "@/components/explore/ExploreSection";
-import FeaturedStudios from "@/components/featuredStudios/featureStudios";
-import Hero from "@/components/herosection/Hero";
-import { TopProducers } from "@/components/producers";
+import ExploreSection from "@/components/home/explore/ExploreSection";
+import FeaturedStudios from "@/components/home/featuredStudios/featureStudios";
+import Hero from "@/components/home/herosection/Hero";
+import { TopProducers } from "@/components/home/producers";
+import { TrendingBeats } from "@/components/home/treadingBeats";
 
 
 export default function HomePage() {
@@ -13,6 +14,7 @@ export default function HomePage() {
             <ExploreSection />
             <FeaturedStudios />
             <TopProducers />
+            <TrendingBeats/>
         </div>
 
     );
