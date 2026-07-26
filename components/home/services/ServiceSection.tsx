@@ -24,7 +24,7 @@ export default function ServiceSection() {
                         flex
                         flex-col
                         gap-6
-                        lg:mb-14
+                        lg:mb-10
                         lg:flex-row
                         lg:items-end
                         lg:justify-between
@@ -33,7 +33,7 @@ export default function ServiceSection() {
 
                     <div className="max-w-2xl">
 
-                        {/* Badge — same pulsing-dot pattern used sitewide */}
+                        {/* Badge — same pulsing-dot pattern used sitewide, recolored for this section */}
                         <span
                             className="
                                 inline-flex
@@ -41,15 +41,15 @@ export default function ServiceSection() {
                                 gap-2
                                 rounded-full
                                 border
-                                border-cyan-500/20
-                                bg-cyan-500/10
+                                border-orange-500/20
+                                bg-orange-500/10
                                 px-3
                                 py-1
                                 text-[9px]
                                 font-semibold
                                 uppercase
                                 tracking-[0.2em]
-                                text-cyan-400
+                                text-orange-400
                             "
                         >
                             <span className="relative flex h-1.5 w-1.5">
@@ -61,41 +61,61 @@ export default function ServiceSection() {
                                         w-full
                                         animate-ping
                                         rounded-full
-                                        bg-cyan-400
+                                        bg-orange-400
                                         opacity-60
                                     "
                                 />
-                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cyan-400" />
+                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-orange-400" />
                             </span>
                             Music Services
                         </span>
 
-                        {/* Heading */}
+                        {/* Heading — single line, fluid size so it never wraps or overflows */}
                         <h2
                             className="
-                                mt-3
+                                relative
+                                mt-2
+                                w-fit
                                 font-black
                                 leading-[1.05]
                                 tracking-tight
                                 text-white
+                                whitespace-nowrap
                                 sm:mt-4
                             "
                             style={{
-                                fontSize: "clamp(1.5rem, 4.5vw, 3rem)",
+                                fontSize: "clamp(1.4rem, 4.5vw, 2rem)",
                             }}
                         >
-                            Everything beyond{" "}
-                            <span
-                                className="
-                                    bg-gradient-to-r
-                                    from-cyan-400
-                                    via-cyan-500
-                                    to-blue-500
-                                    bg-clip-text
-                                    text-transparent
-                                "
-                            >
-                                recording
+                            Beyond{" "}
+                            <span className="relative inline-block">
+                                <span
+                                    className="
+                                        bg-gradient-to-r
+                                        from-orange-400
+                                        via-orange-500
+                                        to-amber-500
+                                        bg-clip-text
+                                        text-transparent
+                                    "
+                                >
+                                    the recording
+                                </span>
+                                <svg
+                                    aria-hidden="true"
+                                    viewBox="0 0 190 16"
+                                    preserveAspectRatio="none"
+                                    className="absolute -bottom-1 left-0 h-3 w-full text-orange-500 sm:-bottom-2"
+                                >
+                                    <path
+                                        d="M2 10c23-9 46-9 69 0s46 9 69 0 46-9 48 0"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="3"
+                                        strokeLinecap="round"
+                                        className="services-headline-underline"
+                                    />
+                                </svg>
                             </span>
                         </h2>
 
@@ -161,20 +181,21 @@ export default function ServiceSection() {
                                 rounded-full
                                 border
                                 border-[#272727]
-                                bg-[#171717]
-                                px-5
-                                py-3
+                                bg-orange-600
+                                px-4
+                                py-2
                                 text-sm
                                 font-semibold
                                 text-white
                                 transition
-                                hover:border-cyan-500/40
-                                hover:bg-[#1b1b1b]
+                                hover:border-orange-500/10
+                                hover:bg-orange-700
                                 hover:gap-3
                                 sm:w-fit
                             "
                         >
                             Browse All Services
+
                             <ArrowRight
                                 size={17}
                                 className="transition-transform duration-300 group-hover:translate-x-1"
@@ -200,7 +221,7 @@ export default function ServiceSection() {
                                         sm:text-xs
                                         ${
                                             activeFilter === filter
-                                                ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-400"
+                                                ? "border-orange-500/40 bg-orange-500/10 text-orange-400"
                                                 : "border-[#272727] bg-[#171717] text-[#aaaaaa] hover:border-[#3f3f3f] hover:text-white"
                                         }
                                     `}
@@ -233,6 +254,26 @@ export default function ServiceSection() {
                 </div>
 
             </div>
+
+            <style>{`
+                .services-headline-underline {
+                    stroke-dasharray: 320;
+                    stroke-dashoffset: 320;
+                    animation: services-underline-draw 0.9s cubic-bezier(0.65, 0, 0.35, 1) 0.35s forwards;
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .services-headline-underline {
+                        animation: none;
+                        stroke-dashoffset: 0;
+                    }
+                }
+                @keyframes services-underline-draw {
+                    to {
+                        stroke-dashoffset: 0;
+                    }
+                }
+            `}</style>
+
         </section>
     );
 }

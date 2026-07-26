@@ -52,15 +52,15 @@ export default function TrendingBeats() {
                                     gap-2
                                     rounded-full
                                     border
-                                    border-emerald-500/20
-                                    bg-emerald-500/10
+                                    border-blue-500/20
+                                    bg-blue-500/10
                                     px-3
                                     py-1
                                     text-[9px]
                                     font-semibold
                                     uppercase
                                     tracking-[0.2em]
-                                    text-emerald-400
+                                    text-blue-400
                                 "
                             >
                                 <span className="relative flex h-1.5 w-1.5">
@@ -72,16 +72,16 @@ export default function TrendingBeats() {
                                             w-full
                                             animate-ping
                                             rounded-full
-                                            bg-emerald-400
+                                            bg-blue-400
                                             opacity-60
                                         "
                                     />
-                                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-blue-400" />
                                 </span>
                                 Trending Beats
                             </span>
 
-                            <span className="h-px flex-1 bg-gradient-to-r from-emerald-500/30 to-transparent lg:hidden" />
+                            <span className="h-px flex-1 bg-gradient-to-r from-blue-500/30 to-transparent lg:hidden" />
                         </div>
 
                         {/* Headline */}
@@ -95,7 +95,7 @@ export default function TrendingBeats() {
                                 {[10, 20, 8, 28, 14, 24, 9, 18].map((h, i) => (
                                     <span
                                         key={i}
-                                        className="w-[3px] animate-pulse rounded-full bg-emerald-400"
+                                        className="w-[3px] animate-pulse rounded-full bg-blue-400"
                                         style={{
                                             height: `${h}px`,
                                             animationDelay: `${i * 0.12}s`,
@@ -122,9 +122,9 @@ export default function TrendingBeats() {
                                     <span
                                         className="
                                             bg-gradient-to-r
-                                            from-emerald-400
-                                            via-emerald-500
-                                            to-teal-500
+                                            from-blue-400
+                                            via-blue-500
+                                            to-blue-600
                                             bg-clip-text
                                             text-transparent
                                         "
@@ -135,7 +135,7 @@ export default function TrendingBeats() {
                                         aria-hidden="true"
                                         viewBox="0 0 200 16"
                                         preserveAspectRatio="none"
-                                        className="absolute -bottom-1 left-0 h-[0.15em] w-full text-emerald-500"
+                                        className="absolute -bottom-1 left-0 h-[0.15em] w-full text-blue-500"
                                     >
                                         <path
                                             d="M2 10c24-9 48-9 72 0s48 9 72 0 48-9 50 0"
@@ -193,14 +193,14 @@ export default function TrendingBeats() {
                                 justify-center
                                 gap-2
                                 rounded-full
-                                bg-emerald-600/20
-                                px-3
-                                py-2
+                                bg-blue-600
+                                px-5
+                                py-2.5
                                 text-sm
                                 font-semibold
                                 text-white
                                 transition-all
-                                hover:bg-emerald-600/10
+                                hover:bg-blue-500
                                 hover:gap-3
                                 sm:w-auto
                                 sm:justify-start
@@ -233,7 +233,7 @@ export default function TrendingBeats() {
                                         sm:text-xs
                                         ${
                                             activeFilter === filter
-                                                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                                                ? "border-blue-500/40 bg-blue-500/10 text-blue-400"
                                                 : "border-[#272727] bg-[#171717] text-[#aaaaaa] hover:border-[#3f3f3f] hover:text-white"
                                         }
                                     `}

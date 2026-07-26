@@ -194,14 +194,14 @@ export default function FeaturedStudios() {
                                 justify-center
                                 gap-2
                                 rounded-full
-                                bg-blue-600/20
+                                bg-blue-600
                                 px-5
                                 py-2.5
                                 text-sm
                                 font-semibold
                                 text-white
                                 transition-all
-                                hover:bg-blue-600/10
+                                hover:bg-blue-700
                                 hover:gap-3
                                 sm:w-auto
                                 sm:justify-start

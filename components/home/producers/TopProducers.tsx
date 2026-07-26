@@ -42,7 +42,7 @@ export default function TopProducers() {
                                 rounded-full
                                 border
                                 border-orange-500/20
-                                bg-orange-500/10
+                                bg-orange-600/10
                                 px-3
                                 py-1
                                 text-[9px]
@@ -179,7 +179,7 @@ export default function TopProducers() {
                                 rounded-full
                                 border
                                 border-[#272727]
-                                bg-orange-500/20
+                                bg-orange-600
                                 px-4
                                 py-2
                                 text-sm
@@ -187,7 +187,7 @@ export default function TopProducers() {
                                 text-white
                                 transition
                                 hover:border-orange-500/10
-                                hover:bg-orange-500/10
+                                hover:bg-orange-700
                                 hover:gap-3
                                 sm:w-fit
                             "
