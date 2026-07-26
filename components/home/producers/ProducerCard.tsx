@@ -64,9 +64,6 @@ export default function ProducerCard({
                 hover:shadow-black/30
                 sm:min-h-[280px]
                 sm:p-4
-                lg:min-h-[300px]
-                lg:rounded-3xl
-                lg:p-5
                 ${featured ? "border-blue-500/25" : "border-[#272727]"}
             `}
         >
@@ -90,9 +87,6 @@ export default function ProducerCard({
                         uppercase
                         tracking-wide
                         text-orange-400
-                        lg:left-5
-                        lg:px-2.5
-                        lg:text-[10px]
                     "
                 >
                     Featured
@@ -100,7 +94,7 @@ export default function ProducerCard({
             )}
 
             {/* Glow — clipped to the card's own rounded corners via this dedicated wrapper, instead of clipping the whole card (which was cutting off the featured tab above) */}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl lg:rounded-3xl">
+            <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
                 <div
                     className={`
                         absolute
@@ -114,10 +108,6 @@ export default function ProducerCard({
                         transition
                         duration-300
                         group-hover:opacity-100
-                        lg:-right-20
-                        lg:-top-20
-                        lg:h-44
-                        lg:w-44
                         ${featured ? "opacity-60" : "opacity-0"}
                     `}
                 />
@@ -126,7 +116,7 @@ export default function ProducerCard({
             {/* Header */}
             <div className="relative flex flex-wrap items-center justify-around ">
                 
-                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-white/20 sm:h-20 sm:w-20 lg:h-24 lg:w-24">
+                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-white/20 sm:h-20 sm:w-20">
                         <Image
                             src={avatar}
                             alt={name}
@@ -142,19 +132,19 @@ export default function ProducerCard({
 
                     <div className="min-w-0">
                         <div className="flex items-center gap-1">
-                            <h3 className="truncate text-sm font-bold text-white lg:text-base">
+                            <h3 className="truncate text-sm font-bold text-white">
                                 {name}
                             </h3>
 
                             {verified && (
                                 <BadgeCheck
                                     size={14}
-                                    className="shrink-0 text-blue-400 lg:size-4"
+                                    className="shrink-0 text-blue-400"
                                 />
                             )}
                         </div>
 
-                        <p className="mt-1 truncate text-xs text-slate-400 lg:text-sm">
+                        <p className="mt-1 truncate text-xs text-slate-400">
                             {genre}
                         </p>
                     </div>
@@ -163,19 +153,19 @@ export default function ProducerCard({
             </div>
 
             {/* Rating + Projects */}
-            <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 lg:mt-3">
+            <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-1">
                     <Star
                         size={14}
-                        className="fill-yellow-400 text-yellow-400 lg:size-4"
+                        className="fill-yellow-400 text-yellow-400"
                     />
 
-                    <span className="text-sm font-semibold text-white lg:text-base">
+                    <span className="text-sm font-semibold text-white">
                         {rating}
                     </span>
                     
 
-                    <span className="text-xs text-slate-500 lg:text-sm">
+                    <span className="text-xs text-slate-500">
                         ({reviews})
                     </span>
                 </div>
@@ -191,9 +181,6 @@ export default function ProducerCard({
                         text-[9px]
                         font-semibold
                         text-blue-400
-                        lg:px-3
-                        lg:py-1
-                        lg:text-[11px]
                     "
                 >
                     {badge}
@@ -206,11 +193,9 @@ export default function ProducerCard({
                         gap-1.5
                         text-xs
                         text-slate-400
-                        lg:gap-2
-                        lg:text-sm
                     "
                 >
-                    <FolderOpen size={13} className="lg:size-[15px]" />
+                    <FolderOpen size={13} />
 
                     <span>
                         {completedProjects.toLocaleString()} projects
@@ -219,7 +204,7 @@ export default function ProducerCard({
             </div>
 
             {/* Skills */}
-            <div className="mt-2.5 flex flex-wrap gap-1.5 lg:mt-3 lg:gap-2">
+            <div className="mt-2.5 flex flex-wrap gap-1.5">
                 {skills.map((skill) => (
                     <span
                         key={skill}
@@ -230,9 +215,6 @@ export default function ProducerCard({
                             py-0.5
                             text-[10px]
                             text-slate-300
-                            lg:px-3
-                            lg:py-1
-                            lg:text-[11px]
                         "
                     >
                         {skill}
@@ -247,17 +229,15 @@ export default function ProducerCard({
                     border-t
                     border-[#262626]
                     pt-3
-                    lg:mt-3
-                    lg:pt-4
                 "
             >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
-                        <p className="text-[11px] text-slate-500 lg:text-xs">
+                        <p className="text-[11px] text-slate-500">
                             Starts from
                         </p>
 
-                        <p className="text-sm font-semibold text-white lg:text-base">
+                        <p className="text-sm font-semibold text-white">
                             {priceLabel}
                         </p>
                     </div>
@@ -269,11 +249,9 @@ export default function ProducerCard({
                             gap-1.5
                             text-xs
                             text-slate-400
-                            lg:gap-2
-                            lg:text-sm
                         "
                     >
-                        <Clock3 size={13} className="lg:size-[15px]" />
+                        <Clock3 size={13} />
 
                         <span>{responseTime}</span>
                     </div>
@@ -292,7 +270,6 @@ export default function ProducerCard({
                             text-sm
                             font-semibold
                             text-orange-400
-                            lg:text-base
                         "
                     >
                         Hire Producer
@@ -304,7 +281,6 @@ export default function ProducerCard({
                             transition-transform
                             duration-300
                             group-hover:translate-x-1
-                            lg:size-[18px]
                         "
                     />
                 </div>

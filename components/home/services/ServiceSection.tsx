@@ -13,7 +13,7 @@ export default function ServiceSection() {
     const [activeFilter, setActiveFilter] = useState("All");
 
     return (
-        <section className="relative overflow-hidden py-5">
+        <section className="relative overflow-hidden ">
 
             <div className="relative mx-auto max-w-[1600px] px-6">
 

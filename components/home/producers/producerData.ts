@@ -119,4 +119,31 @@ export const producerData = [
             "Songwriting",
         ],
     },
+    {
+        id: 5,
+        slug: "nia-waves",
+        name: "Nia Waves",
+        avatar: "/images/avatar.png",
+        verified: true,
+        featured: false,
+
+        genre: "R&B",
+
+        rating: 4.7,
+        reviews: 156,
+
+        completedProjects: 340,
+
+        responseTime: "20 min",
+
+        priceLabel: "From KSh 3,500",
+
+        badge: "Rising Talent",
+
+        skills: [
+            "Vocal Production",
+            "Mixing",
+            "Mastering",
+        ],
+    },
 ];

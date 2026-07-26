@@ -146,6 +146,8 @@ export default function ServiceCategoryCard({
                 focus-visible:ring-2
                 focus-visible:ring-white/20
                 sm:p-4
+                lg:rounded-xl
+                lg:p-3
                 ${style.hover}
             `}
         >
@@ -165,49 +167,51 @@ export default function ServiceCategoryCard({
                     transition-opacity
                     duration-300
                     group-hover:opacity-100
+                    lg:h-20
+                    lg:w-20
                     ${style.glow}
                 `}
             />
 
             <div className="relative flex items-start justify-between gap-2">
                 <div
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border sm:h-12 sm:w-12 sm:rounded-2xl ${style.icon}`}
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border sm:h-12 sm:w-12 sm:rounded-2xl lg:h-10 lg:w-10 lg:rounded-xl ${style.icon}`}
                 >
-                    <Icon size={19} className="sm:size-6" />
+                    <Icon size={19} className="sm:size-6 lg:size-5" />
                 </div>
 
-                <span className="rounded-full bg-[#1c1c1c] px-2 py-0.5 text-[10px] text-slate-400 sm:px-2.5 sm:text-xs">
+                <span className="rounded-full bg-[#1c1c1c] px-2 py-0.5 text-[10px] text-slate-400 sm:px-2.5 sm:text-xs lg:px-2 lg:text-[10px]">
                     {services.length} services
                 </span>
             </div>
 
-            <h3 className="relative mt-3 truncate text-sm font-bold text-white sm:mt-4 sm:text-lg">
+            <h3 className="relative mt-3 truncate text-sm font-bold text-white sm:mt-4 sm:text-lg lg:mt-3 lg:text-base">
                 {title}
             </h3>
 
-            <p className="relative mt-1.5 line-clamp-2 text-xs leading-5 text-slate-400 sm:mt-2 sm:text-sm sm:leading-6">
+            <p className="relative mt-1.5 line-clamp-2 text-xs leading-5 text-slate-400 sm:mt-2 sm:text-sm sm:leading-6 lg:mt-1.5 lg:text-xs lg:leading-5">
                 {description}
             </p>
 
-            <div className="relative mt-3 flex flex-wrap gap-1 sm:mt-4 sm:gap-1.5">
+            <div className="relative mt-3 flex flex-wrap gap-1 sm:mt-4 sm:gap-1.5 lg:mt-3 lg:gap-1">
                 {services.slice(0, 2).map((service) => (
                     <span
                         key={service}
-                        className="truncate rounded-full bg-[#1c1c1c] px-2 py-0.5 text-[10px] text-slate-300 sm:px-2.5 sm:text-[11px]"
+                        className="truncate rounded-full bg-[#1c1c1c] px-2 py-0.5 text-[10px] text-slate-300 sm:px-2.5 sm:text-[11px] lg:px-2 lg:text-[10px]"
                     >
                         {service}
                     </span>
                 ))}
 
                 {services.length > 2 && (
-                    <span className="rounded-full bg-[#1c1c1c] px-2 py-0.5 text-[10px] text-slate-500 sm:px-2.5 sm:text-[11px]">
+                    <span className="rounded-full bg-[#1c1c1c] px-2 py-0.5 text-[10px] text-slate-500 sm:px-2.5 sm:text-[11px] lg:px-2 lg:text-[10px]">
                         +{services.length - 2}
                     </span>
                 )}
             </div>
 
-            <div className="relative mt-3 flex items-center justify-between gap-2 border-t border-[#232323] pt-2.5 sm:mt-4 sm:pt-3.5">
-                <span className={`truncate text-xs font-semibold sm:text-sm ${style.text}`}>
+            <div className="relative mt-3 flex items-center justify-between gap-2 border-t border-[#232323] pt-2.5 sm:mt-4 sm:pt-3.5 lg:mt-2.5 lg:pt-2.5">
+                <span className={`truncate text-xs font-semibold sm:text-sm lg:text-xs ${style.text}`}>
                     Explore
                 </span>
 
@@ -227,10 +231,12 @@ export default function ServiceCategoryCard({
                         group-hover:translate-x-0.5
                         sm:h-7
                         sm:w-7
+                        lg:h-6
+                        lg:w-6
                         ${style.solid}
                     `}
                 >
-                    <ArrowRight size={13} className="sm:size-[15px]" />
+                    <ArrowRight size={13} className="sm:size-[15px] lg:size-[13px]" />
                 </div>
             </div>
         </Link>

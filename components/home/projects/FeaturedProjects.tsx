@@ -39,11 +39,11 @@ export default function FeaturedProjects() {
                 {/* Header */}
                 <div
                     className="
-                        mb-8
+                        mb-5
                         flex
                         flex-col
                         gap-6
-                        lg:mb-10
+                        lg:mb-5
                         lg:flex-row
                         lg:items-end
                         lg:justify-between
@@ -63,7 +63,7 @@ export default function FeaturedProjects() {
                                 bg-blue-500/10
                                 px-3
                                 py-1
-                                text-[11px]
+                                text-[9px]
                                 font-semibold
                                 uppercase
                                 tracking-[0.2em]
@@ -89,7 +89,7 @@ export default function FeaturedProjects() {
                         </span>
 
                         {/* Heading — waveform mark + single-line, fluid size so it never wraps or overflows */}
-                        <div className="mt-3 flex items-center gap-3 sm:mt-4 sm:gap-4">
+                        <div className="mt-2 flex items-center gap-3 sm:mt-3 sm:gap-3">
                             <div
                                 aria-hidden="true"
                                 className="hidden h-7 shrink-0 items-end gap-[3px] sm:flex"
@@ -197,15 +197,15 @@ export default function FeaturedProjects() {
                                 rounded-full
                                 border
                                 border-[#272727]
-                                bg-[#171717]
-                                px-5
-                                py-3
+                                bg-blue-600
+                                px-3
+                                py-2
                                 text-sm
                                 font-semibold
                                 text-white
                                 transition
                                 hover:border-blue-500/40
-                                hover:bg-[#1b1b1b]
+                                hover:bg-blue-700
                                 hover:gap-3
                                 sm:w-fit
                             "
@@ -255,13 +255,13 @@ export default function FeaturedProjects() {
                 {visibleProjects.length > 0 ? (
                     <div
                         className="
-                            grid
+                           grid
                             grid-cols-2
-                            gap-4
-                            sm:grid-cols-3
-                            sm:gap-6
-                            xl:grid-cols-5
-                        "
+                            gap-3
+                            sm:gap-4
+                            md:grid-cols-3
+                            lg:grid-cols-5
+                            "
                     >
                         {visibleProjects.map((project) => (
                             <ProjectCard

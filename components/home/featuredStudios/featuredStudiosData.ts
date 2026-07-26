@@ -20,7 +20,7 @@ export const featuredStudios = [
         equipment: ["Neumann U87", "Apollo x8", "Yamaha HS8"],
         rooms: 3,
         yearsActive: 8,
-        image: "/images/logo.png",
+        image: "/images/beats.png",
     },
     {
         id: 2,
@@ -43,7 +43,7 @@ export const featuredStudios = [
         equipment: ["AKG C414", "Focusrite Red", "KRK Rokit"],
         rooms: 2,
         yearsActive: 6,
-        image: "/images/logo.png",
+        image: "/images/beats.png",
     },
     {
         id: 3,
@@ -66,7 +66,7 @@ export const featuredStudios = [
         equipment: ["Shure SM7B", "RØDECaster Pro"],
         rooms: 2,
         yearsActive: 5,
-        image: "/images/logo.png",
+        image: "/images/beats.png",
     },
     {
         id: 4,
@@ -89,7 +89,7 @@ export const featuredStudios = [
         equipment: ["Universal Audio", "Genelec Monitors"],
         rooms: 4,
         yearsActive: 9,
-        image: "/images/logo.png",
+        image: "/images/beats.png",
     },
     {
         id: 5,
@@ -112,7 +112,7 @@ export const featuredStudios = [
         equipment: ["SSL Interface", "Adam Audio A7X"],
         rooms: 2,
         yearsActive: 3,
-        image: "/images/logo.png",
+        image: "/images/beats.png",
     },
     {
         id: 6,
@@ -135,6 +135,6 @@ export const featuredStudios = [
         equipment: ["Neve Console", "Neumann U87", "Barefoot Monitors"],
         rooms: 5,
         yearsActive: 12,
-        image: "/images/logo.png",
+        image: "/images/beats.png",
     },
 ];

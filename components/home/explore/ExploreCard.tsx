@@ -72,20 +72,26 @@ export default function ExploreCard({
                 group
                 relative
                 flex
-                min-h-[205px]
+                min-h-[180px]
                 flex-col
                 justify-between
                 overflow-hidden
-                rounded-2xl
+                rounded-xl
                 border
                 border-[#262626]
                 bg-[#171717]
-                p-5
+                p-3
                 transition-all
                 duration-300
                 hover:-translate-y-1
                 hover:bg-[#1b1b1b]
                 hover:shadow-xl
+                sm:min-h-[205px]
+                sm:rounded-2xl
+                sm:p-5
+                lg:min-h-[190px]
+                lg:rounded-xl
+                lg:p-4
                 ${style.border}
             `}
         >
@@ -96,14 +102,18 @@ export default function ExploreCard({
                     absolute
                     -right-12
                     -top-12
-                    h-32
-                    w-32
+                    h-24
+                    w-24
                     rounded-full
                     blur-3xl
                     opacity-0
                     transition
                     duration-300
                     group-hover:opacity-100
+                    sm:h-32
+                    sm:w-32
+                    lg:h-28
+                    lg:w-28
                     ${style.glow}
                 `}
             />
@@ -112,29 +122,36 @@ export default function ExploreCard({
 
             <div className="flex items-start justify-between">
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5 sm:gap-3">
 
                     <div
                         className={`
                             flex
-                            h-10
-                            w-10
+                            h-9
+                            w-9
+                            shrink-0
                             items-center
                             justify-center
-                            rounded-xl
+                            rounded-lg
+                            sm:h-10
+                            sm:w-10
+                            sm:rounded-xl
+                            lg:h-9
+                            lg:w-9
+                            lg:rounded-lg
                             ${style.icon}
                         `}
                     >
-                        <Icon size={20} />
+                        <Icon size={18} className="sm:size-5 lg:size-[18px]" />
                     </div>
 
-                    <div>
+                    <div className="min-w-0">
 
-                        <h3 className="text-lg font-semibold text-white">
+                        <h3 className="truncate text-base font-semibold text-white sm:text-lg lg:text-base">
                             {title}
                         </h3>
 
-                        <p className="mt-0.5 text-xs text-slate-500">
+                        <p className="mt-0.5 truncate text-[11px] text-slate-500 sm:text-xs lg:text-[11px]">
                             {stats}
                         </p>
 
@@ -146,15 +163,15 @@ export default function ExploreCard({
 
             {/* Description */}
 
-            <div className="mt-4">
+            <div className="mt-3 sm:mt-4 lg:mt-3">
 
-                <p className="line-clamp-2 text-sm leading-6 text-slate-400">
+                <p className="line-clamp-2 text-xs leading-5 text-slate-400 sm:text-sm sm:leading-6 lg:text-xs lg:leading-5">
                     {description}
                 </p>
 
                 {/* Tags */}
 
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-3 flex flex-wrap gap-1.5 sm:mt-4 sm:gap-2 lg:mt-3">
 
                     {tags.slice(0, 2).map((tag) => (
                         <span
@@ -164,11 +181,17 @@ export default function ExploreCard({
                                 border
                                 border-[#333]
                                 bg-[#202020]
-                                px-2.5
-                                py-1
-                                text-[10px]
+                                px-2
+                                py-0.5
+                                text-[9px]
                                 font-medium
                                 text-slate-300
+                                sm:px-2.5
+                                sm:py-1
+                                sm:text-[10px]
+                                lg:px-2
+                                lg:py-0.5
+                                lg:text-[10px]
                             "
                         >
                             {tag}
@@ -183,19 +206,25 @@ export default function ExploreCard({
 
             <div
                 className="
-                    mt-4
+                    mt-3
                     flex
                     items-center
                     justify-between
                     border-t
                     border-[#262626]
-                    pt-3
+                    pt-2.5
+                    sm:mt-4
+                    sm:pt-3
+                    lg:mt-3
+                    lg:pt-2.5
                 "
             >
                 <span
                     className={`
-                        text-sm
+                        text-xs
                         font-medium
+                        sm:text-sm
+                        lg:text-xs
                         ${style.text}
                     `}
                 >
@@ -203,11 +232,13 @@ export default function ExploreCard({
                 </span>
 
                 <ArrowRight
-                    size={16}
+                    size={14}
                     className="
                         transition-transform
                         duration-300
                         group-hover:translate-x-1
+                        sm:size-4
+                        lg:size-[14px]
                     "
                 />
             </div>

@@ -172,7 +172,6 @@ export default function ExploreSection() {
                 </div>
 
                 {/* Cards */}
-                                {/* Cards */}
                 <div
                     className="
                         grid

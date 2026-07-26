@@ -240,7 +240,7 @@ export default function TopProducers() {
                         gap-4
                         sm:gap-6
                         md:grid-cols-3
-                        lg:grid-cols-4
+                        lg:grid-cols-5
                     "
                 >
 

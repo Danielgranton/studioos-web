@@ -8,9 +8,8 @@ import {
     Calendar,
     Clock3,
     Headphones,
-    Music2,
+    Heart,
     Play,
-    User,
 } from "lucide-react";
 
 interface ProjectCardProps {
@@ -61,7 +60,7 @@ export default function ProjectCard({
     projectType,
     verified,
 }: ProjectCardProps) {
-    const extraServices = services.length - 3;
+    const extraServices = services.length - 2;
 
     return (
         <Link
@@ -70,7 +69,6 @@ export default function ProjectCard({
                 group
                 relative
                 flex
-                min-h-[300px]
                 flex-col
                 overflow-hidden
                 rounded-xl
@@ -82,7 +80,6 @@ export default function ProjectCard({
                 hover:-translate-y-1.5
                 hover:border-blue-500/40
                 hover:bg-[#1b1b1b]
-                sm:min-h-[360px]
                 sm:rounded-2xl
             "
         >
@@ -91,7 +88,7 @@ export default function ProjectCard({
                 className="
                     relative
                     flex
-                    aspect-[16/10]
+                    aspect-[16/9]
                     items-center
                     justify-center
                     overflow-hidden
@@ -107,8 +104,8 @@ export default function ProjectCard({
                 <div
                     className="
                         absolute
-                        h-40
-                        w-40
+                        h-32
+                        w-32
                         rounded-full
                         bg-blue-500/10
                         blur-3xl
@@ -116,8 +113,8 @@ export default function ProjectCard({
                         duration-500
                         group-hover:scale-125
                         group-hover:bg-blue-500/20
-                        sm:h-52
-                        sm:w-52
+                        sm:h-44
+                        sm:w-44
                     "
                 />
 
@@ -125,12 +122,12 @@ export default function ProjectCard({
                 <div
                     className="
                         relative
-                        text-4xl
+                        text-3xl
                         transition-all
                         duration-500
                         group-hover:scale-110
                         group-hover:-rotate-6
-                        sm:text-6xl
+                        sm:text-5xl
                     "
                 >
                     {cover}
@@ -152,8 +149,6 @@ export default function ProjectCard({
                             font-semibold
                             text-white
                             backdrop-blur-md
-                            sm:px-2.5
-                            sm:py-1
                             sm:text-[11px]
                         "
                     >
@@ -171,8 +166,8 @@ export default function ProjectCard({
                             right-2
                             top-2
                             flex
-                            h-8
-                            w-8
+                            h-7
+                            w-7
                             items-center
                             justify-center
                             rounded-full
@@ -183,12 +178,12 @@ export default function ProjectCard({
                             hover:bg-white/25
                             sm:right-3
                             sm:top-3
-                            sm:h-9
-                            sm:w-9
+                            sm:h-8
+                            sm:w-8
                         "
                     >
                         <Play
-                            size={13}
+                            size={12}
                             className="fill-white"
                         />
                     </button>
@@ -214,9 +209,6 @@ export default function ProjectCard({
                         backdrop-blur-md
                         sm:bottom-3
                         sm:left-3
-                        sm:gap-2
-                        sm:px-2.5
-                        sm:py-1
                         sm:text-[11px]
                     "
                 >
@@ -229,64 +221,37 @@ export default function ProjectCard({
             <div className="flex flex-1 flex-col p-3 sm:p-4">
 
                 {/* Title */}
-                <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                        <h3 className="truncate text-sm font-bold text-white sm:text-base">
-                            {title}
-                        </h3>
+                <div className="flex min-w-0 items-center gap-1.5">
+                    <h3 className="truncate text-sm font-bold text-white sm:text-base">
+                        {title}
+                    </h3>
 
-                        {verified && (
-                            <BadgeCheck
-                                size={15}
-                                className="shrink-0 text-blue-400"
-                            />
-                        )}
-                    </div>
+                    {verified && (
+                        <BadgeCheck
+                            size={14}
+                            className="shrink-0 text-blue-400"
+                        />
+                    )}
+                </div>
 
-                    <div className="mt-1.5 flex min-w-0 items-center gap-1.5 text-xs text-slate-400 sm:text-sm">
-                        <User size={13} className="shrink-0" />
-                        <span className="truncate">{artist}</span>
-                    </div>
+                {/* Artist • Genre — merged onto one line instead of two */}
+                <p className="mt-1 truncate text-xs text-slate-400 sm:text-sm">
+                    {artist} <span className="text-slate-600">•</span>{" "}
+                    <span className="text-blue-400">{genre}</span>
+                </p>
 
-                    <span
-                        className="
-                            mt-2
-                            inline-flex
-                            max-w-full
-                            truncate
-                            rounded-full
-                            bg-blue-500/10
-                            px-2.5
-                            py-0.5
-                            text-[11px]
-                            font-medium
-                            text-blue-400
-                            sm:mt-2.5
-                            sm:px-3
-                            sm:py-1
-                            sm:text-xs
-                        "
-                    >
-                        {genre}
+                {/* Studio • Producer — merged onto one line instead of two */}
+                <div className="mt-2 flex min-w-0 items-center gap-1.5 text-xs text-slate-300 sm:text-sm">
+                    <Building2 size={13} className="shrink-0" />
+                    <span className="truncate">
+                        {studio} <span className="text-slate-600">•</span>{" "}
+                        {producer}
                     </span>
                 </div>
 
-                {/* Studio & Producer */}
-                <div className="mt-3 space-y-2 sm:mt-4">
-                    <div className="flex min-w-0 items-center gap-1.5 text-xs text-slate-300 sm:text-sm">
-                        <Building2 size={13} className="shrink-0" />
-                        <span className="truncate">{studio}</span>
-                    </div>
-
-                    <div className="flex min-w-0 items-center gap-1.5 text-xs text-slate-300 sm:text-sm">
-                        <Music2 size={13} className="shrink-0" />
-                        <span className="truncate">{producer}</span>
-                    </div>
-                </div>
-
-                {/* Services */}
-                <div className="mt-3 flex flex-wrap gap-1.5 sm:mt-4 sm:gap-2">
-                    {services.slice(0, 3).map((service) => (
+                {/* Services — capped at 2 + overflow count, was 3 */}
+                <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    {services.slice(0, 2).map((service) => (
                         <span
                             key={service}
                             className="
@@ -296,8 +261,6 @@ export default function ProjectCard({
                                 py-0.5
                                 text-[10px]
                                 text-slate-300
-                                sm:px-2.5
-                                sm:py-1
                                 sm:text-[11px]
                             "
                         >
@@ -314,8 +277,6 @@ export default function ProjectCard({
                                 py-0.5
                                 text-[10px]
                                 text-slate-500
-                                sm:px-2.5
-                                sm:py-1
                                 sm:text-[11px]
                             "
                         >
@@ -324,92 +285,48 @@ export default function ProjectCard({
                     )}
                 </div>
 
-                {/* Stats — consistent icon + label + value styling across all four cells */}
-                <div
-                    className="
-                        mt-3
-                        grid
-                        grid-cols-2
-                        gap-2
-                        rounded-xl
-                        border
-                        border-[#262626]
-                        bg-[#1b1b1b]
-                        p-2.5
-                        sm:mt-4
-                        sm:gap-3
-                        sm:rounded-2xl
-                        sm:p-3
-                    "
-                >
-                    <div>
-                        <p className="text-[10px] text-slate-500 sm:text-[11px]">
-                            Streams
-                        </p>
-                        <p className="mt-0.5 text-xs font-semibold text-white sm:mt-1 sm:text-sm">
-                            {streams}
-                        </p>
-                    </div>
-
-                    <div>
-                        <p className="text-[10px] text-slate-500 sm:text-[11px]">
-                            Likes
-                        </p>
-                        <p className="mt-0.5 text-xs font-semibold text-white sm:mt-1 sm:text-sm">
-                            {likes}
-                        </p>
-                    </div>
-
-                    <div>
-                        <p className="flex items-center gap-1 text-[10px] text-slate-500 sm:gap-1.5 sm:text-[11px]">
-                            <Clock3 size={11} />
-                            Duration
-                        </p>
-                        <p className="mt-0.5 truncate text-xs font-semibold text-white sm:mt-1 sm:text-sm">
-                            {duration}
-                        </p>
-                    </div>
-
-                    <div className="min-w-0">
-                        <p className="flex items-center gap-1 text-[10px] text-slate-500 sm:gap-1.5 sm:text-[11px]">
-                            <Calendar size={11} />
-                            Released
-                        </p>
-                        <p className="mt-0.5 truncate text-xs font-semibold text-white sm:mt-1 sm:text-sm">
-                            {releaseDate}
-                        </p>
-                    </div>
+                {/* Stats — one compact row instead of a bordered 2x2 box */}
+                <div className="mt-3 flex items-center  border-t border-[#262626] pt-2 text-[11px] text-slate-400 sm:gap-4 sm:text-xs">
+                    <span className="flex items-center gap-1">
+                        <Headphones size={12} />
+                        {streams}
+                    </span>
+                    <span className="flex items-center gap-1">
+                        <Heart size={12} className="text-red-400" />
+                        {likes}
+                    </span>
+                    <span className="flex items-center gap-1">
+                        <Clock3 size={12} />
+                        {duration}
+                    </span>
+                    <span className="ml-auto flex shrink-0 items-center gap-1">
+                        <Calendar size={12} />
+                        {releaseDate}
+                    </span>
                 </div>
 
-                {/* Footer */}
-                <div
-                    className="
-                        mt-auto
-                        flex
-                        items-center
-                        justify-between
-                        border-t
-                        border-[#262626]
-                        pt-3
-                        sm:pt-4
-                    "
-                >
-                    <div className="flex items-center gap-1.5 text-blue-400 sm:gap-2">
-                        <Headphones size={14} className="sm:size-4" />
-                        <span className="text-sm font-semibold sm:text-base">
-                            View Project
-                        </span>
-                    </div>
+                <div className="mt-2 flex min-w-0 items-center justify-between gap-2">
+                    <span className="truncate text-xs font-semibold text-blue-400 sm:text-sm">
+                        View Project
+                    </span>
 
-                    <ArrowRight
-                        size={16}
+                    <span
                         className="
-                            transition-transform
+                            flex
+                            shrink-0
+                            items-center
+                            justify-center
+                            rounded-full
+                            bg-blue-500/10
+                            text-blue-400
+                            transition-all
                             duration-300
-                            group-hover:translate-x-1
-                            sm:size-[18px]
+                            group-hover:bg-blue-500/20
+                            group-hover:translate-x-0.5
                         "
-                    />
+                    >
+                        <ArrowRight size={13} className="sm:size-[15px]" />
+                    </span>
                 </div>
             </div>
         </Link>

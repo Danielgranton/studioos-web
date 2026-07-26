@@ -47,8 +47,13 @@ export default function Navbar() {
                     sticky
                     top-0
                     ${Z.header}
+                    border-b
+                    border-[#3f3f3f]/60
                     bg-[#0f0f0f]/90
                     backdrop-blur-xl
+                    lg:px-20
+                    md:px-15
+                    sm:px-10
                 `}
             >
 
@@ -128,8 +133,6 @@ export default function Navbar() {
                     aria-label="Primary"
                     className="
                         hidden
-                        border-b
-                        border-[#3f3f3f]/60
                         lg:block
                     "
                 >
