@@ -118,7 +118,7 @@ export default function BeatCard({
                     src={thumbnail}
                     alt={title}
                     fill
-                    sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+                    sizes="(min-width: 1000px) 20vw, (min-width: 700px) 30vw, 40vw"
                     className="
                         object-cover
                         transition-transform

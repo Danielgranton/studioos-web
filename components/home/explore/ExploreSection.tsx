@@ -16,7 +16,7 @@ export default function ExploreSection() {
                 {/* Header */}
                 <div
                     className="
-                        mb-10
+                        mb-6
                         flex
                         flex-col
                         gap-8
@@ -180,7 +180,7 @@ export default function ExploreSection() {
                         gap-4
                         sm:gap-5
                         md:grid-cols-3
-                        lg:grid-cols-4
+                        lg:grid-cols-5
                     "
                 >
                     {exploreItems.map((item) => (

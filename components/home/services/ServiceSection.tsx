@@ -4,18 +4,18 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 
-import ProducerCard from "./ProducerCard";
-import { producerData } from "./producerData";
+import ServiceCategoryCard from "./serviceCategoryCard";
+import { serviceCategories } from "./serviceCategories";
 
-const filters = ["All", "Hip-Hop", "Afrobeat", "R&B", "Available Now"];
+const filters = ["All", "Mixing", "Mastering", "Marketing", "Visuals"];
 
-export default function TopProducers() {
+export default function ServiceSection() {
     const [activeFilter, setActiveFilter] = useState("All");
 
     return (
-        <section className="relative">
+        <section className="relative overflow-hidden py-5">
 
-            <div className="mx-auto max-w-[1600px] px-6">
+            <div className="relative mx-auto max-w-[1600px] px-6">
 
                 {/* Header */}
                 <div
@@ -24,7 +24,7 @@ export default function TopProducers() {
                         flex
                         flex-col
                         gap-6
-                        lg:mb-10
+                        lg:mb-14
                         lg:flex-row
                         lg:items-end
                         lg:justify-between
@@ -33,7 +33,7 @@ export default function TopProducers() {
 
                     <div className="max-w-2xl">
 
-                        {/* Badge — same pulsing-dot pattern used sitewide, recolored for this section */}
+                        {/* Badge — same pulsing-dot pattern used sitewide */}
                         <span
                             className="
                                 inline-flex
@@ -41,15 +41,15 @@ export default function TopProducers() {
                                 gap-2
                                 rounded-full
                                 border
-                                border-orange-500/20
-                                bg-orange-500/10
+                                border-cyan-500/20
+                                bg-cyan-500/10
                                 px-3
                                 py-1
                                 text-[9px]
                                 font-semibold
                                 uppercase
                                 tracking-[0.2em]
-                                text-orange-400
+                                text-cyan-400
                             "
                         >
                             <span className="relative flex h-1.5 w-1.5">
@@ -61,61 +61,41 @@ export default function TopProducers() {
                                         w-full
                                         animate-ping
                                         rounded-full
-                                        bg-orange-400
+                                        bg-cyan-400
                                         opacity-60
                                     "
                                 />
-                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-orange-400" />
+                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cyan-400" />
                             </span>
-                            Top Producers
+                            Music Services
                         </span>
 
-                        {/* Heading — single line, fluid size so it never wraps or overflows */}
+                        {/* Heading */}
                         <h2
                             className="
-                                relative
-                                mt-2
-                                w-fit
+                                mt-3
                                 font-black
                                 leading-[1.05]
                                 tracking-tight
                                 text-white
-                                whitespace-nowrap
                                 sm:mt-4
                             "
                             style={{
-                                fontSize: "clamp(1.4rem, 4.5vw, 2rem)",
+                                fontSize: "clamp(1.5rem, 4.5vw, 3rem)",
                             }}
                         >
-                            Work with{" "}
-                            <span className="relative inline-block">
-                                <span
-                                    className="
-                                        bg-gradient-to-r
-                                        from-orange-400
-                                        via-orange-500
-                                        to-amber-500
-                                        bg-clip-text
-                                        text-transparent
-                                    "
-                                >
-                                    the best
-                                </span>
-                                <svg
-                                    aria-hidden="true"
-                                    viewBox="0 0 150 16"
-                                    preserveAspectRatio="none"
-                                    className="absolute -bottom-1 left-0 h-3 w-full text-orange-500 sm:-bottom-2"
-                                >
-                                    <path
-                                        d="M2 10c18-9 36-9 54 0s36 9 54 0 36-9 38 0"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="3"
-                                        strokeLinecap="round"
-                                        className="producers-headline-underline"
-                                    />
-                                </svg>
+                            Everything beyond{" "}
+                            <span
+                                className="
+                                    bg-gradient-to-r
+                                    from-cyan-400
+                                    via-cyan-500
+                                    to-blue-500
+                                    bg-clip-text
+                                    text-transparent
+                                "
+                            >
+                                recording
                             </span>
                         </h2>
 
@@ -132,15 +112,17 @@ export default function TopProducers() {
                                 sm:leading-8
                             "
                         >
-                            Connect with experienced producers trusted by
-                            thousands of artists to create chart-worthy music.
+                            Hire professionals for mixing, mastering,
+                            songwriting, marketing, distribution,
+                            photography, music videos and much more —
+                            all from one platform.
                         </p>
 
                         {/* Trust signal strip */}
                         <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 sm:mt-6 sm:gap-x-6">
                             {[
-                                { value: "12K+", label: "producers" },
-                                { value: "4.9★", label: "avg rating" },
+                                { value: "500+", label: "specialists" },
+                                { value: "24hr", label: "avg turnaround" },
                             ].map((stat) => (
                                 <div key={stat.label} className="flex items-baseline gap-1.5">
                                     <span className="text-sm font-bold text-white sm:text-base">
@@ -168,7 +150,7 @@ export default function TopProducers() {
                         "
                     >
                         <Link
-                            href="/producers"
+                            href="/services"
                             className="
                                 group
                                 inline-flex
@@ -179,21 +161,20 @@ export default function TopProducers() {
                                 rounded-full
                                 border
                                 border-[#272727]
-                                bg-orange-500/20
-                                px-4
-                                py-2
+                                bg-[#171717]
+                                px-5
+                                py-3
                                 text-sm
                                 font-semibold
                                 text-white
                                 transition
-                                hover:border-orange-500/10
-                                hover:bg-orange-500/10
+                                hover:border-cyan-500/40
+                                hover:bg-[#1b1b1b]
                                 hover:gap-3
                                 sm:w-fit
                             "
                         >
-                            View All
-
+                            Browse All Services
                             <ArrowRight
                                 size={17}
                                 className="transition-transform duration-300 group-hover:translate-x-1"
@@ -219,7 +200,7 @@ export default function TopProducers() {
                                         sm:text-xs
                                         ${
                                             activeFilter === filter
-                                                ? "border-orange-500/40 bg-orange-500/10 text-orange-400"
+                                                ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-400"
                                                 : "border-[#272727] bg-[#171717] text-[#aaaaaa] hover:border-[#3f3f3f] hover:text-white"
                                         }
                                     `}
@@ -232,50 +213,26 @@ export default function TopProducers() {
 
                 </div>
 
-                {/* Cards */}
+                {/* Grid */}
                 <div
                     className="
                         grid
                         grid-cols-2
-                        gap-4
-                        sm:gap-6
+                        gap-3
+                        sm:gap-4
                         md:grid-cols-3
-                        lg:grid-cols-4
+                        lg:grid-cols-5
                     "
                 >
-
-                    {producerData.map((producer) => (
-
-                        <ProducerCard
-                            key={producer.id}
-                            {...producer}
+                    {serviceCategories.map((category) => (
+                        <ServiceCategoryCard
+                            key={category.id}
+                            {...category}
                         />
-
                     ))}
-
                 </div>
 
             </div>
-
-            <style>{`
-                .producers-headline-underline {
-                    stroke-dasharray: 250;
-                    stroke-dashoffset: 250;
-                    animation: producers-underline-draw 0.9s cubic-bezier(0.65, 0, 0.35, 1) 0.35s forwards;
-                }
-                @media (prefers-reduced-motion: reduce) {
-                    .producers-headline-underline {
-                        animation: none;
-                        stroke-dashoffset: 0;
-                    }
-                }
-                @keyframes producers-underline-draw {
-                    to {
-                        stroke-dashoffset: 0;
-                    }
-                }
-            `}</style>
-
         </section>
     );
 }

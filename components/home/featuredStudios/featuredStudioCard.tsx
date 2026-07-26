@@ -324,44 +324,43 @@ export default function FeaturedStudioCard({
                 )}
 
                 {/* Footer */}
-                <div className="mt-3 flex items-center justify-between gap-2 border-t border-[#232323] pt-2.5 sm:mt-4 sm:pt-3.5">
-                    <span className="hidden truncate text-[11px] text-[#717171] sm:block">
-                        {reviews > 0 ? `${reviews} verified reviews` : "New studio"}
-                    </span>
-                    <span className="text-[10px] text-[#717171] sm:hidden">
-                        {reviews > 0 ? `${reviews} reviews` : "New"}
-                    </span>
+<div className="mt-2.5 flex items-center justify-between gap-2 border-t border-[#232323] pt-2 sm:mt-3 sm:pt-2.5">
+    <span className="hidden truncate text-[10px] text-[#717171] sm:block">
+        {reviews > 0 ? `${reviews} verified reviews` : "New studio"}
+    </span>
+    <span className="text-[9px] text-[#717171] sm:hidden">
+        {reviews > 0 ? `${reviews} reviews` : "New"}
+    </span>
 
-                    <div
-                        className="
-                            flex
-                            shrink-0
-                            items-center
-                            gap-1
-                            rounded-full
-                            bg-blue-600
-                            px-3
-                            py-1.5
-                            text-[11px]
-                            font-semibold
-                            text-white
-                            transition-all
-                            duration-300
-                            group-hover:gap-2
-                            group-hover:bg-blue-500
-                            sm:gap-1.5
-                            sm:px-4
-                            sm:py-2
-                            sm:text-xs
-                        "
-                    >
-                        Book
-                        <ArrowRight
-                            size={12}
-                            className="transition-transform duration-300 group-hover:translate-x-0.5 sm:size-[14px]"
-                        />
-                    </div>
-                </div>
+    <div
+        className="
+            flex
+            shrink-0
+            items-center
+            gap-1
+            rounded-full
+            bg-blue-600
+            px-2.5
+            py-1
+            text-[10px]
+            font-semibold
+            text-white
+            transition-all
+            duration-300
+            group-hover:gap-1.5
+            group-hover:bg-blue-500
+            sm:px-3
+            sm:py-1.5
+            sm:text-[11px]
+        "
+    >
+        Book
+        <ArrowRight
+            size={11}
+            className="transition-transform duration-300 group-hover:translate-x-0.5 sm:size-3"
+        />
+    </div>
+</div>
 
             </div>
 

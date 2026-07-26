@@ -19,23 +19,6 @@ export default function TrendingBeats() {
                 overflow-hidden
             "
         >
-            {/* Glow */}
-            <div
-                aria-hidden="true"
-                className="
-                    pointer-events-none
-                    absolute
-                    left-1/2
-                    top-1/2
-                    h-[700px]
-                    w-[700px]
-                    -translate-x-1/2
-                    -translate-y-1/2
-                    rounded-full
-                    bg-emerald-500/[0.06]
-                    blur-[180px]
-                "
-            />
 
             <div
                 className="
@@ -268,10 +251,10 @@ export default function TrendingBeats() {
                     className="
                         grid
                         grid-cols-2
-                        gap-4
-                        sm:gap-6
+                        gap-3
+                        sm:gap-4
                         md:grid-cols-3
-                        lg:grid-cols-4
+                        lg:grid-cols-5
                     "
                 >
                     {trendingBeats.map((beat) => (
