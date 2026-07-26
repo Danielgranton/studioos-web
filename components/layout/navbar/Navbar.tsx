@@ -37,6 +37,7 @@ export default function Navbar() {
 
     }, [searchOpen]);
 
+
     return (
 
         <>
@@ -46,7 +47,7 @@ export default function Navbar() {
                     sticky
                     top-0
                     ${Z.header}
-                    bg-[#0f0f0f]/70
+                    bg-[#0f0f0f]/90
                     backdrop-blur-xl
                 `}
             >
@@ -168,6 +169,8 @@ export default function Navbar() {
                     aria-label="Search"
                     className={`
                         fixed
+                        flex
+                        flex-col
                         inset-0
                         ${Z.mobileSearch}
                         bg-[#0f0f0f]

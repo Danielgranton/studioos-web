@@ -27,7 +27,7 @@ const BROWSE_LINKS = [
     { href: "/explore", label: "Explore", icon: <Compass size={20} className="text-blue-500" /> },
     { href: "/studios", label: "Studios", icon: <Building2 size={20} className="text-blue-500" /> },
     { href: "/producers", label: "Producers", icon: <Mic2 size={20} className="text-blue-500" /> },
-    { label: "Artists", href: "/artists", icon: <User  size={20} className="text-blue-500"/>},
+    { label: "Artists", href: "/artists", icon: <User size={20} className="text-blue-500" /> },
     { href: "/marketplace", label: "Beat Marketplace", icon: <ShoppingBag size={20} className="text-blue-500" /> },
     { href: "/services", label: "Services", icon: <Wrench size={20} className="text-blue-500" /> },
     { href: "/bookings", label: "Bookings", icon: <CalendarCheck size={20} className="text-blue-500" /> },
@@ -44,6 +44,8 @@ export default function NavbarMobileMenu({
 
     // Lock body scroll while the drawer is open, compensating for the
     // scrollbar's width so page content doesn't shift when it disappears.
+    // This is the single owner of body scroll-lock for the mobile menu —
+    // Navbar.tsx should not also toggle body overflow for `menuOpen`.
     useEffect(() => {
 
         if (open) {
@@ -97,7 +99,7 @@ export default function NavbarMobileMenu({
                     fixed
                     left-0
                     top-0
-                    z-70
+                    z-[70]
                     flex
                     h-screen
                     w-60

@@ -2,6 +2,7 @@ import ExploreSection from "@/components/home/explore/ExploreSection";
 import FeaturedStudios from "@/components/home/featuredStudios/featureStudios";
 import Hero from "@/components/home/herosection/Hero";
 import { TopProducers } from "@/components/home/producers";
+import { FeaturedProjects } from "@/components/home/projects";
 import { ServiceSection } from "@/components/home/services";
 import { TrendingBeats } from "@/components/home/treadingBeats";
 
@@ -17,6 +18,7 @@ export default function HomePage() {
             <TopProducers />
             <TrendingBeats/>
             <ServiceSection />
+            <FeaturedProjects />
         </div>
 
     );
