@@ -13,6 +13,7 @@ import {
     Megaphone,
     CircleHelp,
     User,
+    Star,
 } from "lucide-react";
 
 const NAV_LINKS = [
@@ -24,6 +25,7 @@ const NAV_LINKS = [
     { label: "Services", href: "/services", icon: Wrench },
     { label: "Bookings", href: "/bookings", icon: CalendarCheck },
     { label: "Sponsored", href: "/sponsored", icon: Megaphone },
+    { label: "Reviews" , href: "/reviews", icon: Star},
     { label: "Help Center", href: "/help", icon: CircleHelp },
 ];
 

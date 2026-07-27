@@ -129,7 +129,7 @@ export default function TrendingBeats() {
                                             text-transparent
                                         "
                                     >
-                                        ready to record
+                                        Own your favourite Beat
                                     </span>
                                     <svg
                                         aria-hidden="true"

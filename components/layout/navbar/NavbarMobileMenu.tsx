@@ -16,6 +16,7 @@ import {
     Megaphone,
     CircleHelp,
     User,
+    Star,
 } from "lucide-react";
 
 interface NavbarMobileMenuProps {
@@ -32,6 +33,7 @@ const BROWSE_LINKS = [
     { href: "/services", label: "Services", icon: <Wrench size={20} className="text-blue-500" /> },
     { href: "/bookings", label: "Bookings", icon: <CalendarCheck size={20} className="text-blue-500" /> },
     { href: "/sponsored", label: "Sponsored", icon: <Megaphone size={20} className="text-blue-500" /> },
+    { href: "/reviews" , label : "Reviews", icon: <Star size={20} className="text-blue-500"/>},
     { href: "/help", label: "Help Center", icon: <CircleHelp size={20} className="text-blue-500" /> },
 ];
 

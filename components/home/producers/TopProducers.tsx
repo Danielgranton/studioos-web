@@ -99,7 +99,7 @@ export default function TopProducers() {
                                         text-transparent
                                     "
                                 >
-                                    the best
+                                    the best producers
                                 </span>
                                 <svg
                                     aria-hidden="true"
