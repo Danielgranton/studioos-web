@@ -10,7 +10,8 @@ import {
     Music2,
     BriefcaseBusiness,
     MessageCircleMore,
-    Star
+    Star,
+    ThumbsUp
 } from "lucide-react";
 
 import TestimonialSlider from "./TestimonialSlider";
@@ -58,9 +59,22 @@ export default function TestimonialSection() {
                     px-6
                 "
             >
-                {/* Header */}
+              {/* Header */}
 
-                <div className="mb-9">
+            <div
+                className="
+                    mb-10
+                    flex
+                    flex-col
+                    gap-8
+                    xl:flex-row
+                    xl:items-end
+                    xl:justify-between
+                "
+            >
+                {/* Left */}
+
+                <div className="max-w-2xl">
 
                     {/* Badge */}
 
@@ -75,10 +89,10 @@ export default function TestimonialSection() {
                             bg-blue-500/10
                             px-3
                             py-1
-                            text-[9px]
+                            text-[10px]
                             font-semibold
                             uppercase
-                            tracking-[0.22em]
+                            tracking-[0.2em]
                             text-blue-400
                         "
                     >
@@ -115,155 +129,185 @@ export default function TestimonialSection() {
 
                     {/* Title */}
 
-                    <div
+                    <h2
                         className="
-                            mt-3
-                            flex
-                            flex-col
-                            gap-8
-                            xl:flex-row
-                            xl:items-end
-                            xl:justify-between
+                            mt-4
+                            text-3xl
+                            font-black
+                            tracking-tight
+                            text-white
+                            md:text-4xl
                         "
                     >
-                        <div className="max-w-2xl">
+                        Loved by{" "}
 
-                            <h2
-                                className="
-                                    text-2xl
-                                    font-black
-                                    tracking-tight
-                                    text-white
-                                    md:text-4xl
-                                "
-                            >
-                                Loved by{" "}
+                        <span
+                            className="
+                                bg-gradient-to-r
+                                from-blue-400
+                                via-blue-500
+                                to-blue-600
+                                bg-clip-text
+                                text-transparent
+                            "
+                        >
+                            creators
+                        </span>
 
-                                <span
-                                    className="
-                                        bg-gradient-to-r
-                                        from-blue-400
-                                        via-blue-500
-                                        to-blue-600
-                                        bg-clip-text
-                                        text-transparent
-                                    "
-                                >
-                                    creators
-                                </span>
+                        {" "}worldwide.
+                    </h2>
 
-                                {" "}worldwide.
-                            </h2>
+                    <p
+                        className="
+                            mt-4
+                            max-w-2xl
+                            text-base
+                            leading-7
+                            text-slate-400
+                            md:text-lg
+                        "
+                    >
+                        Honest feedback from artists, producers,
+                        studios and creators building amazing
+                        careers with StudioOS.
+                    </p>
 
-                            <p
-                                className="
-                                    mt-2
-                                    max-w-2xl
-                                    text-lg
-                                    leading-8
-                                    text-slate-400
-                                "
-                            >
-                                Real feedback from artists, producers,
-                                studios and creators using StudioOS to
-                                build amazing music.
-                            </p>
+                    {/* Metrics */}
 
-                            {/* Trust Metrics */}
+                    <div
+                        className="
+                            mt-6
+                            flex
+                            flex-wrap
+                            items-center
+                            gap-6
+                        "
+                    >
+                        <div className="flex items-center gap-2">
 
-                            <div
-                                className="
-                                    mt-5
-                                    flex
-                                    flex-wrap
-                                    gap-5
-                                "
-                            >
-                                <div>
+                            <Star
+                                size={18}
+                                className="fill-yellow-400 text-yellow-400"
+                            />
 
-                                    <p className="text-sm font-bold text-white flex items-center gap-2">
-                                        <Star size={20} className="text-yellow-600"/>
-                                        <span>4.9</span>
-                                    </p>
+                            <div>
 
-                                    <p className="mt-1 text-sm text-slate-500">
-                                        Average Rating
-                                    </p>
+                                <p className="font-semibold text-white">
+                                    4.9
+                                </p>
 
-                                </div>
-
-                                <div>
-
-                                    <p className="text-sm font-bold text-white flex items-center gap-2">
-                                        <MessageCircleMore size={20} className="text-blue-500"/> <span>8.4k</span>
-                                    </p>
-
-                                    <p className="mt-1 text-sm text-slate-500">
-                                        Reviews
-                                    </p>
-
-                                </div>
-
-                                <div>
-
-                                    <p className="text-sm font-bold text-white">
-                                        ❤️ 97%
-                                    </p>
-
-                                    <p className="mt-1 text-sm text-slate-500">
-                                        Recommend StudioOS
-                                    </p>
-
-                                </div>
+                                <p className="text-xs text-slate-500">
+                                    Average Rating
+                                </p>
 
                             </div>
 
                         </div>
 
+                        <div className="flex items-center gap-2">
 
-                <div className=" flex-col">
-                        <Link
-                            href="/testimonials"
-                            className="
-                                group
-                                inline-flex
-                                items-center
-                                gap-2
-                                self-start
-                                rounded-full
-                                border
-                                border-[#272727]
-                                bg-blue-600
-                                px-5
-                                py-2
-                                text-sm
-                                font-semibold
-                                text-white
-                                transition-all
-                                duration-300
-                                hover:border-blue-500/40
-                                hover:bg-blue-700
-                                hover:gap-3
-                            "
-                        >
-                            View All Reviews
-
-                            <ArrowRight
-                                size={17}
-                                className="
-                                    transition-transform
-                                    duration-300
-                                    group-hover:translate-x-1
-                                "
+                            <MessageCircleMore
+                                size={18}
+                                className="text-blue-400"
                             />
-                        </Link>
+
+                            <div>
+
+                                <p className="font-semibold text-white">
+                                    8.4K
+                                </p>
+
+                                <p className="text-xs text-slate-500">
+                                    Reviews
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div className="flex items-center gap-2">
+
+                            <ThumbsUp
+                                size={18}
+                                className="text-emerald-400"
+                            />
+
+                            <div>
+
+                                <p className="font-semibold text-white">
+                                    97%
+                                </p>
+
+                                <p className="text-xs text-slate-500">
+                                    Recommend StudioOS
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {/* Right */}
+
+                <div
+                    className="
+                        flex
+                        w-full
+                        flex-col
+                        items-start
+                        gap-4
+                        xl:w-auto
+                        xl:items-end
+                    "
+                >
+                    {/* View All */}
+
+                    <Link
+                        href="/testimonials"
+                        className="
+                            group
+                            inline-flex
+                            items-center
+                            gap-2
+                            rounded-full
+                            border
+                            border-blue-500/20
+                            bg-blue-600
+                            px-3
+                            py-1
+                            text-sm
+                            font-semibold
+                            text-white
+                            transition-all
+                            duration-300
+                            hover:bg-blue-700
+                        "
+                    >
+                        View All Reviews
+
+                        <ArrowRight
+                            size={16}
+                            className="
+                                transition-transform
+                                duration-300
+                                group-hover:translate-x-1
+                            "
+                        />
+                    </Link>
+
+                    {/* Filters */}
 
                     <div
                         className="
                             flex
-                            gap-3
-                            overflow-x-auto
-                            scrollbar-none
+                            w-full
+                            flex-wrap
+                            gap-2
+                            xl:w-auto
+                            xl:justify-end
                         "
                     >
                         {filters.map((filter) => {
@@ -274,24 +318,23 @@ export default function TestimonialSection() {
                                     key={filter.label}
                                     className={`
                                         inline-flex
-                                        shrink-0
+                                        h-7
                                         items-center
-                                        gap-2
+                                        gap-1.5
                                         rounded-full
-                                        px-5
-                                        py-2.5
-                                        text-sm
+                                        px-3.5
+                                        text-xs
                                         font-medium
                                         transition-all
                                         duration-300
                                         ${
                                             filter.active
-                                                ? "bg-blue-500 text-white shadow-[0_10px_30px_rgba(37,99,235,.35)]"
-                                                : "border border-[#2a2a2a] bg-[#171717] text-slate-400 hover:border-blue-500/30 hover:bg-[#1d1d1d] hover:text-white"
+                                                ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/20"
+                                                : "border border-[#2b2b2b] bg-[#171717]/80 text-slate-400 hover:border-blue-500/30 hover:bg-[#1d1d1d] hover:text-white"
                                         }
                                     `}
                                 >
-                                    <Icon size={16} />
+                                    <Icon size={14} />
 
                                     {filter.label}
                                 </button>
@@ -300,9 +343,8 @@ export default function TestimonialSection() {
                     </div>
 
                 </div>
-                </div>
 
-                </div>
+            </div>
                 
                 <TestimonialSlider />
 
