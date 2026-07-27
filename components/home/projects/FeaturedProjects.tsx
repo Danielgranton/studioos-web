@@ -121,14 +121,6 @@ export default function FeaturedProjects() {
                             >
                                 Real music,{" "}
                                 <span
-                                    className="
-                                        bg-gradient-to-r
-                                        from-blue-400
-                                        via-blue-500
-                                        to-blue-600
-                                        bg-clip-text
-                                        text-transparent
-                                    "
                                 >
                                     real success
                                 </span>

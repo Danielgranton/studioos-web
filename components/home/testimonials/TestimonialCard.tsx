@@ -49,22 +49,24 @@ export default function TestimonialCard({
                 group
                 block
                 border-y
-                border-[#262626]
+                border-[#2a2825]
                 bg-transparent
-                px-5
-                py-5
+                px-4
+                py-4
                 transition-all
                 duration-300
-                hover:bg-[#1a1a1a]
+                hover:bg-[#1c1a17]
+                sm:px-5
+                sm:py-5
             "
         >
             {/* Header */}
 
-            <div className="flex items-start justify-between">
+            <div className="flex flex-wrap items-start justify-between gap-y-2">
 
-                <div className="flex gap-3">
+                <div className="flex gap-2.5 sm:gap-3">
 
-                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-white/20 sm:h-20 sm:w-20">
+                    <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-white/20 sm:h-16 sm:w-16 lg:h-20 lg:w-20">
                         <Image
                             src={avatar}
                             alt={name}
@@ -78,14 +80,18 @@ export default function TestimonialCard({
                         />
                       </div>  
 
-                    <div>
+                    <div className="min-w-0">
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
 
                             <h3
                                 className="
+                                    truncate
+                                    text-sm
                                     font-semibold
-                                    text-white
+                                    tracking-tight
+                                    text-[#f5f4f1]
+                                    sm:text-base
                                 "
                             >
                                 {name}
@@ -93,13 +99,16 @@ export default function TestimonialCard({
 
                             <span
                                 className="
-                                    rounded-full
-                                    bg-[#202020]
-                                    px-2
+                                    shrink-0
+                                    rounded-md
+                                    bg-[#1c1a17]
+                                    px-1.5
                                     py-0.5
-                                    text-[10px]
+                                    text-[9px]
                                     font-medium
-                                    text-slate-400
+                                    text-[#9a978f]
+                                    sm:px-2
+                                    sm:text-[10px]
                                 "
                             >
                                 {role}
@@ -110,8 +119,11 @@ export default function TestimonialCard({
                         <p
                             className="
                                 mt-0.5
-                                text-sm
-                                text-slate-500
+                                truncate
+                                font-mono
+                                text-xs
+                                text-[#6b685f]
+                                sm:text-sm
                             "
                         >
                             @{username}
@@ -121,15 +133,16 @@ export default function TestimonialCard({
 
                 </div>
 
-                <div className="flex">
+                <div className="flex shrink-0">
 
                     {Array.from({ length: rating }).map((_, index) => (
                         <Star
                             key={index}
-                            size={14}
+                            size={12}
                             className="
-                                fill-yellow-400
-                                text-yellow-400
+                                fill-[#e8a33d]
+                                text-[#e8a33d]
+                                sm:size-[14px]
                             "
                         />
                     ))}
@@ -142,11 +155,14 @@ export default function TestimonialCard({
 
             <p
                 className="
-                    mt-5
+                    mt-4
                     line-clamp-3
-                    text-sm
-                    leading-7
-                    text-slate-300
+                    text-xs
+                    leading-6
+                    text-[#c4c1b8]
+                    sm:mt-5
+                    sm:text-sm
+                    sm:leading-7
                 "
             >
                 {review}
@@ -154,17 +170,22 @@ export default function TestimonialCard({
 
             {/* Tags */}
 
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-3 flex flex-wrap gap-1.5 sm:mt-4 sm:gap-2">
 
                 <span
                     className="
-                        rounded-full
-                        bg-blue-500/10
-                        px-3
-                        py-1
-                        text-[11px]
+                        rounded-md
+                        border
+                        border-[#e8a33d]/20
+                        bg-[#e8a33d]/10
+                        px-2.5
+                        py-0.5
+                        text-[10px]
                         font-medium
-                        text-blue-400
+                        text-[#e8a33d]
+                        sm:px-3
+                        sm:py-1
+                        sm:text-[11px]
                     "
                 >
                     {provider}
@@ -172,12 +193,17 @@ export default function TestimonialCard({
 
                 <span
                     className="
-                        rounded-full
-                        bg-[#202020]
-                        px-3
-                        py-1
-                        text-[11px]
-                        text-slate-300
+                        rounded-md
+                        border
+                        border-[#2a2825]
+                        bg-[#1c1a17]
+                        px-2.5
+                        py-0.5
+                        text-[10px]
+                        text-[#b5b2a8]
+                        sm:px-3
+                        sm:py-1
+                        sm:text-[11px]
                     "
                 >
                     {service}
@@ -189,31 +215,38 @@ export default function TestimonialCard({
 
             <div
                 className="
-                    mt-5
+                    mt-4
                     flex
+                    flex-wrap
                     items-center
                     justify-between
+                    gap-y-2
+                    sm:mt-5
                 "
             >
                 <div
                     className="
                         flex
                         items-center
-                        gap-5
-                        text-sm
-                        text-slate-500
+                        gap-3
+                        font-mono
+                        text-xs
+                        text-[#6b685f]
+                        sm:gap-5
+                        sm:text-sm
                     "
                 >
                     <div
                         className="
                             flex
                             items-center
-                            gap-1.5
+                            gap-1
                             transition-colors
                             group-hover:text-red-400
+                            sm:gap-1.5
                         "
                     >
-                        <Heart size={16} />
+                        <Heart size={14} className="sm:size-4" />
 
                         {likes.toLocaleString()}
                     </div>
@@ -222,10 +255,11 @@ export default function TestimonialCard({
                         className="
                             flex
                             items-center
-                            gap-1.5
+                            gap-1
+                            sm:gap-1.5
                         "
                     >
-                        <MessageCircle size={16} />
+                        <MessageCircle size={14} className="sm:size-4" />
 
                         {comments}
                     </div>
@@ -234,10 +268,11 @@ export default function TestimonialCard({
                         className="
                             flex
                             items-center
-                            gap-1.5
+                            gap-1
+                            sm:gap-1.5
                         "
                     >
-                        <ThumbsDown size={16} />
+                        <ThumbsDown size={14} className="sm:size-4" />
 
                         {dislikes}
                     </div>
@@ -246,8 +281,10 @@ export default function TestimonialCard({
 
                 <span
                     className="
-                        text-xs
-                        text-slate-600
+                        font-mono
+                        text-[10px]
+                        text-[#6b685f]
+                        sm:text-xs
                     "
                 >
                     {time}

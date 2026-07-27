@@ -52,15 +52,15 @@ export default function TrendingBeats() {
                                     gap-2
                                     rounded-full
                                     border
-                                    border-blue-500/20
-                                    bg-blue-500/10
+                                    border-[#e8a33d]/20
+                                    bg-[#e8a33d]/10
                                     px-3
                                     py-1
                                     text-[9px]
                                     font-semibold
                                     uppercase
                                     tracking-[0.2em]
-                                    text-blue-400
+                                    text-[#e8a33d]
                                 "
                             >
                                 <span className="relative flex h-1.5 w-1.5">
@@ -72,16 +72,16 @@ export default function TrendingBeats() {
                                             w-full
                                             animate-ping
                                             rounded-full
-                                            bg-blue-400
+                                            bg-[#e8a33d]
                                             opacity-60
                                         "
                                     />
-                                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-blue-400" />
+                                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#e8a33d]" />
                                 </span>
                                 Trending Beats
                             </span>
 
-                            <span className="h-px flex-1 bg-gradient-to-r from-blue-500/30 to-transparent lg:hidden" />
+                            <span className="h-px flex-1 bg-gradient-to-r from-[#e8a33d]/30 to-transparent lg:hidden" />
                         </div>
 
                         {/* Headline */}
@@ -95,7 +95,7 @@ export default function TrendingBeats() {
                                 {[10, 20, 8, 28, 14, 24, 9, 18].map((h, i) => (
                                     <span
                                         key={i}
-                                        className="w-[3px] animate-pulse rounded-full bg-blue-400"
+                                        className="w-[3px] animate-pulse rounded-full bg-[#e8a33d]"
                                         style={{
                                             height: `${h}px`,
                                             animationDelay: `${i * 0.12}s`,
@@ -110,7 +110,7 @@ export default function TrendingBeats() {
                                     font-black
                                     leading-[1.05]
                                     tracking-tight
-                                    text-white
+                                    text-[#f5f4f1]
                                     whitespace-nowrap
                                 "
                                 style={{
@@ -122,9 +122,9 @@ export default function TrendingBeats() {
                                     <span
                                         className="
                                             bg-gradient-to-r
-                                            from-blue-400
-                                            via-blue-500
-                                            to-blue-600
+                                            from-[#e8a33d]
+                                            via-[#e0954f]
+                                            to-[#d97757]
                                             bg-clip-text
                                             text-transparent
                                         "
@@ -135,7 +135,7 @@ export default function TrendingBeats() {
                                         aria-hidden="true"
                                         viewBox="0 0 200 16"
                                         preserveAspectRatio="none"
-                                        className="absolute -bottom-1 left-0 h-[0.15em] w-full text-blue-500"
+                                        className="absolute -bottom-1 left-0 h-[0.15em] w-full text-[#e8a33d]"
                                     >
                                         <path
                                             d="M2 10c24-9 48-9 72 0s48 9 72 0 48-9 50 0"
@@ -158,7 +158,7 @@ export default function TrendingBeats() {
                                 max-w-lg
                                 text-sm
                                 leading-6
-                                text-[#aaaaaa]
+                                text-[#9a978f]
                                 sm:mt-4
                                 sm:text-base
                                 sm:leading-7
@@ -193,14 +193,14 @@ export default function TrendingBeats() {
                                 justify-center
                                 gap-2
                                 rounded-full
-                                bg-blue-600
+                                bg-[#e8a33d]
                                 px-5
                                 py-2.5
                                 text-sm
                                 font-semibold
-                                text-white
+                                text-[#161513]
                                 transition-all
-                                hover:bg-blue-500
+                                hover:bg-[#f0b458]
                                 hover:gap-3
                                 sm:w-auto
                                 sm:justify-start
@@ -233,8 +233,8 @@ export default function TrendingBeats() {
                                         sm:text-xs
                                         ${
                                             activeFilter === filter
-                                                ? "border-blue-500/40 bg-blue-500/10 text-blue-400"
-                                                : "border-[#272727] bg-[#171717] text-[#aaaaaa] hover:border-[#3f3f3f] hover:text-white"
+                                                ? "border-[#e8a33d]/40 bg-[#e8a33d]/10 text-[#e8a33d]"
+                                                : "border-[#2a2825] bg-[#161513] text-[#9a978f] hover:border-[#3a3630] hover:text-[#f5f4f1]"
                                         }
                                     `}
                                 >

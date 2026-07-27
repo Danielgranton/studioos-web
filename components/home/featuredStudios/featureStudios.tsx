@@ -36,15 +36,15 @@ export default function FeaturedStudios() {
                                     gap-2
                                     rounded-full
                                     border
-                                    border-blue-500/20
-                                    bg-blue-500/10
+                                    border-[#e8a33d]/20
+                                    bg-[#e8a33d]/10
                                     px-2
                                     py-1
                                     text-[9px]
                                     font-semibold
                                     uppercase
                                     tracking-[0.2em]
-                                    text-blue-400
+                                    text-[#e8a33d]
                                 "
                             >
                                 <span className="relative flex h-1.5 w-1.5">
@@ -56,16 +56,16 @@ export default function FeaturedStudios() {
                                             w-full
                                             animate-ping
                                             rounded-full
-                                            bg-blue-400
+                                            bg-[#e8a33d]
                                             opacity-60
                                         "
                                     />
-                                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-blue-400" />
+                                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#e8a33d]" />
                                 </span>
                                 Featured Studios
                             </span>
 
-                            <span className="h-px flex-1 bg-gradient-to-r from-blue-500/30 to-transparent lg:hidden" />
+                            <span className="h-px flex-1 bg-gradient-to-r from-[#e8a33d]/30 to-transparent lg:hidden" />
                         </div>
 
                         {/* Headline */}
@@ -79,7 +79,7 @@ export default function FeaturedStudios() {
                                 {[10, 20, 8, 28, 14, 24, 9, 18].map((h, i) => (
                                     <span
                                         key={i}
-                                        className="w-[3px] animate-pulse rounded-full bg-blue-400"
+                                        className="w-[3px] animate-pulse rounded-full bg-[#e8a33d]"
                                         style={{
                                             height: `${h}px`,
                                             animationDelay: `${i * 0.12}s`,
@@ -94,7 +94,7 @@ export default function FeaturedStudios() {
                                     font-black
                                     leading-[1.05]
                                     tracking-tight
-                                    text-white
+                                    text-[#f5f4f1]
                                     whitespace-nowrap
                                 "
                                 style={{
@@ -106,9 +106,9 @@ export default function FeaturedStudios() {
                                     <span
                                         className="
                                             bg-gradient-to-r
-                                            from-blue-400
-                                            via-blue-500
-                                            to-blue-600
+                                            from-[#e8a33d]
+                                            via-[#e0954f]
+                                            to-[#d97757]
                                             bg-clip-text
                                             text-transparent
                                         "
@@ -119,7 +119,7 @@ export default function FeaturedStudios() {
                                         aria-hidden="true"
                                         viewBox="0 0 110 16"
                                         preserveAspectRatio="none"
-                                        className="absolute -bottom-1 left-0 h-[0.15em] w-full text-blue-500"
+                                        className="absolute -bottom-1 left-0 h-[0.15em] w-full text-[#e8a33d]"
                                     >
                                         <path
                                             d="M2 10c13-9 26-9 39 0s26 9 39 0 26-9 27 0"
@@ -142,7 +142,7 @@ export default function FeaturedStudios() {
                                 max-w-lg
                                 text-sm
                                 leading-6
-                                text-[#aaaaaa]
+                                text-[#9a978f]
                                 sm:mt-4
                                 sm:text-base
                                 sm:leading-7
@@ -153,7 +153,7 @@ export default function FeaturedStudios() {
                             project to life.
                         </p>
 
-                        {/* Trust signal strip */}
+                        {/* Trust signal strip — mono numbers, same convention as every card */}
                         <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 sm:mt-6 sm:gap-x-6">
                             {[
                                 { value: "200+", label: "Studios" },
@@ -161,10 +161,10 @@ export default function FeaturedStudios() {
                                 { value: "4.9★", label: "Avg rating" },
                             ].map((stat) => (
                                 <div key={stat.label} className="flex items-center gap-1.5 sm:gap-2">
-                                    <span className="text-xs font-bold text-white sm:text-sm">
+                                    <span className="font-mono text-xs font-bold text-[#f5f4f1] sm:text-sm">
                                         {stat.value}
                                     </span>
-                                    <span className="text-[11px] text-[#717171] sm:text-xs">
+                                    <span className="text-[11px] text-[#6b685f] sm:text-xs">
                                         {stat.label}
                                     </span>
                                 </div>
@@ -194,14 +194,14 @@ export default function FeaturedStudios() {
                                 justify-center
                                 gap-2
                                 rounded-full
-                                bg-blue-600
+                                bg-[#e8a33d]
                                 px-5
                                 py-2.5
                                 text-sm
                                 font-semibold
-                                text-white
+                                text-[#161513]
                                 transition-all
-                                hover:bg-blue-700
+                                hover:bg-[#f0b458]
                                 hover:gap-3
                                 sm:w-auto
                                 sm:justify-start
@@ -234,8 +234,8 @@ export default function FeaturedStudios() {
                                             sm:text-xs
                                             ${
                                                 i === 0
-                                                    ? "border-blue-500/40 bg-blue-500/10 text-blue-400"
-                                                    : "border-[#272727] bg-[#171717] text-[#aaaaaa] hover:border-[#3f3f3f] hover:text-white"
+                                                    ? "border-[#e8a33d]/40 bg-[#e8a33d]/10 text-[#e8a33d]"
+                                                    : "border-[#2a2825] bg-[#161513] text-[#9a978f] hover:border-[#3a3630] hover:text-[#f5f4f1]"
                                             }
                                         `}
                                     >

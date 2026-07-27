@@ -63,14 +63,14 @@ export default function ProjectCard({
                 overflow-hidden
                 rounded-2xl
                 border
-                border-[#272727]
+                border-[#2a2825]
                 transition-all
                 duration-300
                 hover:-translate-y-1
-                hover:border-blue-500/40
+                hover:border-[#e8a33d]/40
                 focus-visible:outline-none
                 focus-visible:ring-2
-                focus-visible:ring-blue-500/60
+                focus-visible:ring-[#e8a33d]/60
                 sm:aspect-[4/4.2]
             "
         >
@@ -152,36 +152,36 @@ export default function ProjectCard({
             <div className="relative z-10 flex flex-col p-4 sm:p-5">
 
                 {/* Genre */}
-                <span className="text-[10px] font-semibold uppercase tracking-wide text-blue-400 sm:text-[11px]">
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-[#e8a33d] sm:text-[11px]">
                     {genre}
                 </span>
 
                 {/* Title — the visual anchor */}
                 <div className="mt-1 flex min-w-0 items-center gap-1.5">
-                    <h3 className="truncate text-lg font-bold leading-tight text-white sm:text-xl">
+                    <h3 className="truncate text-lg font-semibold tracking-tight text-[#f5f4f1] sm:text-xl">
                         {title}
                     </h3>
 
                     {verified && (
-                        <BadgeCheck size={16} className="shrink-0 text-blue-400" />
+                        <BadgeCheck size={16} className="shrink-0 text-[#5eead4]" />
                     )}
                 </div>
 
                 {/* Artist */}
-                <p className="mt-0.5 truncate text-xs text-slate-300 sm:text-sm">
+                <p className="mt-0.5 truncate text-xs text-[#c4c1b8] sm:text-sm">
                     by {artist}
                 </p>
 
                 {/* Studio • Producer */}
-                <div className="mt-2.5 flex min-w-0 items-center gap-1.5 text-[11px] text-slate-400 sm:text-xs">
-                    <Building2 size={12} className="shrink-0 text-slate-500" />
+                <div className="mt-2.5 flex min-w-0 items-center gap-1.5 text-[11px] text-[#9a978f] sm:text-xs">
+                    <Building2 size={12} className="shrink-0 text-[#6b685f]" />
                     <span className="truncate">
-                        {studio} <span className="text-slate-600">•</span> {producer}
+                        {studio} <span className="text-[#6b685f]">•</span> {producer}
                     </span>
                 </div>
 
-                {/* Stats */}
-                <div className="mt-3.5 flex items-center gap-3 border-t border-white/10 pt-3 text-[11px] text-slate-300 sm:mt-4 sm:pt-3.5">
+                {/* Stats — mono readout, matches every other card in the system */}
+                <div className="mt-3.5 flex items-center gap-3 border-t border-white/10 pt-3 font-mono text-[11px] text-[#c4c1b8] sm:mt-4 sm:pt-3.5">
                     <span className="flex items-center gap-1">
                         <Headphones size={12} />
                         {streams}
@@ -198,7 +198,7 @@ export default function ProjectCard({
 
                 {/* Footer */}
                 <div className="mt-2.5 flex min-w-0 items-center justify-between gap-2">
-                    <span className="truncate text-xs font-semibold text-blue-400 sm:text-sm">
+                    <span className="truncate text-xs font-semibold text-[#e8a33d] sm:text-sm">
                         View Project
                     </span>
 
@@ -209,11 +209,11 @@ export default function ProjectCard({
                             items-center
                             justify-center
                             rounded-full
-                            bg-blue-500/10
-                            text-blue-400
+                            bg-[#e8a33d]/10
+                            text-[#e8a33d]
                             transition-all
                             duration-300
-                            group-hover:bg-blue-500/20
+                            group-hover:bg-[#e8a33d]/20
                             group-hover:translate-x-0.5
                         "
                     >

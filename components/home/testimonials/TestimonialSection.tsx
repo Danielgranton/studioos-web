@@ -87,9 +87,9 @@ export default function TestimonialSection() {
                             border
                             border-blue-500/20
                             bg-blue-500/10
-                            px-3
+                            px-2
                             py-1
-                            text-[10px]
+                            text-[9px]
                             font-semibold
                             uppercase
                             tracking-[0.2em]
@@ -142,14 +142,6 @@ export default function TestimonialSection() {
                         Loved by{" "}
 
                         <span
-                            className="
-                                bg-gradient-to-r
-                                from-blue-400
-                                via-blue-500
-                                to-blue-600
-                                bg-clip-text
-                                text-transparent
-                            "
                         >
                             creators
                         </span>
