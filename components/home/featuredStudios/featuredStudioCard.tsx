@@ -53,16 +53,16 @@ export default function FeaturedStudioCard({
                 overflow-hidden
                 rounded-2xl
                 border
-                border-[#272727]
-                bg-[#141414]
+                border-[#2a2825]
+                bg-[#161513]
                 p-2
                 transition-all
                 duration-300
                 hover:-translate-y-1
-                hover:border-blue-500/30
+                hover:border-[#e8a33d]/30
                 focus-visible:outline-none
                 focus-visible:ring-2
-                focus-visible:ring-blue-500/60
+                focus-visible:ring-[#e8a33d]/60
                 sm:rounded-[24px]
                 sm:p-3
                 lg:rounded-2xl
@@ -81,7 +81,7 @@ export default function FeaturedStudioCard({
                     h-40
                     w-40
                     rounded-full
-                    bg-blue-500/10
+                    bg-[#e8a33d]/10
                     opacity-0
                     blur-3xl
                     transition-opacity
@@ -101,7 +101,7 @@ export default function FeaturedStudioCard({
                     w-full
                     overflow-hidden
                     rounded-xl
-                    bg-[#0a0a0a]
+                    bg-[#0e0d0c]
                     sm:aspect-[16/11]
                     sm:rounded-[18px]
                     lg:rounded-2xl
@@ -126,7 +126,7 @@ export default function FeaturedStudioCard({
                     className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-black/20"
                 />
 
-                {/* Availability */}
+                {/* Availability — status color, kept distinct from the brand accent */}
                 <div className="absolute left-1.5 top-1.5 sm:left-3 sm:top-3 lg:left-2.5 lg:top-2.5">
                     <span
                         className={`
@@ -169,7 +169,7 @@ export default function FeaturedStudioCard({
                     </span>
                 </div>
 
-                {/* Rating */}
+                {/* Rating — mono readout, matches the producer card's meter numbers */}
                 <div
                     className="
                         absolute
@@ -182,6 +182,7 @@ export default function FeaturedStudioCard({
                         bg-black/60
                         px-1.5
                         py-0.5
+                        font-mono
                         text-[9px]
                         font-semibold
                         text-white
@@ -199,9 +200,9 @@ export default function FeaturedStudioCard({
                         lg:text-[10px]
                     "
                 >
-                    <Star size={10} className="fill-yellow-400 text-yellow-400 sm:size-3 lg:size-[11px]" />
+                    <Star size={10} className="fill-[#e8a33d] text-[#e8a33d] sm:size-3 lg:size-[11px]" />
                     {rating.toFixed(1)}
-                    <span className="hidden text-[#d4d4d4] sm:inline">
+                    <span className="hidden text-[#a19d92] sm:inline">
                         ({reviews})
                     </span>
                 </div>
@@ -209,10 +210,10 @@ export default function FeaturedStudioCard({
                 {/* Price */}
                 <div className="absolute bottom-1.5 left-1.5 sm:bottom-3 sm:left-3 lg:bottom-2.5 lg:left-2.5">
                     <div className="rounded-lg bg-black/60 px-2 py-1 backdrop-blur-md sm:rounded-xl sm:px-3 sm:py-1.5 lg:rounded-lg lg:px-2.5 lg:py-1">
-                        <p className="hidden text-[9px] uppercase tracking-wide text-[#c4c4c4] sm:block lg:text-[8px]">
+                        <p className="hidden font-mono text-[9px] uppercase tracking-wide text-[#c4c0b6] sm:block lg:text-[8px]">
                             From
                         </p>
-                        <p className="text-xs font-bold leading-tight text-white sm:text-sm lg:text-xs">
+                        <p className="font-mono text-xs font-bold leading-tight text-white sm:text-sm lg:text-xs">
                             {priceLabel}
                         </p>
                     </div>
@@ -225,11 +226,11 @@ export default function FeaturedStudioCard({
                 {/* Header */}
                 <div className="flex items-start justify-between gap-2 sm:gap-3">
                     <div className="flex min-w-0 items-center gap-1 sm:gap-1.5">
-                        <h3 className="truncate text-sm font-bold text-white sm:text-base lg:text-sm">
+                        <h3 className="truncate text-sm font-semibold tracking-tight text-[#f5f4f1] sm:text-base lg:text-sm">
                             {name}
                         </h3>
                         {verified && (
-                            <BadgeCheck size={14} className="shrink-0 text-blue-400 sm:size-4 lg:size-[14px]" />
+                            <BadgeCheck size={14} className="shrink-0 text-[#5eead4] sm:size-4 lg:size-[14px]" />
                         )}
                     </div>
 
@@ -238,12 +239,16 @@ export default function FeaturedStudioCard({
                             hidden
                             shrink-0
                             rounded-full
-                            bg-blue-500/10
+                            border
+                            border-[#e8a33d]/20
+                            bg-[#e8a33d]/10
                             px-2.5
                             py-1
                             text-[10px]
                             font-semibold
-                            text-blue-400
+                            uppercase
+                            tracking-wide
+                            text-[#e8a33d]
                             sm:inline-block
                             lg:px-2
                             lg:py-0.5
@@ -263,8 +268,9 @@ export default function FeaturedStudioCard({
                         items-center
                         gap-x-3
                         gap-y-1
+                        font-mono
                         text-[11px]
-                        text-[#8a8a8a]
+                        text-[#9a978f]
                         sm:mt-2
                         sm:gap-x-4
                         sm:text-xs
@@ -287,29 +293,29 @@ export default function FeaturedStudioCard({
 
                 {/* Services — desktop/tablet only, too cramped on 2-up mobile */}
                 {services.length > 0 && (
-                    <p className="mt-3 hidden line-clamp-2 text-sm leading-6 text-[#9a9a9a] sm:block lg:mt-2 lg:text-xs lg:leading-5">
+                    <p className="mt-3 hidden line-clamp-2 text-sm leading-6 text-[#a19d92] sm:block lg:mt-2 lg:text-xs lg:leading-5">
                         {services.join(" • ")}
                     </p>
                 )}
 
-                {/* Genre tags — show just one on mobile, up to 3 from sm */}
+                {/* Genre tags — patch-cable label style, shared with ProducerCard */}
                 {genres.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1 sm:mt-3 sm:gap-1.5 lg:mt-2">
                         {genres.slice(0, 1).map((genre) => (
                             <span
                                 key={genre}
                                 className="
-                                    rounded-full
+                                    rounded-md
                                     border
-                                    border-[#2c2c2c]
-                                    bg-[#1c1c1c]
+                                    border-[#2a2825]
+                                    bg-[#1c1a17]
                                     px-2
                                     py-0.5
                                     text-[9px]
                                     font-medium
-                                    text-[#c4c4c4]
+                                    text-[#b5b2a8]
                                     transition-colors
-                                    group-hover:border-[#3a3a3a]
+                                    group-hover:border-[#3a3630]
                                     sm:hidden
                                 "
                             >
@@ -321,17 +327,17 @@ export default function FeaturedStudioCard({
                                 key={`${genre}-desktop`}
                                 className="
                                     hidden
-                                    rounded-full
+                                    rounded-md
                                     border
-                                    border-[#2c2c2c]
-                                    bg-[#1c1c1c]
+                                    border-[#2a2825]
+                                    bg-[#1c1a17]
                                     px-2.5
                                     py-1
                                     text-[10px]
                                     font-medium
-                                    text-[#c4c4c4]
+                                    text-[#b5b2a8]
                                     transition-colors
-                                    group-hover:border-[#3a3a3a]
+                                    group-hover:border-[#3a3630]
                                     sm:inline-block
                                     lg:px-2
                                     lg:py-0.5
@@ -345,46 +351,46 @@ export default function FeaturedStudioCard({
                 )}
 
                 {/* Footer */}
-<div className="mt-2.5 flex items-center justify-between gap-2 border-t border-[#232323] pt-2 sm:mt-3 sm:pt-2.5 lg:mt-2 lg:pt-2">
-    <span className="hidden truncate text-[10px] text-[#717171] sm:block lg:text-[9px]">
-        {reviews > 0 ? `${reviews} verified reviews` : "New studio"}
-    </span>
-    <span className="text-[9px] text-[#717171] sm:hidden">
-        {reviews > 0 ? `${reviews} reviews` : "New"}
-    </span>
+                <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-[#2a2825] pt-2 sm:mt-3 sm:pt-2.5 lg:mt-2 lg:pt-2">
+                    <span className="hidden truncate font-mono text-[10px] text-[#6b685f] sm:block lg:text-[9px]">
+                        {reviews > 0 ? `${reviews} verified reviews` : "New studio"}
+                    </span>
+                    <span className="font-mono text-[9px] text-[#6b685f] sm:hidden">
+                        {reviews > 0 ? `${reviews} reviews` : "New"}
+                    </span>
 
-    <div
-        className="
-            flex
-            shrink-0
-            items-center
-            gap-1
-            rounded-full
-            bg-blue-600
-            px-2.5
-            py-1
-            text-[10px]
-            font-semibold
-            text-white
-            transition-all
-            duration-300
-            group-hover:gap-1.5
-            group-hover:bg-blue-500
-            sm:px-3
-            sm:py-1.5
-            sm:text-[11px]
-            lg:px-2.5
-            lg:py-1
-            lg:text-[10px]
-        "
-    >
-        Book
-        <ArrowRight
-            size={11}
-            className="transition-transform duration-300 group-hover:translate-x-0.5 sm:size-3 lg:size-[11px]"
-        />
-    </div>
-</div>
+                    <div
+                        className="
+                            flex
+                            shrink-0
+                            items-center
+                            gap-1
+                            rounded-full
+                            bg-[#e8a33d]
+                            px-2.5
+                            py-1
+                            text-[10px]
+                            font-semibold
+                            text-[#161513]
+                            transition-all
+                            duration-300
+                            group-hover:gap-1.5
+                            group-hover:bg-[#f0b458]
+                            sm:px-3
+                            sm:py-1.5
+                            sm:text-[11px]
+                            lg:px-2.5
+                            lg:py-1
+                            lg:text-[10px]
+                        "
+                    >
+                        Book
+                        <ArrowRight
+                            size={11}
+                            className="transition-transform duration-300 group-hover:translate-x-0.5 sm:size-3 lg:size-[11px]"
+                        />
+                    </div>
+                </div>
 
             </div>
 

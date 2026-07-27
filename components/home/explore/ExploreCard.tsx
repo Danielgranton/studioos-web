@@ -13,42 +13,45 @@ interface ExploreCardProps {
     accent: string;
 }
 
+// Patch-cable palette — muted, warm-leaning hues instead of stock Tailwind
+// neon-on-dark. Keys are unchanged so existing call sites don't need to
+// pass different accent props.
 const accentStyles = {
     blue: {
-        icon: "text-blue-400 bg-blue-500/10",
-        border: "group-hover:border-blue-500/40",
-        glow: "bg-blue-500/10",
-        text: "text-blue-400",
+        icon: "text-[#7fa9ac] bg-[#7fa9ac]/10",
+        border: "group-hover:border-[#7fa9ac]/40",
+        glow: "bg-[#7fa9ac]/10",
+        text: "text-[#7fa9ac]",
     },
     purple: {
-        icon: "text-purple-400 bg-purple-500/10",
-        border: "group-hover:border-purple-500/40",
-        glow: "bg-purple-500/10",
-        text: "text-purple-400",
+        icon: "text-[#a58bc4] bg-[#a58bc4]/10",
+        border: "group-hover:border-[#a58bc4]/40",
+        glow: "bg-[#a58bc4]/10",
+        text: "text-[#a58bc4]",
     },
     pink: {
-        icon: "text-pink-400 bg-pink-500/10",
-        border: "group-hover:border-pink-500/40",
-        glow: "bg-pink-500/10",
-        text: "text-pink-400",
+        icon: "text-[#c98ba0] bg-[#c98ba0]/10",
+        border: "group-hover:border-[#c98ba0]/40",
+        glow: "bg-[#c98ba0]/10",
+        text: "text-[#c98ba0]",
     },
     green: {
-        icon: "text-green-400 bg-green-500/10",
-        border: "group-hover:border-green-500/40",
-        glow: "bg-green-500/10",
-        text: "text-green-400",
+        icon: "text-[#8fae82] bg-[#8fae82]/10",
+        border: "group-hover:border-[#8fae82]/40",
+        glow: "bg-[#8fae82]/10",
+        text: "text-[#8fae82]",
     },
     orange: {
-        icon: "text-orange-400 bg-orange-500/10",
-        border: "group-hover:border-orange-500/40",
-        glow: "bg-orange-500/10",
-        text: "text-orange-400",
+        icon: "text-[#e8a33d] bg-[#e8a33d]/10",
+        border: "group-hover:border-[#e8a33d]/40",
+        glow: "bg-[#e8a33d]/10",
+        text: "text-[#e8a33d]",
     },
     red: {
-        icon: "text-red-400 bg-red-500/10",
-        border: "group-hover:border-red-500/40",
-        glow: "bg-red-500/10",
-        text: "text-red-400",
+        icon: "text-[#c17361] bg-[#c17361]/10",
+        border: "group-hover:border-[#c17361]/40",
+        glow: "bg-[#c17361]/10",
+        text: "text-[#c17361]",
     },
 } as const;
 
@@ -63,7 +66,7 @@ export default function ExploreCard({
 }: ExploreCardProps) {
     const style =
         accentStyles[accent as keyof typeof accentStyles] ??
-        accentStyles.blue;
+        accentStyles.orange;
 
     return (
         <Link
@@ -78,13 +81,13 @@ export default function ExploreCard({
                 overflow-hidden
                 rounded-xl
                 border
-                border-[#262626]
-                bg-[#171717]
+                border-[#2a2825]
+                bg-[#161513]
                 p-3
                 transition-all
                 duration-300
                 hover:-translate-y-1
-                hover:bg-[#1b1b1b]
+                hover:bg-[#1b1a17]
                 hover:shadow-xl
                 sm:min-h-[205px]
                 sm:rounded-2xl
@@ -147,11 +150,11 @@ export default function ExploreCard({
 
                     <div className="min-w-0">
 
-                        <h3 className="truncate text-base font-semibold text-white sm:text-lg lg:text-sm">
+                        <h3 className="truncate text-base font-semibold tracking-tight text-[#f5f4f1] sm:text-lg lg:text-sm">
                             {title}
                         </h3>
 
-                        <p className="mt-0.5 truncate text-[11px] text-slate-500 sm:text-xs lg:text-[11px]">
+                        <p className="mt-0.5 truncate font-mono text-[11px] text-[#6b685f] sm:text-xs lg:text-[11px]">
                             {stats}
                         </p>
 
@@ -165,7 +168,7 @@ export default function ExploreCard({
 
             <div className="mt-3 sm:mt-4 lg:mt-3">
 
-                <p className="line-clamp-2 text-xs leading-5 text-slate-400 sm:text-sm sm:leading-6 lg:text-xs lg:leading-5">
+                <p className="line-clamp-2 text-xs leading-5 text-[#9a978f] sm:text-sm sm:leading-6 lg:text-xs lg:leading-5">
                     {description}
                 </p>
 
@@ -177,15 +180,15 @@ export default function ExploreCard({
                         <span
                             key={tag}
                             className="
-                                rounded-full
+                                rounded-md
                                 border
-                                border-[#333]
-                                bg-[#202020]
+                                border-[#2a2825]
+                                bg-[#1c1a17]
                                 px-2
                                 py-0.5
                                 text-[9px]
                                 font-medium
-                                text-slate-300
+                                text-[#b5b2a8]
                                 sm:px-2.5
                                 sm:py-1
                                 sm:text-[10px]
@@ -211,7 +214,7 @@ export default function ExploreCard({
                     items-center
                     justify-between
                     border-t
-                    border-[#262626]
+                    border-[#2a2825]
                     pt-2.5
                     sm:mt-4
                     sm:pt-3
@@ -233,13 +236,14 @@ export default function ExploreCard({
 
                 <ArrowRight
                     size={14}
-                    className="
+                    className={`
                         transition-transform
                         duration-300
                         group-hover:translate-x-1
                         sm:size-4
-                        lg:size-[20px]
-                    "
+                        lg:size-[18px]
+                        ${style.text}
+                    `}
                 />
             </div>
 

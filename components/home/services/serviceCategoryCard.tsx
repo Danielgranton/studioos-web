@@ -12,104 +12,109 @@ interface ServiceCategoryCardProps {
     services: string[];
 }
 
+// Re-spaced palette: consistent muted saturation/lightness (matches the
+// patch-cable treatment used across the other cards) with hues spread
+// further apart than Tailwind's defaults, so 14 categories stay tellable
+// apart at a glance instead of clustering (teal/cyan/emerald were all but
+// indistinguishable before, same for indigo/violet/purple).
 const accentStyles = {
-    blue: {
-        icon: "text-blue-400 bg-blue-500/10 border-blue-500/30",
-        hover: "hover:border-blue-500/40",
-        glow: "bg-blue-500/10",
-        text: "text-blue-400",
-        solid: "group-hover:bg-blue-600",
-    },
-    purple: {
-        icon: "text-purple-400 bg-purple-500/10 border-purple-500/30",
-        hover: "hover:border-purple-500/40",
-        glow: "bg-purple-500/10",
-        text: "text-purple-400",
-        solid: "group-hover:bg-purple-600",
-    },
-    pink: {
-        icon: "text-pink-400 bg-pink-500/10 border-pink-500/30",
-        hover: "hover:border-pink-500/40",
-        glow: "bg-pink-500/10",
-        text: "text-pink-400",
-        solid: "group-hover:bg-pink-600",
-    },
-    green: {
-        icon: "text-green-400 bg-green-500/10 border-green-500/30",
-        hover: "hover:border-green-500/40",
-        glow: "bg-green-500/10",
-        text: "text-green-400",
-        solid: "group-hover:bg-green-600",
-    },
     red: {
-        icon: "text-red-400 bg-red-500/10 border-red-500/30",
-        hover: "hover:border-red-500/40",
-        glow: "bg-red-500/10",
-        text: "text-red-400",
-        solid: "group-hover:bg-red-600",
-    },
-    orange: {
-        icon: "text-orange-400 bg-orange-500/10 border-orange-500/30",
-        hover: "hover:border-orange-500/40",
-        glow: "bg-orange-500/10",
-        text: "text-orange-400",
-        solid: "group-hover:bg-orange-600",
-    },
-    yellow: {
-        icon: "text-yellow-400 bg-yellow-500/10 border-yellow-500/30",
-        hover: "hover:border-yellow-500/40",
-        glow: "bg-yellow-500/10",
-        text: "text-yellow-400",
-        solid: "group-hover:bg-yellow-600",
-    },
-    cyan: {
-        icon: "text-cyan-400 bg-cyan-500/10 border-cyan-500/30",
-        hover: "hover:border-cyan-500/40",
-        glow: "bg-cyan-500/10",
-        text: "text-cyan-400",
-        solid: "group-hover:bg-cyan-600",
-    },
-    indigo: {
-        icon: "text-indigo-400 bg-indigo-500/10 border-indigo-500/30",
-        hover: "hover:border-indigo-500/40",
-        glow: "bg-indigo-500/10",
-        text: "text-indigo-400",
-        solid: "group-hover:bg-indigo-600",
-    },
-    violet: {
-        icon: "text-violet-400 bg-violet-500/10 border-violet-500/30",
-        hover: "hover:border-violet-500/40",
-        glow: "bg-violet-500/10",
-        text: "text-violet-400",
-        solid: "group-hover:bg-violet-600",
-    },
-    emerald: {
-        icon: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
-        hover: "hover:border-emerald-500/40",
-        glow: "bg-emerald-500/10",
-        text: "text-emerald-400",
-        solid: "group-hover:bg-emerald-600",
-    },
-    teal: {
-        icon: "text-teal-400 bg-teal-500/10 border-teal-500/30",
-        hover: "hover:border-teal-500/40",
-        glow: "bg-teal-500/10",
-        text: "text-teal-400",
-        solid: "group-hover:bg-teal-600",
-    },
-    amber: {
-        icon: "text-amber-400 bg-amber-500/10 border-amber-500/30",
-        hover: "hover:border-amber-500/40",
-        glow: "bg-amber-500/10",
-        text: "text-amber-400",
-        solid: "group-hover:bg-amber-600",
+        icon: "text-[#c1594e] bg-[#c1594e]/10 border-[#c1594e]/30",
+        hover: "hover:border-[#c1594e]/40",
+        glow: "bg-[#c1594e]/10",
+        text: "text-[#c1594e]",
+        solid: "group-hover:bg-[#c1594e]",
     },
     rose: {
-        icon: "text-rose-400 bg-rose-500/10 border-rose-500/30",
-        hover: "hover:border-rose-500/40",
-        glow: "bg-rose-500/10",
-        text: "text-rose-400",
-        solid: "group-hover:bg-rose-600",
+        icon: "text-[#c2637f] bg-[#c2637f]/10 border-[#c2637f]/30",
+        hover: "hover:border-[#c2637f]/40",
+        glow: "bg-[#c2637f]/10",
+        text: "text-[#c2637f]",
+        solid: "group-hover:bg-[#c2637f]",
+    },
+    pink: {
+        icon: "text-[#c98ba0] bg-[#c98ba0]/10 border-[#c98ba0]/30",
+        hover: "hover:border-[#c98ba0]/40",
+        glow: "bg-[#c98ba0]/10",
+        text: "text-[#c98ba0]",
+        solid: "group-hover:bg-[#c98ba0]",
+    },
+    orange: {
+        icon: "text-[#cf8452] bg-[#cf8452]/10 border-[#cf8452]/30",
+        hover: "hover:border-[#cf8452]/40",
+        glow: "bg-[#cf8452]/10",
+        text: "text-[#cf8452]",
+        solid: "group-hover:bg-[#cf8452]",
+    },
+    amber: {
+        icon: "text-[#e8a33d] bg-[#e8a33d]/10 border-[#e8a33d]/30",
+        hover: "hover:border-[#e8a33d]/40",
+        glow: "bg-[#e8a33d]/10",
+        text: "text-[#e8a33d]",
+        solid: "group-hover:bg-[#e8a33d]",
+    },
+    yellow: {
+        icon: "text-[#c9a548] bg-[#c9a548]/10 border-[#c9a548]/30",
+        hover: "hover:border-[#c9a548]/40",
+        glow: "bg-[#c9a548]/10",
+        text: "text-[#c9a548]",
+        solid: "group-hover:bg-[#c9a548]",
+    },
+    green: {
+        icon: "text-[#8fae82] bg-[#8fae82]/10 border-[#8fae82]/30",
+        hover: "hover:border-[#8fae82]/40",
+        glow: "bg-[#8fae82]/10",
+        text: "text-[#8fae82]",
+        solid: "group-hover:bg-[#8fae82]",
+    },
+    emerald: {
+        icon: "text-[#6fa885] bg-[#6fa885]/10 border-[#6fa885]/30",
+        hover: "hover:border-[#6fa885]/40",
+        glow: "bg-[#6fa885]/10",
+        text: "text-[#6fa885]",
+        solid: "group-hover:bg-[#6fa885]",
+    },
+    teal: {
+        icon: "text-[#5fa39a] bg-[#5fa39a]/10 border-[#5fa39a]/30",
+        hover: "hover:border-[#5fa39a]/40",
+        glow: "bg-[#5fa39a]/10",
+        text: "text-[#5fa39a]",
+        solid: "group-hover:bg-[#5fa39a]",
+    },
+    cyan: {
+        icon: "text-[#6b9ba6] bg-[#6b9ba6]/10 border-[#6b9ba6]/30",
+        hover: "hover:border-[#6b9ba6]/40",
+        glow: "bg-[#6b9ba6]/10",
+        text: "text-[#6b9ba6]",
+        solid: "group-hover:bg-[#6b9ba6]",
+    },
+    blue: {
+        icon: "text-[#6f93b8] bg-[#6f93b8]/10 border-[#6f93b8]/30",
+        hover: "hover:border-[#6f93b8]/40",
+        glow: "bg-[#6f93b8]/10",
+        text: "text-[#6f93b8]",
+        solid: "group-hover:bg-[#6f93b8]",
+    },
+    indigo: {
+        icon: "text-[#7b8fc4] bg-[#7b8fc4]/10 border-[#7b8fc4]/30",
+        hover: "hover:border-[#7b8fc4]/40",
+        glow: "bg-[#7b8fc4]/10",
+        text: "text-[#7b8fc4]",
+        solid: "group-hover:bg-[#7b8fc4]",
+    },
+    violet: {
+        icon: "text-[#9081c4] bg-[#9081c4]/10 border-[#9081c4]/30",
+        hover: "hover:border-[#9081c4]/40",
+        glow: "bg-[#9081c4]/10",
+        text: "text-[#9081c4]",
+        solid: "group-hover:bg-[#9081c4]",
+    },
+    purple: {
+        icon: "text-[#a58bc4] bg-[#a58bc4]/10 border-[#a58bc4]/30",
+        hover: "hover:border-[#a58bc4]/40",
+        glow: "bg-[#a58bc4]/10",
+        text: "text-[#a58bc4]",
+        solid: "group-hover:bg-[#a58bc4]",
     },
 };
 
@@ -123,7 +128,7 @@ export default function ServiceCategoryCard({
 }: ServiceCategoryCardProps) {
     const style =
         accentStyles[accent as keyof typeof accentStyles] ??
-        accentStyles.blue;
+        accentStyles.amber;
 
     return (
         <Link
@@ -136,8 +141,8 @@ export default function ServiceCategoryCard({
                 overflow-hidden
                 rounded-2xl
                 border
-                border-[#272727]
-                bg-[#141414]
+                border-[#2a2825]
+                bg-[#161513]
                 p-3
                 transition-all
                 duration-300
@@ -180,16 +185,16 @@ export default function ServiceCategoryCard({
                     <Icon size={19} className="sm:size-6 lg:size-5" />
                 </div>
 
-                <span className="rounded-full bg-[#1c1c1c] px-2 py-0.5 text-[10px] text-slate-400 sm:px-2.5 sm:text-xs lg:px-2 lg:text-[10px]">
+                <span className="rounded-md bg-[#1c1a17] px-2 py-0.5 font-mono text-[10px] text-[#9a978f] sm:px-2.5 sm:text-xs lg:px-2 lg:text-[10px]">
                     {services.length} services
                 </span>
             </div>
 
-            <h3 className="relative mt-3 truncate text-sm font-bold text-white sm:mt-4 sm:text-lg lg:mt-3 lg:text-base">
+            <h3 className="relative mt-3 truncate text-sm font-semibold tracking-tight text-[#f5f4f1] sm:mt-4 sm:text-lg lg:mt-3 lg:text-base">
                 {title}
             </h3>
 
-            <p className="relative mt-1.5 line-clamp-2 text-xs leading-5 text-slate-400 sm:mt-2 sm:text-sm sm:leading-6 lg:mt-1.5 lg:text-xs lg:leading-5">
+            <p className="relative mt-1.5 line-clamp-2 text-xs leading-5 text-[#9a978f] sm:mt-2 sm:text-sm sm:leading-6 lg:mt-1.5 lg:text-xs lg:leading-5">
                 {description}
             </p>
 
@@ -197,20 +202,20 @@ export default function ServiceCategoryCard({
                 {services.slice(0, 2).map((service) => (
                     <span
                         key={service}
-                        className="truncate rounded-full bg-[#1c1c1c] px-2 py-0.5 text-[10px] text-slate-300 sm:px-2.5 sm:text-[11px] lg:px-2 lg:text-[10px]"
+                        className="truncate rounded-md bg-[#1c1a17] px-2 py-0.5 text-[10px] text-[#b5b2a8] sm:px-2.5 sm:text-[11px] lg:px-2 lg:text-[10px]"
                     >
                         {service}
                     </span>
                 ))}
 
                 {services.length > 2 && (
-                    <span className="rounded-full bg-[#1c1c1c] px-2 py-0.5 text-[10px] text-slate-500 sm:px-2.5 sm:text-[11px] lg:px-2 lg:text-[10px]">
+                    <span className="rounded-md bg-[#1c1a17] px-2 py-0.5 font-mono text-[10px] text-[#6b685f] sm:px-2.5 sm:text-[11px] lg:px-2 lg:text-[10px]">
                         +{services.length - 2}
                     </span>
                 )}
             </div>
 
-            <div className="relative mt-3 flex items-center justify-between gap-2 border-t border-[#232323] pt-2.5 sm:mt-4 sm:pt-3.5 lg:mt-2.5 lg:pt-2.5">
+            <div className="relative mt-3 flex items-center justify-between gap-2 border-t border-[#2a2825] pt-2.5 sm:mt-4 sm:pt-3.5 lg:mt-2.5 lg:pt-2.5">
                 <span className={`truncate text-xs font-semibold sm:text-sm lg:text-xs ${style.text}`}>
                     Explore
                 </span>
@@ -224,11 +229,12 @@ export default function ServiceCategoryCard({
                         items-center
                         justify-center
                         rounded-full
-                        bg-[#1c1c1c]
-                        text-white
+                        bg-[#1c1a17]
+                        text-[#f5f4f1]
                         transition-all
                         duration-300
                         group-hover:translate-x-0.5
+                        group-hover:text-[#161513]
                         sm:h-7
                         sm:w-7
                         lg:h-6

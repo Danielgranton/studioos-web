@@ -71,16 +71,16 @@ export default function BeatCard({
                 overflow-hidden
                 rounded-2xl
                 border
-                border-[#272727]
-                bg-[#141414]
+                border-[#2a2825]
+                bg-[#161513]
                 p-2
                 transition-all
                 duration-300
                 hover:-translate-y-1
-                hover:border-blue-500/30
+                hover:border-[#e8a33d]/30
                 focus-visible:outline-none
                 focus-visible:ring-2
-                focus-visible:ring-blue-500/60
+                focus-visible:ring-[#e8a33d]/60
             "
         >
             {/* Background glow */}
@@ -94,7 +94,7 @@ export default function BeatCard({
                     h-28
                     w-28
                     rounded-full
-                    bg-blue-500/10
+                    bg-[#e8a33d]/10
                     opacity-0
                     blur-3xl
                     transition-opacity
@@ -111,7 +111,7 @@ export default function BeatCard({
                     w-full
                     overflow-hidden
                     rounded-xl
-                    bg-[#0a0a0a]
+                    bg-[#0e0d0c]
                 "
             >
                 <Image
@@ -133,7 +133,7 @@ export default function BeatCard({
                     className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"
                 />
 
-                {/* Exclusive — same slot/style as "Available" on the studio card */}
+                {/* Exclusive — status flag, kept emerald to match "Available" on the studio card */}
                 <div className="absolute left-2 top-2">
                     {exclusive && (
                         <span
@@ -156,7 +156,7 @@ export default function BeatCard({
                     )}
                 </div>
 
-                {/* BPM chip — same slot/style as "Rating" on the studio card */}
+                {/* BPM chip — mono readout, same slot as rating on the studio card */}
                 <div
                     className="
                         absolute
@@ -169,6 +169,7 @@ export default function BeatCard({
                         bg-black/60
                         px-1.5
                         py-0.5
+                        font-mono
                         text-[9px]
                         font-semibold
                         text-white
@@ -178,16 +179,16 @@ export default function BeatCard({
                     {bpm} BPM
                 </div>
 
-                {/* Price — same slot/style as price on the studio card */}
+                {/* Price */}
                 <div className="absolute bottom-2 left-2">
                     <div className="rounded-lg bg-black/60 px-2 py-1 backdrop-blur-md">
-                        <p className="text-xs font-bold leading-tight text-white">
+                        <p className="font-mono text-xs font-bold leading-tight text-white">
                             {price}
                         </p>
                     </div>
                 </div>
 
-                {/* Play — floating center, unique to beats */}
+                {/* Play — floating center, unique to beats, gets the strongest accent */}
                 <button
                     onClick={handlePlayClick}
                     aria-label={playing ? "Pause preview" : "Play preview"}
@@ -204,14 +205,14 @@ export default function BeatCard({
                         items-center
                         justify-center
                         rounded-full
-                        bg-blue-600
-                        text-white
+                        bg-[#e8a33d]
+                        text-[#161513]
                         opacity-0
                         shadow-xl
                         transition-all
                         duration-300
                         group-hover:opacity-100
-                        hover:bg-blue-500
+                        hover:bg-[#f0b458]
                     "
                 >
                     {playing ? (
@@ -221,7 +222,7 @@ export default function BeatCard({
                     )}
                 </button>
 
-                {/* Like — floating, top-right below the BPM chip */}
+                {/* Like — stays red when active, that convention overrides the brand accent */}
                 <button
                     onClick={handleLikeClick}
                     aria-label={liked ? "Unlike" : "Like"}
@@ -258,11 +259,11 @@ export default function BeatCard({
                 {/* Header — title + verified badge, badge pill on the right */}
                 <div className="flex items-start justify-between gap-2">
                     <div className="flex min-w-0 items-center gap-1">
-                        <h3 className="truncate text-sm font-bold text-white">
+                        <h3 className="truncate text-sm font-semibold tracking-tight text-[#f5f4f1]">
                             {title}
                         </h3>
                         {verified && (
-                            <BadgeCheck size={13} className="shrink-0 text-blue-400" />
+                            <BadgeCheck size={13} className="shrink-0 text-[#5eead4]" />
                         )}
                     </div>
 
@@ -270,20 +271,22 @@ export default function BeatCard({
                         className="
                             shrink-0
                             rounded-full
-                            bg-blue-500/10
+                            border
+                            border-[#e8a33d]/20
+                            bg-[#e8a33d]/10
                             px-2
                             py-0.5
                             text-[10px]
                             font-semibold
-                            text-blue-400
+                            text-[#e8a33d]
                         "
                     >
                         {genre}
                     </span>
                 </div>
 
-                {/* Producer + key — same slot as location + bookings */}
-                <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#8a8a8a]">
+                {/* Producer + duration — same slot as location + bookings */}
+                <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] text-[#9a978f]">
                     <span className="min-w-0 truncate">
                         by {producer}
                     </span>
@@ -294,27 +297,28 @@ export default function BeatCard({
                     </span>
                 </div>
 
-                {/* Stats tag — reuses the single-tag pill slot */}
+                {/* Stats tags — patch-cable labels, mono numbers */}
                 <div className="mt-2 flex flex-wrap gap-1">
                     <span
                         className="
                             inline-flex
                             items-center
                             gap-1
-                            rounded-full
+                            rounded-md
                             border
-                            border-[#2c2c2c]
-                            bg-[#1c1c1c]
+                            border-[#2a2825]
+                            bg-[#1c1a17]
                             px-2
                             py-0.5
+                            font-mono
                             text-[9px]
                             font-medium
-                            text-[#c4c4c4]
+                            text-[#b5b2a8]
                             transition-colors
-                            group-hover:border-[#3a3a3a]
+                            group-hover:border-[#3a3630]
                         "
                     >
-                        <TrendingUp size={10} className="text-blue-400" />
+                        <TrendingUp size={10} className="text-[#e8a33d]" />
                         {plays.toLocaleString()} plays
                     </span>
                     <span
@@ -322,17 +326,18 @@ export default function BeatCard({
                             inline-flex
                             items-center
                             gap-1
-                            rounded-full
+                            rounded-md
                             border
-                            border-[#2c2c2c]
-                            bg-[#1c1c1c]
+                            border-[#2a2825]
+                            bg-[#1c1a17]
                             px-2
                             py-0.5
+                            font-mono
                             text-[9px]
                             font-medium
-                            text-[#c4c4c4]
+                            text-[#b5b2a8]
                             transition-colors
-                            group-hover:border-[#3a3a3a]
+                            group-hover:border-[#3a3630]
                         "
                     >
                         <Heart size={10} className="text-red-400" />
@@ -341,8 +346,8 @@ export default function BeatCard({
                 </div>
 
                 {/* Footer — identical structure to FeaturedStudioCard's */}
-                <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-[#232323] pt-2.5">
-                    <span className="truncate text-[10px] text-[#717171]">
+                <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-[#2a2825] pt-2.5">
+                    <span className="truncate font-mono text-[10px] text-[#6b685f]">
                         {musicalKey}
                     </span>
 
@@ -353,16 +358,16 @@ export default function BeatCard({
                             items-center
                             gap-1
                             rounded-full
-                            bg-blue-600
+                            bg-[#e8a33d]
                             px-2.5
                             py-1
                             text-[11px]
                             font-semibold
-                            text-white
+                            text-[#161513]
                             transition-all
                             duration-300
                             group-hover:gap-1.5
-                            group-hover:bg-blue-500
+                            group-hover:bg-[#f0b458]
                         "
                     >
                         Buy
