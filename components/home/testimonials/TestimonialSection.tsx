@@ -220,8 +220,8 @@ export default function TestimonialSection() {
 
                         </div>
 
-                        {/* View All */}
 
+                <div className=" flex-col">
                         <Link
                             href="/testimonials"
                             className="
@@ -258,10 +258,52 @@ export default function TestimonialSection() {
                             />
                         </Link>
 
+                    <div
+                        className="
+                            flex
+                            gap-3
+                            overflow-x-auto
+                            scrollbar-none
+                        "
+                    >
+                        {filters.map((filter) => {
+                            const Icon = filter.icon;
+
+                            return (
+                                <button
+                                    key={filter.label}
+                                    className={`
+                                        inline-flex
+                                        shrink-0
+                                        items-center
+                                        gap-2
+                                        rounded-full
+                                        px-5
+                                        py-2.5
+                                        text-sm
+                                        font-medium
+                                        transition-all
+                                        duration-300
+                                        ${
+                                            filter.active
+                                                ? "bg-blue-500 text-white shadow-[0_10px_30px_rgba(37,99,235,.35)]"
+                                                : "border border-[#2a2a2a] bg-[#171717] text-slate-400 hover:border-blue-500/30 hover:bg-[#1d1d1d] hover:text-white"
+                                        }
+                                    `}
+                                >
+                                    <Icon size={16} />
+
+                                    {filter.label}
+                                </button>
+                            );
+                        })}
                     </div>
 
                 </div>
+                </div>
 
+                </div>
+                
                 <TestimonialSlider />
 
             </div>
