@@ -34,7 +34,7 @@ export default function Hero() {
                         w-[900px]
                         -translate-x-1/2
                         rounded-full
-                        bg-blue-600/10
+                        bg-blue-600/5
                         blur-[200px]
                     "
                 />

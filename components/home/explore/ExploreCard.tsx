@@ -91,7 +91,7 @@ export default function ExploreCard({
                 sm:p-5
                 lg:min-h-[190px]
                 lg:rounded-xl
-                lg:p-4
+                lg:p-5
                 ${style.border}
             `}
         >
@@ -122,7 +122,7 @@ export default function ExploreCard({
 
             <div className="flex items-start justify-between">
 
-                <div className="flex items-center gap-2.5 sm:gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
 
                     <div
                         className={`
@@ -147,7 +147,7 @@ export default function ExploreCard({
 
                     <div className="min-w-0">
 
-                        <h3 className="truncate text-base font-semibold text-white sm:text-lg lg:text-base">
+                        <h3 className="truncate text-base font-semibold text-white sm:text-lg lg:text-sm">
                             {title}
                         </h3>
 
@@ -238,7 +238,7 @@ export default function ExploreCard({
                         duration-300
                         group-hover:translate-x-1
                         sm:size-4
-                        lg:size-[14px]
+                        lg:size-[20px]
                     "
                 />
             </div>

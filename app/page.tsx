@@ -11,7 +11,7 @@ export default function HomePage() {
 
     return (
 
-        <div className=" h-screen  bg-[#0f0f0f]/95 space-y-10">
+        <div className=" h-screen  space-y-10">
             <Hero/>
             <ExploreSection />
             <FeaturedStudios />

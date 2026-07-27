@@ -6,27 +6,17 @@ export const featuredProjects = [
         title: "Forever Mine",
         artist: "Jay Carter",
 
-        cover: "🎵",
+        cover: "/images/beats.png",
 
-        genre: "🎵 Afrobeats",
+        genre: "Afrobeats",
 
-        studio: "🏢 Pulse Studio",
-        producer: "🎚 Kenny Keys",
-
-        services: [
-            "🎙 Recording",
-            "🎛 Mixing",
-            "🎧 Mastering",
-            "🎨 Cover Art",
-        ],
+        studio: "Pulse Studio",
+        producer: "Kenny Keys",
 
         streams: "1.2M",
         likes: "56K",
         duration: "3:42",
         releaseDate: "24 Jun 2026",
-
-        platform: "Spotify",
-        platformIcon: "🟢",
 
         audioPreview: true,
         projectType: "Single",
@@ -42,26 +32,17 @@ export const featuredProjects = [
         title: "Midnight Drive",
         artist: "Luna Sky",
 
-        cover: "🌙",
+        cover: "/images/beats.png",
 
-        genre: "🌙 R&B",
+        genre: " R&B",
 
-        studio: "🏢 Dream Records",
-        producer: "🎚 DJ Nova",
-
-        services: [
-            "🎙 Recording",
-            "🎹 Production",
-            "🎧 Mastering",
-        ],
+        studio: "Dream Records",
+        producer: "DJ Nova",
 
         streams: "860K",
         likes: "41K",
         duration: "4:11",
         releaseDate: "08 May 2026",
-
-        platform: "Apple Music",
-        platformIcon: "🍎",
 
         audioPreview: true,
         projectType: "Single",
@@ -77,26 +58,17 @@ export const featuredProjects = [
         title: "Street Prayers",
         artist: "K Blaze",
 
-        cover: "🔥",
+        cover: "/images/beats.png",
 
-        genre: "🔥 Hip Hop",
+        genre: "Hip Hop",
 
-        studio: "🏢 Royal Sound",
-        producer: "🎚 BeatKing",
-
-        services: [
-            "🥁 Beat Production",
-            "🎛 Mixing",
-            "🎬 Music Video",
-        ],
+        studio: "Royal Sound",
+        producer: "BeatKing",
 
         streams: "2.4M",
         likes: "108K",
         duration: "3:08",
         releaseDate: "17 Mar 2026",
-
-        platform: "YouTube",
-        platformIcon: "🔴",
 
         audioPreview: false,
         videoPreview: true,
@@ -113,26 +85,17 @@ export const featuredProjects = [
         title: "Waves",
         artist: "Nadia",
 
-        cover: "🌊",
+        cover: "/images/beats.png",
 
-        genre: "🌊 Amapiano",
+        genre: "Amapiano",
 
-        studio: "🏢 BlueWave Studio",
-        producer: "🎚 DJ Prince",
-
-        services: [
-            "🎙 Recording",
-            "🎧 Mastering",
-            "🌍 Distribution",
-        ],
+        studio: "BlueWave Studio",
+        producer: " DJ Prince",
 
         streams: "980K",
         likes: "38K",
         duration: "5:02",
         releaseDate: "11 Feb 2026",
-
-        platform: "Spotify",
-        platformIcon: "🟢",
 
         audioPreview: true,
         projectType: "Single",
@@ -148,26 +111,17 @@ export const featuredProjects = [
         title: "Voices Podcast",
         artist: "Studio Talks",
 
-        cover: "🎙️",
+        cover: "/images/beats.png",
 
-        genre: "🎙 Podcast",
+        genre: "Podcast",
 
-        studio: "🏢 Black Room",
-        producer: "🎧 StudioOS Media",
-
-        services: [
-            "🎤 Podcast Recording",
-            "✂️ Editing",
-            "📡 Publishing",
-        ],
+        studio: "Black Room",
+        producer: "StudioOS Media",
 
         streams: "210 Episodes",
         likes: "18K Followers",
         duration: "45 min",
         releaseDate: "Weekly",
-
-        platform: "Spotify Podcasts",
-        platformIcon: "🎧",
 
         audioPreview: true,
         projectType: "Podcast",
@@ -183,26 +137,17 @@ export const featuredProjects = [
         title: "Rise Again",
         artist: "Grace K",
 
-        cover: "🙏",
+        cover: "/images/beats.png",
 
-        genre: "🙏 Gospel",
+        genre: "Gospel",
 
-        studio: "🏢 Echo Studios",
-        producer: "🎚 David Mix",
-
-        services: [
-            "🎙 Recording",
-            "🎼 Choir Recording",
-            "🎧 Mastering",
-        ],
+        studio: "Echo Studios",
+        producer: "David Mix",
 
         streams: "540K",
         likes: "24K",
         duration: "4:36",
         releaseDate: "02 Apr 2026",
-
-        platform: "YouTube",
-        platformIcon: "🔴",
 
         audioPreview: false,
         videoPreview: true,
