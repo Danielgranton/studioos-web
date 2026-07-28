@@ -103,30 +103,22 @@ export default function FeaturedStudios() {
                             >
                                 Studios built for{" "}
                                 <span className="relative inline-block">
-                                    <span
-                                        className="
-                                            bg-gradient-to-r
-                                            from-[#e8a33d]
-                                            via-[#e0954f]
-                                            to-[#d97757]
-                                            bg-clip-text
-                                            text-transparent
-                                        "
-                                    >
+                                    <span className="text-blue-600">
                                         quality sound
                                     </span>
                                     <svg
                                         aria-hidden="true"
                                         viewBox="0 0 110 16"
                                         preserveAspectRatio="none"
-                                        className="absolute -bottom-1 left-0 h-[0.15em] w-full text-[#e8a33d]"
+                                        className="absolute -bottom-1 left-0 h-[0.15em] w-full text-blue-600"
                                     >
                                         <path
-                                            d="M2 10c13-9 26-9 39 0s26 9 39 0 26-9 27 0"
+                                            d="M2 8 H108"
                                             fill="none"
                                             stroke="currentColor"
                                             strokeWidth="3"
                                             strokeLinecap="round"
+                                            strokeDasharray="14 8"
                                             className="studio-headline-underline"
                                         />
                                     </svg>
@@ -194,14 +186,16 @@ export default function FeaturedStudios() {
                                 justify-center
                                 gap-2
                                 rounded-full
-                                bg-[#e8a33d]
+                                border
+                                border-blue-600
+                                bg-blue-600
                                 px-5
                                 py-2.5
                                 text-sm
                                 font-semibold
-                                text-[#161513]
+                                text-white
                                 transition-all
-                                hover:bg-[#f0b458]
+                                hover:bg-blue-700
                                 hover:gap-3
                                 sm:w-auto
                                 sm:justify-start
@@ -270,19 +264,16 @@ export default function FeaturedStudios() {
 
             <style>{`
                 .studio-headline-underline {
-                    stroke-dasharray: 220;
-                    stroke-dashoffset: 220;
-                    animation: studio-underline-draw 1s cubic-bezier(0.65, 0, 0.35, 1) 0.4s forwards;
+                    animation: studio-dash-march 1.2s linear infinite;
                 }
                 @media (prefers-reduced-motion: reduce) {
                     .studio-headline-underline {
                         animation: none;
-                        stroke-dashoffset: 0;
                     }
                 }
-                @keyframes studio-underline-draw {
+                @keyframes studio-dash-march {
                     to {
-                        stroke-dashoffset: 0;
+                        stroke-dashoffset: -22;
                     }
                 }
             `}</style>

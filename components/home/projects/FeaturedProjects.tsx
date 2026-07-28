@@ -12,13 +12,6 @@ const filters = ["All", "Songs", "Podcasts", "Videos"];
 export default function FeaturedProjects() {
     const [activeFilter, setActiveFilter] = useState("All");
 
-    // TODO: wire this to the real category field once known — `type` doesn't
-    // exist on your ProjectCardProps (per the error), and I don't have the
-    // actual shape of projectData.ts to guess correctly a second time.
-    // For now this compiles cleanly and just shows everything regardless of
-    // the selected filter. Once you share the real field name (e.g. `category`,
-    // `contentType`, or something inferred from `videoPreview`), swap the
-    // line below for: featuredProjects.filter((project) => project.<field> === activeFilter)
     const visibleProjects = featuredProjects;
 
     return (
@@ -59,15 +52,15 @@ export default function FeaturedProjects() {
                                 gap-2
                                 rounded-full
                                 border
-                                border-blue-500/20
-                                bg-blue-500/10
+                                border-[#e8a33d]/20
+                                bg-[#e8a33d]/10
                                 px-3
                                 py-1
                                 text-[9px]
                                 font-semibold
                                 uppercase
                                 tracking-[0.2em]
-                                text-blue-400
+                                text-[#e8a33d]
                             "
                         >
                             <span className="relative flex h-1.5 w-1.5">
@@ -79,11 +72,11 @@ export default function FeaturedProjects() {
                                         w-full
                                         animate-ping
                                         rounded-full
-                                        bg-blue-400
+                                        bg-[#e8a33d]
                                         opacity-60
                                     "
                                 />
-                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-blue-400" />
+                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#e8a33d]" />
                             </span>
                             Featured Projects
                         </span>
@@ -97,7 +90,7 @@ export default function FeaturedProjects() {
                                 {[9, 18, 7, 24, 12, 20, 8, 15].map((h, i) => (
                                     <span
                                         key={i}
-                                        className="w-[3px] animate-pulse rounded-full bg-blue-400"
+                                        className="w-[3px] animate-pulse rounded-full bg-[#e8a33d]"
                                         style={{
                                             height: `${h}px`,
                                             animationDelay: `${i * 0.12}s`,
@@ -112,7 +105,7 @@ export default function FeaturedProjects() {
                                     font-black
                                     leading-[1.05]
                                     tracking-tight
-                                    text-white
+                                    text-[#f5f4f1]
                                     whitespace-nowrap
                                 "
                                 style={{
@@ -120,9 +113,26 @@ export default function FeaturedProjects() {
                                 }}
                             >
                                 Real music,{" "}
-                                <span
-                                >
-                                    real success
+                                <span className="relative inline-block">
+                                    <span className="text-blue-600">
+                                        real success
+                                    </span>
+                                    <svg
+                                        aria-hidden="true"
+                                        viewBox="0 0 130 16"
+                                        preserveAspectRatio="none"
+                                        className="absolute -bottom-1 left-0 h-[0.15em] w-full text-blue-600"
+                                    >
+                                        <path
+                                            d="M2 8 H128"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="3"
+                                            strokeLinecap="round"
+                                            strokeDasharray="14 8"
+                                            className="projects-headline-underline"
+                                        />
+                                    </svg>
                                 </span>
                             </h2>
                         </div>
@@ -134,7 +144,7 @@ export default function FeaturedProjects() {
                                 max-w-2xl
                                 text-sm
                                 leading-6
-                                text-slate-400
+                                text-[#9a978f]
                                 sm:mt-4
                                 sm:text-lg
                                 sm:leading-8
@@ -146,17 +156,17 @@ export default function FeaturedProjects() {
                             distribution—everything happens in one place.
                         </p>
 
-                        {/* Trust signal strip */}
+                        {/* Trust signal strip — mono numbers, same convention as every card */}
                         <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 sm:mt-6 sm:gap-x-6">
                             {[
                                 { value: "3K+", label: "projects" },
                                 { value: "180K+", label: "streams" },
                             ].map((stat) => (
                                 <div key={stat.label} className="flex items-baseline gap-1.5">
-                                    <span className="text-sm font-bold text-white sm:text-base">
+                                    <span className="font-mono text-sm font-bold text-[#f5f4f1] sm:text-base">
                                         {stat.value}
                                     </span>
-                                    <span className="text-[11px] text-slate-500 sm:text-xs">
+                                    <span className="text-[11px] text-[#6b685f] sm:text-xs">
                                         {stat.label}
                                     </span>
                                 </div>
@@ -188,7 +198,7 @@ export default function FeaturedProjects() {
                                 gap-2
                                 rounded-full
                                 border
-                                border-[#272727]
+                                border-blue-600
                                 bg-blue-600
                                 px-3
                                 py-2
@@ -196,7 +206,6 @@ export default function FeaturedProjects() {
                                 font-semibold
                                 text-white
                                 transition
-                                hover:border-blue-500/40
                                 hover:bg-blue-700
                                 hover:gap-3
                                 sm:w-fit
@@ -230,8 +239,8 @@ export default function FeaturedProjects() {
                                         sm:text-xs
                                         ${
                                             activeFilter === filter
-                                                ? "border-blue-500/40 bg-blue-500/10 text-blue-400"
-                                                : "border-[#272727] bg-[#171717] text-[#aaaaaa] hover:border-[#3f3f3f] hover:text-white"
+                                                ? "border-[#e8a33d]/40 bg-[#e8a33d]/10 text-[#e8a33d]"
+                                                : "border-[#2a2825] bg-[#161513] text-[#9a978f] hover:border-[#3a3630] hover:text-[#f5f4f1]"
                                         }
                                     `}
                                 >
@@ -263,12 +272,28 @@ export default function FeaturedProjects() {
                         ))}
                     </div>
                 ) : (
-                    <p className="py-12 text-center text-sm text-slate-500">
+                    <p className="py-12 text-center text-sm text-[#6b685f]">
                         No {activeFilter.toLowerCase()} yet — check back soon.
                     </p>
                 )}
 
             </div>
+
+            <style>{`
+                .projects-headline-underline {
+                    animation: projects-dash-march 1.2s linear infinite;
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .projects-headline-underline {
+                        animation: none;
+                    }
+                }
+                @keyframes projects-dash-march {
+                    to {
+                        stroke-dashoffset: -22;
+                    }
+                }
+            `}</style>
         </section>
     );
 }

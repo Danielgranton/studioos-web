@@ -85,15 +85,15 @@ export default function TestimonialSection() {
                             gap-2
                             rounded-full
                             border
-                            border-blue-500/20
-                            bg-blue-500/10
+                            border-[#e8a33d]/20
+                            bg-[#e8a33d]/10
                             px-2
                             py-1
                             text-[9px]
                             font-semibold
                             uppercase
                             tracking-[0.2em]
-                            text-blue-400
+                            text-[#e8a33d]
                         "
                     >
                         <span className="relative flex h-2 w-2">
@@ -106,7 +106,7 @@ export default function TestimonialSection() {
                                     w-full
                                     animate-ping
                                     rounded-full
-                                    bg-blue-400
+                                    bg-[#e8a33d]
                                     opacity-70
                                 "
                             />
@@ -118,7 +118,7 @@ export default function TestimonialSection() {
                                     h-2
                                     w-2
                                     rounded-full
-                                    bg-blue-400
+                                    bg-[#e8a33d]
                                 "
                             />
 
@@ -135,15 +135,32 @@ export default function TestimonialSection() {
                             text-3xl
                             font-black
                             tracking-tight
-                            text-white
+                            text-[#f5f4f1]
                             md:text-4xl
                         "
                     >
                         Loved by{" "}
 
-                        <span
-                        >
-                            creators
+                        <span className="relative inline-block">
+                            <span className="text-blue-600">
+                                creators
+                            </span>
+                            <svg
+                                aria-hidden="true"
+                                viewBox="0 0 110 16"
+                                preserveAspectRatio="none"
+                                className="absolute -bottom-1 left-0 h-3 w-full text-blue-600"
+                            >
+                                <path
+                                    d="M2 8 H108"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    strokeLinecap="round"
+                                    strokeDasharray="14 8"
+                                    className="testimonial-headline-underline"
+                                />
+                            </svg>
                         </span>
 
                         {" "}worldwide.
@@ -155,7 +172,7 @@ export default function TestimonialSection() {
                             max-w-2xl
                             text-base
                             leading-7
-                            text-slate-400
+                            text-[#9a978f]
                             md:text-lg
                         "
                     >
@@ -164,7 +181,7 @@ export default function TestimonialSection() {
                         careers with StudioOS.
                     </p>
 
-                    {/* Metrics */}
+                    {/* Metrics — mono numbers, same convention as every card */}
 
                     <div
                         className="
@@ -179,16 +196,16 @@ export default function TestimonialSection() {
 
                             <Star
                                 size={18}
-                                className="fill-yellow-400 text-yellow-400"
+                                className="fill-[#e8a33d] text-[#e8a33d]"
                             />
 
                             <div>
 
-                                <p className="font-semibold text-white">
+                                <p className="font-mono font-semibold text-[#f5f4f1]">
                                     4.9
                                 </p>
 
-                                <p className="text-xs text-slate-500">
+                                <p className="text-xs text-[#6b685f]">
                                     Average Rating
                                 </p>
 
@@ -200,16 +217,16 @@ export default function TestimonialSection() {
 
                             <MessageCircleMore
                                 size={18}
-                                className="text-blue-400"
+                                className="text-[#5eead4]"
                             />
 
                             <div>
 
-                                <p className="font-semibold text-white">
+                                <p className="font-mono font-semibold text-[#f5f4f1]">
                                     8.4K
                                 </p>
 
-                                <p className="text-xs text-slate-500">
+                                <p className="text-xs text-[#6b685f]">
                                     Reviews
                                 </p>
 
@@ -226,11 +243,11 @@ export default function TestimonialSection() {
 
                             <div>
 
-                                <p className="font-semibold text-white">
+                                <p className="font-mono font-semibold text-[#f5f4f1]">
                                     97%
                                 </p>
 
-                                <p className="text-xs text-slate-500">
+                                <p className="text-xs text-[#6b685f]">
                                     Recommend StudioOS
                                 </p>
 
@@ -266,7 +283,7 @@ export default function TestimonialSection() {
                             gap-2
                             rounded-full
                             border
-                            border-blue-500/20
+                            border-blue-600
                             bg-blue-600
                             px-3
                             py-1
@@ -321,8 +338,8 @@ export default function TestimonialSection() {
                                         duration-300
                                         ${
                                             filter.active
-                                                ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/20"
-                                                : "border border-[#2b2b2b] bg-[#171717]/80 text-slate-400 hover:border-blue-500/30 hover:bg-[#1d1d1d] hover:text-white"
+                                                ? "bg-[#e8a33d] text-[#161513]"
+                                                : "border border-[#2a2825] bg-[#161513]/80 text-[#9a978f] hover:border-[#e8a33d]/30 hover:bg-[#1c1a17] hover:text-[#f5f4f1]"
                                         }
                                     `}
                                 >
@@ -341,6 +358,22 @@ export default function TestimonialSection() {
                 <TestimonialSlider />
 
             </div>
+
+            <style>{`
+                .testimonial-headline-underline {
+                    animation: testimonial-dash-march 1.2s linear infinite;
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .testimonial-headline-underline {
+                        animation: none;
+                    }
+                }
+                @keyframes testimonial-dash-march {
+                    to {
+                        stroke-dashoffset: -22;
+                    }
+                }
+            `}</style>
         </section>
     );
 }

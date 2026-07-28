@@ -119,30 +119,22 @@ export default function TrendingBeats() {
                             >
                                 Fresh sounds,{" "}
                                 <span className="relative inline-block">
-                                    <span
-                                        className="
-                                            bg-gradient-to-r
-                                            from-[#e8a33d]
-                                            via-[#e0954f]
-                                            to-[#d97757]
-                                            bg-clip-text
-                                            text-transparent
-                                        "
-                                    >
+                                    <span className="text-blue-600">
                                         Own your favourite Beat
                                     </span>
                                     <svg
                                         aria-hidden="true"
                                         viewBox="0 0 200 16"
                                         preserveAspectRatio="none"
-                                        className="absolute -bottom-1 left-0 h-[0.15em] w-full text-[#e8a33d]"
+                                        className="absolute -bottom-1 left-0 h-[0.15em] w-full text-blue-600"
                                     >
                                         <path
-                                            d="M2 10c24-9 48-9 72 0s48 9 72 0 48-9 50 0"
+                                            d="M2 8 H198"
                                             fill="none"
                                             stroke="currentColor"
                                             strokeWidth="3"
                                             strokeLinecap="round"
+                                            strokeDasharray="14 8"
                                             className="beats-headline-underline"
                                         />
                                     </svg>
@@ -193,14 +185,16 @@ export default function TrendingBeats() {
                                 justify-center
                                 gap-2
                                 rounded-full
-                                bg-[#e8a33d]
+                                border
+                                border-blue-600
+                                bg-blue-600
                                 px-5
                                 py-2.5
                                 text-sm
                                 font-semibold
-                                text-[#161513]
+                                text-white
                                 transition-all
-                                hover:bg-[#f0b458]
+                                hover:bg-blue-700
                                 hover:gap-3
                                 sm:w-auto
                                 sm:justify-start
@@ -269,19 +263,16 @@ export default function TrendingBeats() {
 
             <style>{`
                 .beats-headline-underline {
-                    stroke-dasharray: 350;
-                    stroke-dashoffset: 350;
-                    animation: beats-underline-draw 1s cubic-bezier(0.65, 0, 0.35, 1) 0.4s forwards;
+                    animation: beats-dash-march 1.2s linear infinite;
                 }
                 @media (prefers-reduced-motion: reduce) {
                     .beats-headline-underline {
                         animation: none;
-                        stroke-dashoffset: 0;
                     }
                 }
-                @keyframes beats-underline-draw {
+                @keyframes beats-dash-march {
                     to {
-                        stroke-dashoffset: 0;
+                        stroke-dashoffset: -22;
                     }
                 }
             `}</style>

@@ -20,15 +20,15 @@ export default function HeroLeft() {
                     gap-2
                     rounded-full
                     border
-                    border-blue-500/20
-                    bg-blue-500/10
+                    border-[#e8a33d]/20
+                    bg-[#e8a33d]/10
                     px-2.5
                     py-1
                     text-[8px]
                     font-semibold
                     uppercase
                     tracking-[0.2em]
-                    text-blue-400
+                    text-[#e8a33d]
                     sm:mb-5
                     sm:px-3
                     sm:text-[9px]
@@ -43,11 +43,11 @@ export default function HeroLeft() {
                             w-full
                             animate-ping
                             rounded-full
-                            bg-blue-400
+                            bg-[#e8a33d]
                             opacity-60
                         "
                     />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-blue-400" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#e8a33d]" />
                 </span>
                 Featured Today
             </div>
@@ -59,7 +59,7 @@ export default function HeroLeft() {
                     font-black
                     leading-[0.95]
                     tracking-tight
-                    text-white
+                    text-[#f5f4f1]
                     sm:text-4xl
                     md:text-5xl
                     xl:text-6xl
@@ -67,30 +67,22 @@ export default function HeroLeft() {
             >
                 CREATE MUSIC
                 <span className="relative mt-1 block w-fit">
-                    <span
-                        className="
-                            bg-gradient-to-r
-                            from-blue-400
-                            via-blue-500
-                            to-blue-600
-                            bg-clip-text
-                            text-transparent
-                        "
-                    >
+                    <span className="text-blue-600">
                         WITHOUT LIMITS
                     </span>
                     <svg
                         aria-hidden="true"
                         viewBox="0 0 460 20"
                         preserveAspectRatio="none"
-                        className="absolute -bottom-2 left-0 h-3 w-full text-blue-500 sm:-bottom-3 sm:h-4"
+                        className="absolute -bottom-2 left-0 h-3 w-full text-blue-600 sm:-bottom-3 sm:h-4"
                     >
                         <path
-                            d="M2 12c32-11 64-11 96 0s64 11 96 0 64-11 96 0 64 11 96 0 64-11 74 0"
+                            d="M2 10 H458"
                             fill="none"
                             stroke="currentColor"
                             strokeWidth="3.5"
                             strokeLinecap="round"
+                            strokeDasharray="16 9"
                             className="hero-headline-underline"
                         />
                     </svg>
@@ -103,7 +95,7 @@ export default function HeroLeft() {
                     max-w-xl
                     text-sm
                     leading-6
-                    text-slate-400
+                    text-[#9a978f]
                     sm:mt-6
                     sm:text-base
                     sm:leading-7
@@ -127,14 +119,16 @@ export default function HeroLeft() {
                         justify-center
                         gap-2
                         rounded-full
-                        bg-orange-600
+                        border
+                        border-blue-600
+                        bg-blue-600
                         px-4
                         py-2.5
                         text-xs
                         font-semibold
                         text-white
                         transition-all
-                        hover:bg-orange-700
+                        hover:bg-blue-700
                         hover:gap-3
                         sm:flex-none
                         sm:px-5
@@ -160,16 +154,16 @@ export default function HeroLeft() {
                         gap-2
                         rounded-full
                         border
-                        border-slate-700
-                        bg-[#171717]
+                        border-[#2a2825]
+                        bg-[#161513]
                         px-4
                         py-2.5
                         text-xs
                         font-semibold
-                        text-white
+                        text-[#f5f4f1]
                         transition
-                        hover:border-slate-600
-                        hover:bg-[#272727]
+                        hover:border-[#3a3630]
+                        hover:bg-[#1c1a17]
                         sm:flex-none
                         sm:px-5
                         sm:py-3
@@ -196,15 +190,15 @@ export default function HeroLeft() {
                         className="
                             rounded-full
                             border
-                            border-slate-800
-                            bg-[#171717]
+                            border-[#2a2825]
+                            bg-[#161513]
                             px-2.5
                             py-1
                             text-[11px]
-                            text-slate-300
+                            text-[#b5b2a8]
                             transition
-                            hover:border-blue-500/40
-                            hover:text-white
+                            hover:border-[#e8a33d]/40
+                            hover:text-[#f5f4f1]
                             sm:px-3
                             sm:text-xs
                         "
@@ -237,7 +231,7 @@ export default function HeroLeft() {
                                 w-7
                                 rounded-full
                                 border-2
-                                border-[#0f0f0f]
+                                border-[#0e0d0c]
                                 object-cover
                                 sm:h-8
                                 sm:w-8
@@ -254,13 +248,14 @@ export default function HeroLeft() {
                             justify-center
                             rounded-full
                             border-2
-                            border-[#0f0f0f]
+                            border-[#0e0d0c]
                             bg-gradient-to-br
-                            from-blue-500
-                            to-blue-700
+                            from-[#e8a33d]
+                            to-[#d97757]
+                            font-mono
                             text-[9px]
                             font-semibold
-                            text-white
+                            text-[#161513]
                             sm:h-8
                             sm:w-8
                             sm:text-[10px]
@@ -272,11 +267,11 @@ export default function HeroLeft() {
                 </div>
 
                 <div>
-                    <p className="text-xs text-yellow-400 sm:text-sm">
+                    <p className="text-xs text-[#e8a33d] sm:text-sm">
                         ★★★★★
                     </p>
 
-                    <p className="text-[11px] text-slate-400 sm:text-xs">
+                    <p className="text-[11px] text-[#9a978f] sm:text-xs">
                         Trusted by creators worldwide
                     </p>
                 </div>
@@ -292,12 +287,13 @@ export default function HeroLeft() {
                     gap-2
                     rounded-full
                     border
-                    border-slate-800
-                    bg-[#171717]
+                    border-[#2a2825]
+                    bg-[#161513]
                     px-2.5
                     py-1.5
+                    font-mono
                     text-[11px]
-                    text-slate-300
+                    text-[#b5b2a8]
                     sm:px-3
                     sm:text-xs
                 "
@@ -311,11 +307,11 @@ export default function HeroLeft() {
                             w-full
                             animate-ping
                             rounded-full
-                            bg-blue-500
+                            bg-[#e8a33d]
                             opacity-75
                         "
                     />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-blue-500" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#e8a33d]" />
                 </span>
 
                 <span className="truncate">Studio session booked 3 min ago</span>
@@ -338,19 +334,19 @@ export default function HeroLeft() {
                             overflow-hidden
                             rounded-xl
                             border
-                            border-slate-800
-                            bg-[#171717]
+                            border-[#2a2825]
+                            bg-[#161513]
                             p-2.5
                             transition-colors
-                            hover:border-slate-700
+                            hover:border-[#3a3630]
                             sm:p-3
                         "
                     >
-                        <p className="text-lg font-bold text-white sm:text-xl">
+                        <p className="font-mono text-lg font-bold text-[#f5f4f1] sm:text-xl">
                             {value}
                         </p>
 
-                        <p className="mt-0.5 text-[11px] text-slate-400 sm:text-xs">
+                        <p className="mt-0.5 text-[11px] text-[#9a978f] sm:text-xs">
                             {label}
                         </p>
 
@@ -362,7 +358,7 @@ export default function HeroLeft() {
                                 left-0
                                 h-[2px]
                                 w-0
-                                bg-blue-500
+                                bg-[#e8a33d]
                                 transition-all
                                 duration-300
                                 group-hover:w-full
@@ -375,19 +371,16 @@ export default function HeroLeft() {
 
             <style>{`
                 .hero-headline-underline {
-                    stroke-dasharray: 620;
-                    stroke-dashoffset: 620;
-                    animation: hero-underline-draw 1.1s cubic-bezier(0.65, 0, 0.35, 1) 0.5s forwards;
+                    animation: hero-dash-march 1.2s linear infinite;
                 }
                 @media (prefers-reduced-motion: reduce) {
                     .hero-headline-underline {
                         animation: none;
-                        stroke-dashoffset: 0;
                     }
                 }
-                @keyframes hero-underline-draw {
+                @keyframes hero-dash-march {
                     to {
-                        stroke-dashoffset: 0;
+                        stroke-dashoffset: -25;
                     }
                 }
             `}</style>

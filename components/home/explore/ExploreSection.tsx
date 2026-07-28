@@ -35,15 +35,15 @@ export default function ExploreSection() {
                                 gap-2
                                 rounded-full
                                 border
-                                border-blue-500/20
-                                bg-blue-500/10
+                                border-[#e8a33d]/20
+                                bg-[#e8a33d]/10
                                 px-2
                                 py-1
                                 text-[9px]
                                 font-semibold
                                 uppercase
                                 tracking-[0.2em]
-                                text-blue-400
+                                text-[#e8a33d]
                             "
                         >
                             <span className="relative flex h-1.5 w-1.5">
@@ -55,16 +55,16 @@ export default function ExploreSection() {
                                         w-full
                                         animate-ping
                                         rounded-full
-                                        bg-blue-400
+                                        bg-[#e8a33d]
                                         opacity-60
                                     "
                                 />
-                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-blue-400" />
+                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#e8a33d]" />
                             </span>
                             Explore
                         </span>
 
-                        {/* Headline */}
+                        {/* Headline — blue reserved for the accent word, same rule as Hero/Testimonials/Beats/Studios */}
                         <h2
                             className="
                                 mt-4
@@ -72,25 +72,28 @@ export default function ExploreSection() {
                                 font-bold
                                 leading-[1.1]
                                 tracking-tight
-                                text-white
+                                text-[#f5f4f1]
                                 md:text-4xl
                             "
                         >
                             Everything you need to{" "}
                             <span className="relative inline-block">
-                                create music.
+                                <span className="text-blue-600">
+                                    create music.
+                                </span>
                                 <svg
                                     aria-hidden="true"
                                     viewBox="0 0 220 16"
                                     preserveAspectRatio="none"
-                                    className="absolute -bottom-1 left-0 h-3 w-full text-green-500"
+                                    className="absolute -bottom-1 left-0 h-3 w-full text-blue-600"
                                 >
                                     <path
-                                        d="M2 10c18-9 36-9 54 0s36 9 54 0 36-9 54 0 36 9 54 0"
+                                        d="M2 8 H218"
                                         fill="none"
                                         stroke="currentColor"
                                         strokeWidth="3"
                                         strokeLinecap="round"
+                                        strokeDasharray="14 8"
                                         className="explore-headline-underline"
                                     />
                                 </svg>
@@ -104,21 +107,21 @@ export default function ExploreSection() {
                                 max-w-xl
                                 text-sm
                                 leading-7
-                                text-slate-400
+                                text-[#9a978f]
                             "
                         >
                             Discover{" "}
-                            <span className="font-medium text-slate-200">studios</span>,{" "}
-                            <span className="font-medium text-slate-200">producers</span>,{" "}
-                            <span className="font-medium text-slate-200">artists</span>,{" "}
-                            <span className="font-medium text-slate-200">beats</span>,
+                            <span className="font-medium text-[#f5f4f1]">studios</span>,{" "}
+                            <span className="font-medium text-[#f5f4f1]">producers</span>,{" "}
+                            <span className="font-medium text-[#f5f4f1]">artists</span>,{" "}
+                            <span className="font-medium text-[#f5f4f1]">beats</span>,
                             creative services and promotional tools — all in one
                             platform.
                         </p>
 
                     </div>
 
-                    {/* Social proof */}
+                    {/* Social proof — swatches pulled from ExploreCard's own category palette */}
                     <div
                         className="
                             hidden
@@ -127,18 +130,18 @@ export default function ExploreSection() {
                             gap-4
                             rounded-full
                             border
-                            border-[#262626]
-                            bg-[#171717]
+                            border-[#2a2825]
+                            bg-[#161513]
                             px-4
                             py-2
                             lg:flex
                         "
                     >
                         <div className="flex -space-x-2">
-                            <div className="h-7 w-7 rounded-full border-2 border-[#171717] bg-gradient-to-br from-blue-400 to-blue-600" />
-                            <div className="h-7 w-7 rounded-full border-2 border-[#171717] bg-gradient-to-br from-purple-400 to-purple-600" />
-                            <div className="h-7 w-7 rounded-full border-2 border-[#171717] bg-gradient-to-br from-emerald-400 to-emerald-600" />
-                            <div className="h-7 w-7 rounded-full border-2 border-[#171717] bg-gradient-to-br from-orange-400 to-orange-600" />
+                            <div className="h-7 w-7 rounded-full border-2 border-[#161513]" style={{ background: "linear-gradient(to bottom right, #7fa9ac, #5a8386)" }} />
+                            <div className="h-7 w-7 rounded-full border-2 border-[#161513]" style={{ background: "linear-gradient(to bottom right, #a58bc4, #7d63a0)" }} />
+                            <div className="h-7 w-7 rounded-full border-2 border-[#161513]" style={{ background: "linear-gradient(to bottom right, #8fae82, #6b8a5e)" }} />
+                            <div className="h-7 w-7 rounded-full border-2 border-[#161513]" style={{ background: "linear-gradient(to bottom right, #e8a33d, #cf8452)" }} />
                             <div
                                 className="
                                     flex
@@ -148,11 +151,11 @@ export default function ExploreSection() {
                                     justify-center
                                     rounded-full
                                     border-2
-                                    border-[#171717]
-                                    bg-[#262626]
+                                    border-[#161513]
+                                    bg-[#2a2825]
                                     text-[9px]
                                     font-bold
-                                    text-slate-300
+                                    text-[#b5b2a8]
                                 "
                             >
                                 +
@@ -160,10 +163,10 @@ export default function ExploreSection() {
                         </div>
 
                         <div>
-                            <p className="text-xs font-semibold text-white">
-                                Join <span className="text-blue-400">250K+</span> creators
+                            <p className="text-xs font-semibold text-[#f5f4f1]">
+                                Join <span className="font-mono text-[#e8a33d]">250K+</span> creators
                             </p>
-                            <p className="text-[11px] text-slate-500">
+                            <p className="text-[11px] text-[#6b685f]">
                                 Studios • Artists • Producers
                             </p>
                         </div>
@@ -194,22 +197,20 @@ export default function ExploreSection() {
 
             <style>{`
                 .explore-headline-underline {
-                    stroke-dasharray: 320;
-                    stroke-dashoffset: 320;
-                    animation: explore-underline-draw 0.9s cubic-bezier(0.65, 0, 0.35, 1) 0.3s forwards;
+                    animation: explore-dash-march 1.2s linear infinite;
                 }
                 @media (prefers-reduced-motion: reduce) {
                     .explore-headline-underline {
                         animation: none;
-                        stroke-dashoffset: 0;
                     }
                 }
-                @keyframes explore-underline-draw {
+                @keyframes explore-dash-march {
                     to {
-                        stroke-dashoffset: 0;
+                        stroke-dashoffset: -22;
                     }
                 }
             `}</style>
+
         </section>
     );
 }

@@ -33,7 +33,7 @@ export default function ServiceSection() {
 
                     <div className="max-w-2xl">
 
-                        {/* Badge — same pulsing-dot pattern used sitewide, recolored for this section */}
+                        {/* Badge — same pulsing-dot pattern used sitewide */}
                         <span
                             className="
                                 inline-flex
@@ -41,15 +41,15 @@ export default function ServiceSection() {
                                 gap-2
                                 rounded-full
                                 border
-                                border-orange-500/20
-                                bg-orange-500/10
+                                border-[#e8a33d]/20
+                                bg-[#e8a33d]/10
                                 px-3
                                 py-1
                                 text-[9px]
                                 font-semibold
                                 uppercase
                                 tracking-[0.2em]
-                                text-orange-400
+                                text-[#e8a33d]
                             "
                         >
                             <span className="relative flex h-1.5 w-1.5">
@@ -61,11 +61,11 @@ export default function ServiceSection() {
                                         w-full
                                         animate-ping
                                         rounded-full
-                                        bg-orange-400
+                                        bg-[#e8a33d]
                                         opacity-60
                                     "
                                 />
-                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-orange-400" />
+                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#e8a33d]" />
                             </span>
                             Music Services
                         </span>
@@ -79,7 +79,7 @@ export default function ServiceSection() {
                                 font-black
                                 leading-[1.05]
                                 tracking-tight
-                                text-white
+                                text-[#f5f4f1]
                                 whitespace-nowrap
                                 sm:mt-4
                             "
@@ -89,30 +89,22 @@ export default function ServiceSection() {
                         >
                             Beyond{" "}
                             <span className="relative inline-block">
-                                <span
-                                    className="
-                                        bg-gradient-to-r
-                                        from-orange-400
-                                        via-orange-500
-                                        to-amber-500
-                                        bg-clip-text
-                                        text-transparent
-                                    "
-                                >
+                                <span className="text-blue-600">
                                     the recording
                                 </span>
                                 <svg
                                     aria-hidden="true"
                                     viewBox="0 0 190 16"
                                     preserveAspectRatio="none"
-                                    className="absolute -bottom-1 left-0 h-3 w-full text-orange-500 sm:-bottom-2"
+                                    className="absolute -bottom-1 left-0 h-3 w-full text-blue-600 sm:-bottom-2"
                                 >
                                     <path
-                                        d="M2 10c23-9 46-9 69 0s46 9 69 0 46-9 48 0"
+                                        d="M2 8 H188"
                                         fill="none"
                                         stroke="currentColor"
                                         strokeWidth="3"
                                         strokeLinecap="round"
+                                        strokeDasharray="14 8"
                                         className="services-headline-underline"
                                     />
                                 </svg>
@@ -126,7 +118,7 @@ export default function ServiceSection() {
                                 max-w-2xl
                                 text-sm
                                 leading-6
-                                text-slate-400
+                                text-[#9a978f]
                                 sm:mt-4
                                 sm:text-lg
                                 sm:leading-8
@@ -138,17 +130,17 @@ export default function ServiceSection() {
                             all from one platform.
                         </p>
 
-                        {/* Trust signal strip */}
+                        {/* Trust signal strip — mono numbers, same convention as every card */}
                         <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 sm:mt-6 sm:gap-x-6">
                             {[
                                 { value: "500+", label: "specialists" },
                                 { value: "24hr", label: "avg turnaround" },
                             ].map((stat) => (
                                 <div key={stat.label} className="flex items-baseline gap-1.5">
-                                    <span className="text-sm font-bold text-white sm:text-base">
+                                    <span className="font-mono text-sm font-bold text-[#f5f4f1] sm:text-base">
                                         {stat.value}
                                     </span>
-                                    <span className="text-[11px] text-slate-500 sm:text-xs">
+                                    <span className="text-[11px] text-[#6b685f] sm:text-xs">
                                         {stat.label}
                                     </span>
                                 </div>
@@ -180,16 +172,15 @@ export default function ServiceSection() {
                                 gap-2
                                 rounded-full
                                 border
-                                border-[#272727]
-                                bg-orange-600
+                                border-blue-600
+                                bg-blue-600
                                 px-4
                                 py-2
                                 text-sm
                                 font-semibold
                                 text-white
                                 transition
-                                hover:border-orange-500/10
-                                hover:bg-orange-700
+                                hover:bg-blue-700
                                 hover:gap-3
                                 sm:w-fit
                             "
@@ -221,8 +212,8 @@ export default function ServiceSection() {
                                         sm:text-xs
                                         ${
                                             activeFilter === filter
-                                                ? "border-orange-500/40 bg-orange-500/10 text-orange-400"
-                                                : "border-[#272727] bg-[#171717] text-[#aaaaaa] hover:border-[#3f3f3f] hover:text-white"
+                                                ? "border-[#e8a33d]/40 bg-[#e8a33d]/10 text-[#e8a33d]"
+                                                : "border-[#2a2825] bg-[#161513] text-[#9a978f] hover:border-[#3a3630] hover:text-[#f5f4f1]"
                                         }
                                     `}
                                 >
@@ -257,19 +248,16 @@ export default function ServiceSection() {
 
             <style>{`
                 .services-headline-underline {
-                    stroke-dasharray: 320;
-                    stroke-dashoffset: 320;
-                    animation: services-underline-draw 0.9s cubic-bezier(0.65, 0, 0.35, 1) 0.35s forwards;
+                    animation: services-dash-march 1.2s linear infinite;
                 }
                 @media (prefers-reduced-motion: reduce) {
                     .services-headline-underline {
                         animation: none;
-                        stroke-dashoffset: 0;
                     }
                 }
-                @keyframes services-underline-draw {
+                @keyframes services-dash-march {
                     to {
-                        stroke-dashoffset: 0;
+                        stroke-dashoffset: -22;
                     }
                 }
             `}</style>
