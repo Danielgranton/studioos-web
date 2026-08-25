@@ -16,7 +16,7 @@ import {
     LogOut,
 } from "lucide-react";
 
-import { useClickOutside } from "@/features/search/hooks/useClickOutside";
+import { useClickOutside } from "@/features/search";
 
 interface NavbarUser {
     name: string;

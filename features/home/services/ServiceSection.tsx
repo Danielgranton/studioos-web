@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 
-import ServiceCategoryCard from "./serviceCategoryCard";
+import ServiceCategoryCard from "./ServiceCategoryCard";
 import { serviceCategories } from "./serviceCategories";
 
 const filters = ["All", "Mixing", "Mastering", "Marketing", "Visuals"];

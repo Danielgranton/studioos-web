@@ -5,37 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
-import {
-    X,
-    Compass,
-    Building2,
-    Mic2,
-    ShoppingBag,
-    Wrench,
-    CalendarCheck,
-    Megaphone,
-    CircleHelp,
-    User,
-    Star,
-} from "lucide-react";
+import { X } from "lucide-react";
+
+import { NAV_ITEMS } from "./navigation";
 
 interface NavbarMobileMenuProps {
     open: boolean;
     onClose: () => void;
 }
-
-const BROWSE_LINKS = [
-    { href: "/explore", label: "Explore", icon: <Compass size={20} className="text-blue-500" /> },
-    { href: "/studios", label: "Studios", icon: <Building2 size={20} className="text-blue-500" /> },
-    { href: "/producers", label: "Producers", icon: <Mic2 size={20} className="text-blue-500" /> },
-    { label: "Artists", href: "/artists", icon: <User size={20} className="text-blue-500" /> },
-    { href: "/marketplace", label: "Beat Marketplace", icon: <ShoppingBag size={20} className="text-blue-500" /> },
-    { href: "/services", label: "Services", icon: <Wrench size={20} className="text-blue-500" /> },
-    { href: "/bookings", label: "Bookings", icon: <CalendarCheck size={20} className="text-blue-500" /> },
-    { href: "/sponsored", label: "Sponsored", icon: <Megaphone size={20} className="text-blue-500" /> },
-    { href: "/reviews" , label : "Reviews", icon: <Star size={20} className="text-blue-500"/>},
-    { href: "/help", label: "Help Center", icon: <CircleHelp size={20} className="text-blue-500" /> },
-];
 
 export default function NavbarMobileMenu({
     open,
@@ -155,17 +132,21 @@ export default function NavbarMobileMenu({
                 <nav className="flex-1 overflow-y-auto p-3">
 
                     <MenuSection>
-                        {BROWSE_LINKS.map((link) => (
-                            <MenuItem
-                                key={link.href}
-                                href={link.href}
-                                icon={link.icon}
-                                active={pathname === link.href || pathname.startsWith(link.href + "/")}
-                                onNavigate={onClose}
-                            >
-                                {link.label}
-                            </MenuItem>
-                        ))}
+                        {NAV_ITEMS.map((link) => {
+                            const Icon = link.icon;
+
+                            return (
+                                <MenuItem
+                                    key={link.href}
+                                    href={link.href}
+                                    icon={<Icon size={20} className="text-blue-500" />}
+                                    active={pathname === link.href || pathname.startsWith(link.href + "/")}
+                                    onNavigate={onClose}
+                                >
+                                    {link.label}
+                                </MenuItem>
+                            );
+                        })}
                     </MenuSection>
 
                 </nav>

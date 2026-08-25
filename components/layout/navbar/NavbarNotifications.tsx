@@ -3,86 +3,11 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 
-import {
-    Bell,
-    CheckCheck,
-    Calendar,
-    Music2,
-    Wallet,
-    UserPlus,
-    MessageSquare,
-    BadgeCheck,
-} from "lucide-react";
+import { Bell, CheckCheck } from "lucide-react";
 
-import { useClickOutside } from "@/features/search/hooks/useClickOutside";
+import { useClickOutside } from "@/features/search";
 
-interface Notification {
-    id: string;
-    title: string;
-    description: string;
-    time: string;
-    read: boolean;
-    type:
-        | "booking"
-        | "payment"
-        | "beat"
-        | "message"
-        | "follow"
-        | "system";
-}
-
-// TODO: replace with real data from NotificationService (GET /notifications, GET /notifications/unread-count)
-const notifications: Notification[] = [
-    {
-        id: "1",
-        title: "Booking Confirmed",
-        description: "Studio Alpha accepted your booking.",
-        time: "2 min ago",
-        read: false,
-        type: "booking",
-    },
-    {
-        id: "2",
-        title: "Beat Sold",
-        description: "Trap Anthem was purchased.",
-        time: "18 min ago",
-        read: false,
-        type: "beat",
-    },
-    {
-        id: "3",
-        title: "Payment Received",
-        description: "KES 12,000 has been added to your wallet.",
-        time: "1 hour ago",
-        read: true,
-        type: "payment",
-    },
-    {
-        id: "4",
-        title: "New Follower",
-        description: "John Mwangi started following you.",
-        time: "Yesterday",
-        read: true,
-        type: "follow",
-    },
-    {
-        id: "5",
-        title: "Advertisement Approved",
-        description: "Your homepage advertisement is now live.",
-        time: "2 days ago",
-        read: true,
-        type: "system",
-    },
-];
-
-const TYPE_ICON: Record<Notification["type"], React.ReactNode> = {
-    booking: <Calendar size={18} />,
-    payment: <Wallet size={18} />,
-    beat: <Music2 size={18} />,
-    message: <MessageSquare size={18} />,
-    follow: <UserPlus size={18} />,
-    system: <BadgeCheck size={18} />,
-};
+import { NOTIFICATION_ICONS, NOTIFICATIONS } from "./notifications";
 
 export default function NavbarNotifications() {
 
@@ -92,7 +17,7 @@ export default function NavbarNotifications() {
 
     useClickOutside(containerRef, () => setOpen(false));
 
-    const unread = notifications.filter((n) => !n.read).length;
+    const unread = NOTIFICATIONS.filter((n) => !n.read).length;
 
     const unreadLabel = unread > 9 ? "9+" : unread;
 
@@ -202,7 +127,7 @@ export default function NavbarNotifications() {
 
                     </div>
 
-                    {notifications.length === 0 ? (
+                    {NOTIFICATIONS.length === 0 ? (
 
                         <div className="px-5 py-12 text-center">
 
@@ -218,7 +143,7 @@ export default function NavbarNotifications() {
 
                         <div className="max-h-[420px] overflow-y-auto no-scrollbar">
 
-                            {notifications.map((notification) => (
+                            {NOTIFICATIONS.map((notification) => (
 
                                 <button
                                     key={notification.id}
@@ -236,7 +161,11 @@ export default function NavbarNotifications() {
                                 >
 
                                     <div className="mt-0.5 text-[#3ea6ff]">
-                                        {TYPE_ICON[notification.type]}
+                                        {(() => {
+                                            const Icon = NOTIFICATION_ICONS[notification.type];
+
+                                            return <Icon size={18} />;
+                                        })()}
                                     </div>
 
                                     <div className="min-w-0 flex-1">

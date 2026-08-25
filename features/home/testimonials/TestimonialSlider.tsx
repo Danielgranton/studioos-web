@@ -22,10 +22,6 @@ export default function TestimonialSlider() {
     const [page, setPage] = useState(0);
     const [paused, setPaused] = useState(false);
 
-    const next = () => {
-        setPage((prev) => (prev + 1) % pages.length);
-    };
-
     const previous = () => {
         setPage((prev) => (prev - 1 + pages.length) % pages.length);
     };
@@ -33,10 +29,16 @@ export default function TestimonialSlider() {
     useEffect(() => {
         if (paused) return;
 
-        const interval = setInterval(next, 10000);
+        const interval = setInterval(() => {
+            setPage((prev) => (prev + 1) % pages.length);
+        }, 10000);
 
         return () => clearInterval(interval);
     }, [paused, pages.length]);
+
+    const next = () => {
+        setPage((prev) => (prev + 1) % pages.length);
+    };
 
     return (
         <div

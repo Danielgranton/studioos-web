@@ -3,7 +3,7 @@
 import { Search, Menu } from "lucide-react";
 
 import NavbarLogo from "./NavbarLogo";
-import NavbarNotifications from "./NavbarNotification";
+import NavbarNotifications from "./NavbarNotifications";
 import NavbarProfile from "./NavbarProfile";
 
 interface NavbarMobileProps {

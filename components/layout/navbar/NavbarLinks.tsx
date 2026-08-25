@@ -3,31 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import {
-    Compass,
-    Building2,
-    Mic2,
-    ShoppingBag,
-    Wrench,
-    CalendarCheck,
-    Megaphone,
-    CircleHelp,
-    User,
-    Star,
-} from "lucide-react";
-
-const NAV_LINKS = [
-    { label: "Explore", href: "/explore", icon: Compass },
-    { label: "Studios", href: "/studios", icon: Building2 },
-    { label: "Producers", href: "/producers", icon: Mic2 },
-    { label: "Artists", href: "/artists", icon: User},
-    { label: "Beat Marketplace", href: "/marketplace", icon: ShoppingBag },
-    { label: "Services", href: "/services", icon: Wrench },
-    { label: "Bookings", href: "/bookings", icon: CalendarCheck },
-    { label: "Sponsored", href: "/sponsored", icon: Megaphone },
-    { label: "Reviews" , href: "/reviews", icon: Star},
-    { label: "Help Center", href: "/help", icon: CircleHelp },
-];
+import { NAV_ITEMS } from "./navigation";
 
 export default function NavbarLinks() {
 
@@ -35,7 +11,7 @@ export default function NavbarLinks() {
 
     return (
         <nav className="hidden lg:flex items-center gap-2">
-            {NAV_LINKS.map((link) => {
+            {NAV_ITEMS.map((link) => {
 
                 const active = pathname === link.href || pathname.startsWith(link.href + "/");
 

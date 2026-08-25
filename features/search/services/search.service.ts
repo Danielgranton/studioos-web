@@ -1,4 +1,4 @@
-import api from "@/lib/axios";
+import api from "@/lib/api";
 
 import {
     AdvertisementSearchResult,
@@ -26,8 +26,6 @@ class SearchService {
                 params: request,
             }
         );
-
-        console.log("Search response:", response.data);
 
         return response.data;
     }
@@ -164,4 +162,6 @@ class SearchService {
 
 }
 
-export default new SearchService();
+const searchService = new SearchService();
+
+export default searchService;

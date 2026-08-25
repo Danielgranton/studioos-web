@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import FeaturedStudioCard from "./featuredStudioCard";
+import FeaturedStudioCard from "./FeaturedStudioCard";
 import { featuredStudios } from "./featuredStudiosData";
 
 export default function FeaturedStudios() {

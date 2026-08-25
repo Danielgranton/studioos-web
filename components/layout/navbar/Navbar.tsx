@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import NavbarLogo from "./NavbarLogo";
 import NavbarLinks from "./NavbarLinks";
 import NavbarSearch from "./NavbarSearch";
-import NavbarNotifications from "./NavbarNotification";
+import NavbarNotifications from "./NavbarNotifications";
 import NavbarProfile from "./NavbarProfile";
 import NavbarMobile from "./NavbarMobile";
 import NavbarMobileMenu from "./NavbarMobileMenu";

@@ -115,4 +115,6 @@ class SearchCache {
 
 }
 
-export default new SearchCache();
+const searchCache = new SearchCache();
+
+export default searchCache;

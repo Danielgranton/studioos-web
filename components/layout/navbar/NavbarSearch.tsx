@@ -2,15 +2,15 @@
 
 import { useCallback, useMemo, useRef } from "react";
 
-import SearchInput from "@/features/search/components/SearchInput";
-import SearchDropdown from "@/features/search/components/SearchDropdown";
-
-import useSearch from "@/features/search/hooks/useSearch";
-import useSearchHome from "@/features/search/hooks/useSearchHome";
-
-import { useSearchShortcuts } from "@/features/search/hooks/useSearchShortcuts";
-import { useSearchKeyboard } from "@/features/search/hooks/useSearchKeyboard";
-import { useClickOutside } from "@/features/search/hooks/useClickOutside";
+import {
+    SearchDropdown,
+    SearchInput,
+    useClickOutside,
+    useSearch,
+    useSearchHome,
+    useSearchKeyboard,
+    useSearchShortcuts,
+} from "@/features/search";
 
 export default function NavbarSearch() {
 
@@ -65,10 +65,7 @@ export default function NavbarSearch() {
 
         items: keyboardItems,
 
-        onSelect: (item) => {
-
-            console.log("Selected:", item);
-
+        onSelect: () => {
             /**
              * TODO
              *
