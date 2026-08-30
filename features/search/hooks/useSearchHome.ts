@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import SearchService from "../services/search.service";
+import { SearchService } from "../services";
 
 import {
     RecentSearch,
@@ -10,7 +10,7 @@ import {
     TrendingSearch,
 } from "../types/search";
 
-export default function useSearchHome() {
+export function useSearchHome() {
 
     const [recent, setRecent] = useState<RecentSearch[]>([]);
 

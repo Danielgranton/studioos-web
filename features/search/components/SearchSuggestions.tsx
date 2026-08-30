@@ -9,7 +9,7 @@ interface SearchSuggestionsProps {
     onSelect?: (value: string) => void;
 }
 
-export default function SearchSuggestions({
+export function SearchSuggestions({
     suggestions,
     onSelect,
 }: SearchSuggestionsProps) {

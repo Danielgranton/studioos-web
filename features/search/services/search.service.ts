@@ -1,4 +1,4 @@
-import api from "@/lib/api";
+import { api } from "@/lib/api";
 
 import {
     AdvertisementSearchResult,
@@ -15,7 +15,7 @@ import {
     TrendingSearch,
 } from "../types/search";
 
-class SearchService {
+class SearchServiceClient {
 
     // Global Search
     async search(request: SearchRequest): Promise<SearchResponse> {
@@ -162,6 +162,4 @@ class SearchService {
 
 }
 
-const searchService = new SearchService();
-
-export default searchService;
+export const SearchService = new SearchServiceClient();

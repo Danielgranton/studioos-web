@@ -13,7 +13,7 @@ interface SearchInputProps {
     onClear: () => void;
 }
 
-export default function SearchInput({
+export function SearchInput({
     inputRef,
     value,
     loading,

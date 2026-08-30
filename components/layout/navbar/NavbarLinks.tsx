@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 import { NAV_ITEMS } from "./navigation";
 
-export default function NavbarLinks() {
+export function NavbarLinks() {
 
     const pathname = usePathname();
 

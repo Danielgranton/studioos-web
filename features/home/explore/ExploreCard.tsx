@@ -55,7 +55,7 @@ const accentStyles = {
     },
 } as const;
 
-export default function ExploreCard({
+export function ExploreCard({
     title,
     description,
     href,

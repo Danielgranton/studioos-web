@@ -9,7 +9,7 @@ import { useClickOutside } from "@/features/search";
 
 import { NOTIFICATION_ICONS, NOTIFICATIONS } from "./notifications";
 
-export default function NavbarNotifications() {
+export function NavbarNotifications() {
 
     const [open, setOpen] = useState(false);
 

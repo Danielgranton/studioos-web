@@ -44,7 +44,7 @@ const WORKSPACE_LINKS = [
     { href: "/dashboard/settings", label: "Settings", icon: <Settings size={18} /> },
 ];
 
-export default function NavbarProfile({ user = FALLBACK_USER }: NavbarProfileProps) {
+export function NavbarProfile({ user = FALLBACK_USER }: NavbarProfileProps) {
 
     const [open, setOpen] = useState(false);
 

@@ -4,19 +4,21 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 
-import BeatCard from "./BeatCard";
+import { BeatCard } from "./BeatCard";
 import { trendingBeats } from "./beatData";
 
 const filters = ["All", "Hip-Hop", "Afrobeat", "Trap", "Exclusive"];
 
-export default function TrendingBeats() {
+export function TrendingBeats() {
     const [activeFilter, setActiveFilter] = useState("All");
 
     return (
         <section
+            id="beats"
             className="
                 relative
                 overflow-hidden
+                scroll-mt-28
             "
         >
 

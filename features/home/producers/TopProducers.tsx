@@ -4,16 +4,19 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 
-import ProducerCard from "./ProducerCard";
+import { ProducerCard } from "./ProducerCard";
 import { producerData } from "./producerData";
 
 const filters = ["All", "Hip-Hop", "Afrobeat", "R&B", "Available Now"];
 
-export default function TopProducers() {
+export function TopProducers() {
     const [activeFilter, setActiveFilter] = useState("All");
 
     return (
-        <section className="relative">
+        <section
+            id="producers"
+            className="relative scroll-mt-28"
+        >
 
             <div className="mx-auto max-w-[1600px] px-6">
 

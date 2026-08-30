@@ -17,7 +17,7 @@ const ENTITY_LABELS: Record<SearchEntityType, string> = {
     [SearchEntityType.USER]: "User",
 };
 
-export default function SearchResults({
+export function SearchResults({
     results,
 }: SearchResultsProps) {
 

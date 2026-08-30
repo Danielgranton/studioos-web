@@ -1,6 +1,6 @@
 "use client";
 
-export default function SearchLoading() {
+export function SearchLoading() {
     return (
         <div className="p-6">
 

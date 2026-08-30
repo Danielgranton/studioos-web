@@ -12,7 +12,7 @@ import {
     useSearchShortcuts,
 } from "@/features/search";
 
-export default function NavbarSearch() {
+export function NavbarSearch() {
 
     const containerRef = useRef<HTMLDivElement>(null);
 

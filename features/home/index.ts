@@ -1,7 +1,6 @@
-export { default as ExploreSection } from "./explore";
-export { default as FeaturedStudios } from "./studios";
-export { default as Hero } from "./hero";
-
+export { ExploreSection } from "./explore";
+export { FeaturedStudios } from "./studios";
+export { Hero } from "./hero";
 export { TopProducers } from "./producers";
 export { TrendingBeats } from "./trending-beats";
 export { ServiceSection } from "./services";

@@ -3,12 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import TestimonialCard from "./TestimonialCard";
+import { TestimonialCard } from "./TestimonialCard";
 import { testimonials } from "./testimonialData";
 
 const ITEMS_PER_PAGE = 6;
 
-export default function TestimonialSlider() {
+export function TestimonialSlider() {
     const pages = useMemo(() => {
         const result = [];
 

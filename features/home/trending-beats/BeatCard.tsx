@@ -30,7 +30,7 @@ interface BeatCardProps {
     verified: boolean;
 }
 
-export default function BeatCard({
+export function BeatCard({
     slug,
     title,
     producer,

@@ -12,7 +12,7 @@ const videos = [
     { id: 4, title: "Elite Sound", emoji: "🎤", tag: "Live tracking • Gospel choir", meta: "Kampala" },
 ];
 
-export default function HeroAds() {
+export function HeroAds() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [progress, setProgress] = useState(0);
     const [paused, setPaused] = useState(false);

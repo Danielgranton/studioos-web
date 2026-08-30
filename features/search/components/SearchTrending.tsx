@@ -9,7 +9,7 @@ interface SearchTrendingProps {
     onSelect?: (value: string) => void;
 }
 
-export default function SearchTrending({
+export function SearchTrending({
     trending,
     onSelect,
 }: SearchTrendingProps) {

@@ -118,7 +118,7 @@ const accentStyles = {
     },
 };
 
-export default function ServiceCategoryCard({
+export function ServiceCategoryCard({
     id,
     title,
     description,

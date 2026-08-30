@@ -2,16 +2,16 @@
 
 import { Search, Menu } from "lucide-react";
 
-import NavbarLogo from "./NavbarLogo";
-import NavbarNotifications from "./NavbarNotifications";
-import NavbarProfile from "./NavbarProfile";
+import { NavbarLogo } from "./NavbarLogo";
+import { NavbarNotifications } from "./NavbarNotifications";
+import { NavbarProfile } from "./NavbarProfile";
 
 interface NavbarMobileProps {
     onMenuOpen: () => void;
     onSearchOpen: () => void;
 }
 
-export default function NavbarMobile({
+export function NavbarMobile({
     onMenuOpen,
     onSearchOpen,
 }: NavbarMobileProps) {

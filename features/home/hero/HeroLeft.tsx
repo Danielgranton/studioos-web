@@ -3,11 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Music2 } from "lucide-react";
-import HeroAudienceToggle from "./HeroAudienceToggle";
+import { HeroAudienceToggle } from "./HeroAudienceToggle";
 
 const genres = ["Hip-Hop", "Afrobeat", "R&B", "Podcast", "Gospel"];
 
-export default function HeroLeft() {
+export function HeroLeft() {
     return (
         <div className="w-full max-w-3xl">
 

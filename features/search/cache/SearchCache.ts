@@ -15,7 +15,7 @@ interface CachedSearch {
 
 }
 
-class SearchCache {
+class SearchCacheStore {
 
     private readonly TTL = 1000 * 60 * 5;
 
@@ -115,6 +115,4 @@ class SearchCache {
 
 }
 
-const searchCache = new SearchCache();
-
-export default searchCache;
+export const SearchCache = new SearchCacheStore();

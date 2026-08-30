@@ -1,1 +1,1 @@
-export { default as SearchCache } from "./SearchCache";
+export { SearchCache } from "./SearchCache";

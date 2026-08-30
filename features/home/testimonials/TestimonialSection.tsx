@@ -14,7 +14,7 @@ import {
   ThumbsUp,
 } from "lucide-react";
 
-import TestimonialSlider from "./TestimonialSlider";
+import { TestimonialSlider } from "./TestimonialSlider";
 
 const filters = [
   {
@@ -44,12 +44,14 @@ const filters = [
   },
 ];
 
-export default function TestimonialSection() {
+export function TestimonialSection() {
   return (
     <section
+      id="testimonials"
       className="
                 relative
                 overflow-hidden
+                scroll-mt-28
             "
     >
       <div
@@ -329,4 +331,3 @@ export default function TestimonialSection() {
     </section>
   );
 }
-

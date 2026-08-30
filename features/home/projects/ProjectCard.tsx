@@ -34,7 +34,7 @@ interface ProjectCardProps {
     verified: boolean;
 }
 
-export default function ProjectCard({
+export function ProjectCard({
     slug,
     title,
     artist,

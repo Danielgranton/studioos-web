@@ -1,1 +1,1 @@
-export { default } from "./FeaturedStudios";
+export { FeaturedStudios } from "./FeaturedStudios";

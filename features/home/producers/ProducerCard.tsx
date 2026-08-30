@@ -42,7 +42,7 @@ function Waveform({ active }: { active: boolean }) {
     );
 }
 
-export default function ProducerCard({
+export function ProducerCard({
     slug,
     name,
     avatar,

@@ -4,16 +4,19 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 
-import ServiceCategoryCard from "./ServiceCategoryCard";
+import { ServiceCategoryCard } from "./ServiceCategoryCard";
 import { serviceCategories } from "./serviceCategories";
 
 const filters = ["All", "Mixing", "Mastering", "Marketing", "Visuals"];
 
-export default function ServiceSection() {
+export function ServiceSection() {
     const [activeFilter, setActiveFilter] = useState("All");
 
     return (
-        <section className="relative overflow-hidden ">
+        <section
+            id="services"
+            className="relative overflow-hidden scroll-mt-28"
+        >
 
             <div className="relative mx-auto max-w-[1600px] px-6">
 

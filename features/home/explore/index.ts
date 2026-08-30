@@ -1,1 +1,1 @@
-export { default } from "./ExploreSection";
+export { ExploreSection } from "./ExploreSection";

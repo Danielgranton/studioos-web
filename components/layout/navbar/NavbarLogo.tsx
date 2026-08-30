@@ -5,7 +5,7 @@ interface NavbarLogoProps {
     compact?: boolean;
 }
 
-export default function NavbarLogo({ compact = false }: NavbarLogoProps) {
+export function NavbarLogo({ compact = false }: NavbarLogoProps) {
     return (
         <Link
             href="/"

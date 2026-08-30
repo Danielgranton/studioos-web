@@ -4,21 +4,23 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 
-import ProjectCard from "./ProjectCard";
+import { ProjectCard } from "./ProjectCard";
 import { featuredProjects } from "./projectData";
 
 const filters = ["All", "Songs", "Podcasts", "Videos"];
 
-export default function FeaturedProjects() {
+export function FeaturedProjects() {
     const [activeFilter, setActiveFilter] = useState("All");
 
     const visibleProjects = featuredProjects;
 
     return (
         <section
+            id="projects"
             className="
                 relative
                 overflow-hidden
+                scroll-mt-28
             "
         >
             <div

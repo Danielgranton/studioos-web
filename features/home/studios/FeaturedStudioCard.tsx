@@ -27,7 +27,7 @@ interface FeaturedStudioCardProps {
     image: string;
 }
 
-export default function FeaturedStudioCard({
+export function FeaturedStudioCard({
     slug,
     name,
     location,

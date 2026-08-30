@@ -9,6 +9,25 @@ export default defineConfig([
   {
     rules: {
       "react-hooks/set-state-in-effect": "off",
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "@/features/*/components/*",
+                "@/features/*/hooks/*",
+                "@/features/*/services/*",
+                "@/features/*/cache/*",
+                "@/features/*/types/*",
+                "@/features/*/*/*",
+              ],
+              message:
+                "Import from the feature root (for example, '@/features/search') instead of deep-linking into feature internals.",
+            },
+          ],
+        },
+      ],
     },
   },
 

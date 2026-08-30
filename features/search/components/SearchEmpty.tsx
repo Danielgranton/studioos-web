@@ -7,7 +7,7 @@ interface SearchEmptyProps {
     results: SearchResponse | null;
 }
 
-export default function SearchEmpty({
+export function SearchEmpty({
     query,
     results,
 }: SearchEmptyProps) {

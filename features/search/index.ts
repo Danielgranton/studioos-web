@@ -1,22 +1,23 @@
-export { default as SearchCache } from "./cache/SearchCache";
-
-export { default as SearchDropdown } from "./components/SearchDropdown";
-export { default as SearchEmpty } from "./components/SearchEmpty";
-export { default as SearchInput } from "./components/SearchInput";
-export { default as SearchLoading } from "./components/SearchLoading";
-export { default as SearchRecent } from "./components/SearchRecent";
-export { default as SearchResults } from "./components/SearchResults";
-export { default as SearchSuggestions } from "./components/SearchSuggestions";
-export { default as SearchTrending } from "./components/SearchTrending";
-
-export { useClickOutside } from "./hooks/useClickOutside";
-export { useDebounce } from "./hooks/useDebounce";
-export { default as useSearch } from "./hooks/useSearch";
-export { default as useSearchHome } from "./hooks/useSearchHome";
-export { useSearchKeyboard } from "./hooks/useSearchKeyboard";
-export { useSearchShortcuts } from "./hooks/useSearchShortcuts";
-
-export { default as SearchService } from "./services/search.service";
+export { SearchCache } from "./cache";
+export {
+    SearchDropdown,
+    SearchEmpty,
+    SearchInput,
+    SearchLoading,
+    SearchRecent,
+    SearchResults,
+    SearchSuggestions,
+    SearchTrending,
+} from "./components";
+export {
+    useClickOutside,
+    useDebounce,
+    useSearch,
+    useSearchHome,
+    useSearchKeyboard,
+    useSearchShortcuts,
+} from "./hooks";
+export { SearchService } from "./services";
 
 export type {
     AdvertisementSearchResult,

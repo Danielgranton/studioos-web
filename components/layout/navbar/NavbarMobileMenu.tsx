@@ -14,7 +14,7 @@ interface NavbarMobileMenuProps {
     onClose: () => void;
 }
 
-export default function NavbarMobileMenu({
+export function NavbarMobileMenu({
     open,
     onClose,
 }: NavbarMobileMenuProps) {

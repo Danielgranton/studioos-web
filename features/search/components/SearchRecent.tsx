@@ -8,7 +8,7 @@ interface SearchRecentProps {
     recent: RecentSearch[];
 }
 
-export default function SearchRecent({
+export function SearchRecent({
     recent,
 }: SearchRecentProps) {
 

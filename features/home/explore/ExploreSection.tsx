@@ -1,14 +1,16 @@
 "use client";
 
-import ExploreCard from "./ExploreCard";
+import { ExploreCard } from "./ExploreCard";
 import { exploreItems } from "./exploreData";
 
-export default function ExploreSection() {
+export function ExploreSection() {
     return (
         <section
+            id="explore"
             className="
                 relative
                 overflow-hidden
+                scroll-mt-28
             "
         >
             <div className="mx-auto max-w-[1600px] px-6">

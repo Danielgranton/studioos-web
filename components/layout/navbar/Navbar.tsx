@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 
-import NavbarLogo from "./NavbarLogo";
-import NavbarLinks from "./NavbarLinks";
-import NavbarSearch from "./NavbarSearch";
-import NavbarNotifications from "./NavbarNotifications";
-import NavbarProfile from "./NavbarProfile";
-import NavbarMobile from "./NavbarMobile";
-import NavbarMobileMenu from "./NavbarMobileMenu";
+import { NavbarLogo } from "./NavbarLogo";
+import { NavbarLinks } from "./NavbarLinks";
+import { NavbarSearch } from "./NavbarSearch";
+import { NavbarNotifications } from "./NavbarNotifications";
+import { NavbarProfile } from "./NavbarProfile";
+import { NavbarMobile } from "./NavbarMobile";
+import { NavbarMobileMenu } from "./NavbarMobileMenu";
 
 // Centralized so every overlay in the app can be reasoned about relative to each other.
 const Z = {
@@ -16,7 +16,7 @@ const Z = {
     mobileSearch: "z-[60]",
 } as const;
 
-export default function Navbar() {
+export function Navbar() {
 
     const [menuOpen, setMenuOpen] = useState(false);
 

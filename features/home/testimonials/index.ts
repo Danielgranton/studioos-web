@@ -1,5 +1,5 @@
-export { default as TestimonialCard } from "./TestimonialCard";
-export { default as TestimonialSlider } from "./TestimonialSlider";
-export { default as TestimonialSection } from "./TestimonialSection";
+export { TestimonialCard } from "./TestimonialCard";
+export { TestimonialSlider } from "./TestimonialSlider";
+export { TestimonialSection } from "./TestimonialSection";
 
 export * from "./testimonialData";

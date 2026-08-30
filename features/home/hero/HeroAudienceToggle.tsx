@@ -29,7 +29,7 @@ const CONTENT: Record<
     ],
 };
 
-export default function HeroAudienceToggle() {
+export function HeroAudienceToggle() {
 
     const [audience, setAudience] = useState<Audience>("artists");
 

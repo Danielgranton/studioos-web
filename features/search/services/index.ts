@@ -1,1 +1,1 @@
-export { default as SearchService } from "./search.service";
+export { SearchService } from "./search.service";

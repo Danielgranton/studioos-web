@@ -12,6 +12,8 @@ This repo uses a route-first Next.js app with feature-owned modules.
 
 - `features/home/` owns the landing page sections and their local data, cards, hooks, and indexes.
 - `features/search/` owns search UI, hooks, cache, services, and types behind a single public entrypoint.
+- Each feature should expose one public root barrel, and app/layout code should import from that barrel only.
+- Keep feature-internal modules private. Reach into `components/`, `hooks/`, `services/`, `cache/`, or `types/` only from inside the same feature.
 
 ## Layout
 
@@ -28,3 +30,5 @@ This repo uses a route-first Next.js app with feature-owned modules.
 - Prefer feature entrypoints over deep imports.
 - Keep shared utilities shared and feature logic local.
 - Use consistent naming for folders, files, and exports.
+- Match export style to the module. Named exports should not be re-exported as defaults, and default exports should remain default all the way through the barrel.
+- Keep route files thin. If a route grows beyond composition, move the logic into a feature module first.

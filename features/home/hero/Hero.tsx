@@ -1,15 +1,17 @@
 "use client";
 
-import HeroLeft from "./HeroLeft";
-import HeroAds from "./HeroAds";
+import { HeroLeft } from "./HeroLeft";
+import { HeroAds } from "./HeroAds";
 
-export default function Hero() {
+export function Hero() {
     return (
         <section
+            id="hero"
             className="
                 relative
                 overflow-hidden
                 bg-[#0f0f0f]
+                scroll-mt-28
             "
         >
             {/* Background — glow pair + grid. Mask lives HERE only, so it fades without touching HeroLeft/HeroAds */}

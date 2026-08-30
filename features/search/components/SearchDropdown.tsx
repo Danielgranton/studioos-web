@@ -1,11 +1,11 @@
 "use client";
 
-import SearchEmpty from "./SearchEmpty";
-import SearchLoading from "./SearchLoading";
-import SearchRecent from "./SearchRecent";
-import SearchResults from "./SearchResults";
-import SearchSuggestions from "./SearchSuggestions";
-import SearchTrending from "./SearchTrending";
+import { SearchEmpty } from "./SearchEmpty";
+import { SearchLoading } from "./SearchLoading";
+import { SearchRecent } from "./SearchRecent";
+import { SearchResults } from "./SearchResults";
+import { SearchSuggestions } from "./SearchSuggestions";
+import { SearchTrending } from "./SearchTrending";
 
 import {
     AutocompleteSuggestion,
@@ -32,7 +32,7 @@ interface SearchDropdownProps {
     onClose: () => void;
 }
 
-export default function SearchDropdown({
+export function SearchDropdown({
     open,
     loading,
     query,

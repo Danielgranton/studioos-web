@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import FeaturedStudioCard from "./FeaturedStudioCard";
+import { FeaturedStudioCard } from "./FeaturedStudioCard";
 import { featuredStudios } from "./featuredStudiosData";
 
-export default function FeaturedStudios() {
+export function FeaturedStudios() {
     return (
-        <section className="relative">
+        <section
+            id="studios"
+            className="relative scroll-mt-28"
+        >
             <div className="mx-auto max-w-[1600px] px-6">
 
                 {/* Header */}

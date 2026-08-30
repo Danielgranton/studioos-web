@@ -28,7 +28,7 @@ interface TestimonialCardProps {
     time: string;
 }
 
-export default function TestimonialCard({
+export function TestimonialCard({
     username,
     name,
     avatar,

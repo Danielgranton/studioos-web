@@ -2,15 +2,15 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import SearchService from "../services/search.service";
-import SearchCache from "../cache/SearchCache";
+import { SearchService } from "../services";
+import { SearchCache } from "../cache";
 
 import {
     AutocompleteSuggestion,
     SearchResponse,
 } from "../types/search";
 
-export default function useSearch() {
+export function useSearch() {
 
     // State
 
