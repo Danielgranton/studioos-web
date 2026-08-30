@@ -69,7 +69,7 @@ const FOCUS_RING =
 
 export function Footer() {
     return (
-        <footer className="relative mt-16 overflow-hidden border-t border-white/10 bg-[#090909]">
+        <footer className="relative mt-16 overflow-hidden border-t border-[#3f3f3f]/60 bg-[#090909] sm:px-10 md:px-15 lg:px-20">
             <div
                 aria-hidden="true"
                 className="
@@ -80,7 +80,7 @@ export function Footer() {
                     h-px
                     bg-gradient-to-r
                     from-transparent
-                    via-[#3ea6ff]/60
+                    via-[#3ea6ff]/30
                     to-transparent
                 "
             />
@@ -89,7 +89,7 @@ export function Footer() {
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-0"
             >
-                <div className="absolute -left-16 top-0 h-96 w-96 rounded-full bg-[#3ea6ff]/12 blur-[140px]" />
+                <div className="absolute -left-16 top-0 h-96 w-96 rounded-full bg-[#3ea6ff]/5 blur-[140px]" />
                 <div className="absolute right-0 top-20 h-80 w-80 rounded-full bg-[#e8a33d]/10 blur-[120px]" />
                 <div
                     className="absolute inset-0 opacity-[0.035]"
