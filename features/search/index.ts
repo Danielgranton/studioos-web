@@ -9,8 +9,8 @@ export { default as SearchResults } from "./components/SearchResults";
 export { default as SearchSuggestions } from "./components/SearchSuggestions";
 export { default as SearchTrending } from "./components/SearchTrending";
 
-export { default as useClickOutside } from "./hooks/useClickOutside";
-export { default as useDebounce } from "./hooks/useDebounce";
+export { useClickOutside } from "./hooks/useClickOutside";
+export { useDebounce } from "./hooks/useDebounce";
 export { default as useSearch } from "./hooks/useSearch";
 export { default as useSearchHome } from "./hooks/useSearchHome";
 export { useSearchKeyboard } from "./hooks/useSearchKeyboard";
