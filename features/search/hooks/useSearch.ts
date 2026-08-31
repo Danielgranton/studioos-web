@@ -32,9 +32,14 @@ export function useSearch() {
 
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
+    // Prevent slower responses from older queries replacing newer results.
+    const requestIdRef = useRef(0);
+
     // Search
 
     const search = useCallback(async (value: string) => {
+
+        const requestId = ++requestIdRef.current;
 
         const normalized = value.trim();
 
@@ -43,6 +48,8 @@ export function useSearch() {
             setResults(null);
 
             setSuggestions([]);
+
+            setLoading(false);
 
             return;
 
@@ -60,6 +67,8 @@ export function useSearch() {
 
             setError(null);
 
+            setLoading(false);
+
             return;
 
         }
@@ -70,13 +79,7 @@ export function useSearch() {
 
             setError(null);
 
-            const [
-
-                searchResults,
-
-                searchSuggestions,
-
-            ] = await Promise.all([
+            const [searchResponse, suggestionsResponse] = await Promise.allSettled([
 
                 SearchService.search({
                     q: normalized,
@@ -86,23 +89,35 @@ export function useSearch() {
 
             ]);
 
-            // Save to cache
+            if (requestId !== requestIdRef.current) return;
 
-            SearchCache.set(
+            const searchSucceeded = searchResponse.status === "fulfilled";
+            const suggestionsSucceeded = suggestionsResponse.status === "fulfilled";
 
-                normalized,
+            if (searchSucceeded) {
+                setResults(searchResponse.value);
+            } else {
+                setError("Failed to search.");
+            }
 
-                searchResults,
+            if (suggestionsSucceeded) {
+                setSuggestions(suggestionsResponse.value);
+            } else if (searchSucceeded) {
+                setError("Failed to load suggestions.");
+            }
 
-                searchSuggestions,
-
-            );
-
-            setResults(searchResults);
-
-            setSuggestions(searchSuggestions);
+            // Cache only complete responses so a temporary failure can retry.
+            if (searchSucceeded && suggestionsSucceeded) {
+                SearchCache.set(
+                    normalized,
+                    searchResponse.value,
+                    suggestionsResponse.value,
+                );
+            }
 
         } catch (err) {
+
+            if (requestId !== requestIdRef.current) return;
 
             console.error(err);
 
@@ -110,7 +125,9 @@ export function useSearch() {
 
         } finally {
 
-            setLoading(false);
+            if (requestId === requestIdRef.current) {
+                setLoading(false);
+            }
 
         }
 
@@ -152,6 +169,8 @@ export function useSearch() {
 
     const clear = () => {
 
+        ++requestIdRef.current;
+
         setQuery("");
 
         setResults(null);
@@ -159,6 +178,8 @@ export function useSearch() {
         setSuggestions([]);
 
         setError(null);
+
+        setLoading(false);
 
     };
 

@@ -24,12 +24,14 @@ export interface SearchResultItem {
     href?: string;
 }
 
-export interface SearchResponse {
-    results: SearchResultItem[];
+export interface PaginatedSearchResponse<T> {
+    results: T[];
     page: number;
     size: number;
     total: number;
 }
+
+export type SearchResponse = PaginatedSearchResponse<SearchResultItem>;
 
 export interface AutocompleteSuggestion {
     value: string;

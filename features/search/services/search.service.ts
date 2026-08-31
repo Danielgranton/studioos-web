@@ -6,6 +6,7 @@ import {
     BeatSearchRequest,
     BeatSearchResult,
     ProducerSearchResult,
+    PaginatedSearchResponse,
     RecentSearch,
     SearchEntityType,
     SearchRequest,
@@ -14,6 +15,25 @@ import {
     StudioSearchResult,
     TrendingSearch,
 } from "../types/search";
+
+type PaginatedPayload<T> = PaginatedSearchResponse<T> | T[];
+
+function normalizePage<T>(
+    data: PaginatedPayload<T>,
+    page = 0,
+    size = 20,
+): PaginatedSearchResponse<T> {
+    if (Array.isArray(data)) {
+        return {
+            results: data,
+            page,
+            size,
+            total: data.length,
+        };
+    }
+
+    return data;
+}
 
 class SearchServiceClient {
 
@@ -46,31 +66,31 @@ class SearchServiceClient {
     // Studios
     async studios(
         request: StudioSearchRequest,
-    ): Promise<StudioSearchResult[]> {
+    ): Promise<PaginatedSearchResponse<StudioSearchResult>> {
 
-        const response = await api.get<StudioSearchResult[]>(
+        const response = await api.get<PaginatedPayload<StudioSearchResult>>(
             "/search/studios",
             {
                 params: request,
             }
         );
 
-        return response.data;
+        return normalizePage(response.data, request.page, request.size);
     }
 
     // Beats
     async beats(
         request: BeatSearchRequest,
-    ): Promise<BeatSearchResult[]> {
+    ): Promise<PaginatedSearchResponse<BeatSearchResult>> {
 
-        const response = await api.get<BeatSearchResult[]>(
+        const response = await api.get<PaginatedPayload<BeatSearchResult>>(
             "/search/beats",
             {
                 params: request,
             }
         );
 
-        return response.data;
+        return normalizePage(response.data, request.page, request.size);
     }
 
     // Producers
@@ -78,9 +98,9 @@ class SearchServiceClient {
         q?: string,
         page = 0,
         size = 20,
-    ): Promise<ProducerSearchResult[]> {
+    ): Promise<PaginatedSearchResponse<ProducerSearchResult>> {
 
-        const response = await api.get<ProducerSearchResult[]>(
+        const response = await api.get<PaginatedPayload<ProducerSearchResult>>(
             "/search/producers",
             {
                 params: {
@@ -91,17 +111,17 @@ class SearchServiceClient {
             }
         );
 
-        return response.data;
+        return normalizePage(response.data, page, size);
     }
 
     // Advertisements
-    async advertisement(
+    async advertisements(
         q?: string,
         page = 0,
         size = 20,
-    ): Promise<AdvertisementSearchResult[]> {
+    ): Promise<PaginatedSearchResponse<AdvertisementSearchResult>> {
 
-        const response = await api.get<AdvertisementSearchResult[]>(
+        const response = await api.get<PaginatedPayload<AdvertisementSearchResult>>(
             "/search/advertisements",
             {
                 params: {
@@ -112,7 +132,7 @@ class SearchServiceClient {
             }
         );
 
-        return response.data;
+        return normalizePage(response.data, page, size);
     }
 
     // Trending
@@ -148,16 +168,6 @@ class SearchServiceClient {
     async clearRecent(): Promise<void> {
 
         await api.delete("/search/recent");
-    }
-
-    // Reindex Search
-    async reindex(): Promise<unknown> {
-
-        const response = await api.post(
-            "/search/reindex"
-        );
-
-        return response.data;
     }
 
 }

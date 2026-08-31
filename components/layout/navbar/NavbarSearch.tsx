@@ -32,8 +32,7 @@ export function NavbarSearch() {
 
         if (
             !home.loading &&
-            home.recent.length === 0 &&
-            home.trending.length === 0
+            !home.hasLoaded
         ) {
             void home.refresh();
         }

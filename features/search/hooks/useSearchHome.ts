@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { SearchService } from "../services";
 
@@ -19,6 +19,8 @@ export function useSearchHome() {
     const [loading, setLoading] = useState(false);
 
     const [error, setError] = useState<string | null>(null);
+
+    const [hasLoaded, setHasLoaded] = useState(false);
 
     const refresh = async () => {
 
@@ -40,6 +42,8 @@ export function useSearchHome() {
 
             setTrending(trendingResults);
 
+            setHasLoaded(true);
+
         } catch (err) {
 
             console.error(err);
@@ -53,12 +57,6 @@ export function useSearchHome() {
         }
 
     };
-
-    useEffect(() => {
-
-        void refresh();
-
-    }, []);
 
     const clearRecent = async () => {
 
@@ -87,6 +85,8 @@ export function useSearchHome() {
         loading,
 
         error,
+
+        hasLoaded,
 
         refresh,
 
