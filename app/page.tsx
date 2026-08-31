@@ -17,12 +17,12 @@ export default function HomePage() {
         <div className="min-h-screen space-y-10">
             <Hero />
             <ExploreSection />
-            <FeaturedStudios />
             <TopProducers />
+            <FeaturedStudios />
+            <FeaturedProjects/>
             <TrendingBeats />
+            <TestimonialSection/>
             <ServiceSection />
-            <FeaturedProjects />
-            <TestimonialSection />
         </div>
 
     );

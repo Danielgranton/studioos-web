@@ -166,7 +166,7 @@ export function Footer() {
                         </div>
                     </div>
 
-                    <aside className="rounded-2xl border border-white/10 bg-[#111111] px-4 py-3.5 shadow-2xl shadow-black/25 lg:px-4 lg:py-4">
+                    <aside className="h-fit self-start rounded-2xl border border-white/10 bg-[#111111] px-4 py-3.5 shadow-2xl shadow-black/25 lg:px-4 lg:py-4">
                         <div className="flex items-center justify-between gap-4">
                             <div>
                                 <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#717171]">
