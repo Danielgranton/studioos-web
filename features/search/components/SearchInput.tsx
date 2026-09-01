@@ -1,6 +1,7 @@
 "use client";
 
 import { Search, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface SearchInputProps {
     inputRef: React.RefObject<HTMLInputElement | null>;
@@ -22,6 +23,19 @@ export function SearchInput({
     onFocus,
     onClear,
 }: SearchInputProps) {
+    const [showLoading, setShowLoading] = useState(false);
+
+    useEffect(() => {
+        if (!loading) {
+            setShowLoading(false);
+            return;
+        }
+
+        const timeout = setTimeout(() => setShowLoading(true), 180);
+
+        return () => clearTimeout(timeout);
+    }, [loading]);
+
     return (
         <div className="flex w-full">
 
@@ -54,7 +68,7 @@ export function SearchInput({
 
                 <div className="absolute right-4 top-1/2 flex -translate-y-1/2 items-center">
 
-                    {loading ? (
+                    {showLoading ? (
 
                         <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#5a5a5a] border-t-[#3ea6ff]" />
 

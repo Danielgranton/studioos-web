@@ -94,13 +94,13 @@ export function NavbarSearch() {
 
             <SearchDropdown
                 open={search.isOpen}
-                loading={search.loading || home.loading}
                 query={search.query}
                 suggestions={search.suggestions}
                 results={search.results}
                 recent={home.recent}
                 trending={home.trending}
                 onClose={search.close}
+                onSelectQuery={search.setQuery}
             />
 
             {(search.error || home.error) && (

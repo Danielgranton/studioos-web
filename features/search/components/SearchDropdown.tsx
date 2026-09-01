@@ -1,7 +1,7 @@
 "use client";
 
 import { SearchEmpty } from "./SearchEmpty";
-import { SearchLoading } from "./SearchLoading";
+import { SearchHomeEmpty } from "./SearchHomeEmpty";
 import { SearchRecent } from "./SearchRecent";
 import { SearchResults } from "./SearchResults";
 import { SearchSuggestions } from "./SearchSuggestions";
@@ -17,8 +17,6 @@ import {
 interface SearchDropdownProps {
     open: boolean;
 
-    loading: boolean;
-
     query: string;
 
     suggestions: AutocompleteSuggestion[];
@@ -30,18 +28,22 @@ interface SearchDropdownProps {
     trending: TrendingSearch[];
 
     onClose: () => void;
+
+    onSelectQuery: (value: string) => void;
 }
 
 export function SearchDropdown({
     open,
-    loading,
     query,
     suggestions,
     results,
     recent,
     trending,
+    onSelectQuery,
 }: SearchDropdownProps) {
     if (!open) return null;
+
+    const hasQuery = query.trim() !== "";
 
     return (
         <div
@@ -57,20 +59,21 @@ export function SearchDropdown({
                 z-50
             "
         >
-            {/* Loading */}
-            {loading && <SearchLoading />}
-
             {/* Empty Query */}
-            {!loading && query.trim() === "" && (
+            {!hasQuery && (
                 <>
                     <SearchRecent recent={recent} />
 
                     <SearchTrending trending={trending} />
+
+                    {recent.length === 0 && trending.length === 0 && (
+                        <SearchHomeEmpty onSelect={onSelectQuery} />
+                    )}
                 </>
             )}
 
             {/* Search */}
-            {!loading && query.trim() !== "" && (
+            {hasQuery && (
                 <>
                     <SearchSuggestions
                         suggestions={suggestions}
