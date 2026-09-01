@@ -1,13 +1,14 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import PhoneInput from "react-phone-number-input";
-import { ArrowLeft, ArrowRight, Loader2, Mail, Phone } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Mail, Phone, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { useLogin } from "../hooks/useLogin";
+import { useOtpResend } from "../hooks/useOtpResend";
 import { CountryPicker } from "./registration";
 import { VerifyOTP } from "./verifyOTP";
 
@@ -20,7 +21,9 @@ export function Signin() {
     const [identifier, setIdentifier] = useState("");
     const [mode, setMode] = useState<IdentifierMode>("email");
     const [dismissedError, setDismissedError] = useState(false);
+    const verifyRef = useRef<HTMLDivElement>(null);
     const { state, error, delivery, login } = useLogin();
+    const { resend, resendCount, resending, remaining, canResend } = useOtpResend();
     const router = useRouter();
 
     async function submit(event: FormEvent<HTMLFormElement>) {
@@ -35,14 +38,26 @@ export function Signin() {
         setDismissedError(true);
     }
 
+    async function resendLoginOtp() {
+        try {
+            const sent = await resend(identifier.trim());
+            if (sent) toast.success("New code sent");
+        } catch (requestError) {
+            const response = (requestError as { response?: { data?: { message?: string } } }).response;
+            toast.error("Could not resend code", { description: response?.data?.message || "Please try again later." });
+        }
+    }
+
     useEffect(() => {
         if (state === "success") toast.success("Verification code sent", { description: "Check your email or phone." });
         if (error) toast.error("Login failed", { description: error });
     }, [error, state]);
 
-    if (state === "success" && delivery) {
-        return <VerifyOTP mode="login" identifier={identifier.trim()} delivery={delivery} />;
-    }
+    useEffect(() => {
+        if (state === "success" && delivery) {
+            window.requestAnimationFrame(() => verifyRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }));
+        }
+    }, [delivery, state]);
 
     const showError = error && !dismissedError;
 
@@ -145,15 +160,22 @@ export function Signin() {
                     )}
 
                     <button
-                        type="submit"
-                        disabled={state === "loading"}
-                        aria-busy={state === "loading"}
+                        type={state === "success" ? "button" : "submit"}
+                        onClick={state === "success" ? resendLoginOtp : undefined}
+                        disabled={state === "loading" || (state === "success" && (resending || !canResend))}
+                        aria-busy={state === "loading" || resending}
                         className={`flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#3ea6ff] text-sm font-medium text-[#0f0f0f] transition hover:bg-[#65b8ff] disabled:cursor-wait disabled:opacity-60 ${FOCUS_RING}`}
                     >
-                        {state === "loading" ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
-                        {state === "loading" ? "Sending code" : "Continue with OTP"}
+                        {state === "loading" || resending ? <Loader2 size={16} className="animate-spin" /> : state === "success" ? <RefreshCw size={16} /> : <ArrowRight size={16} />}
+                        {state === "loading" ? "Sending code" : state === "success" ? (canResend ? `Resend OTP (${remaining} left)` : "Resend limit reached") : "Continue with OTP"}
                     </button>
                 </form>
+
+                {state === "success" && delivery && (
+                    <div ref={verifyRef} className="mt-6 border-t border-[#3f3f3f] pt-6">
+                        <VerifyOTP key={resendCount} mode="login" identifier={identifier.trim()} delivery={delivery} embedded />
+                    </div>
+                )}
 
                 <p className="mt-6 text-center text-[13px] text-[#717171]">
                     New to StudioOS?{" "}

@@ -4,10 +4,11 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import PhoneInput from "react-phone-number-input";
-import { ArrowLeft, Loader2, Mail, Upload, UserRound } from "lucide-react";
+import { ArrowLeft, Loader2, Mail, RefreshCw, Upload, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
 import { useRegistration } from "../hooks/useRegistration";
+import { useOtpResend } from "../hooks/useOtpResend";
 import { VerifyOTP } from "./verifyOTP";
 
 const FOCUS_RING =
@@ -20,6 +21,7 @@ export function Registration() {
     const { state, error, fieldErrors, otpDelivery, register } = useRegistration();
     const router = useRouter();
     const verifyRef = useRef<HTMLDivElement>(null);
+    const { resend, resendCount, resending, remaining, canResend } = useOtpResend();
 
     function updateField(field: keyof typeof form, value: string | boolean) {
         setForm((current) => ({ ...current, [field]: value }));
@@ -33,6 +35,16 @@ export function Registration() {
             phone: form.phone.trim(),
             password: form.password || undefined,
         });
+    }
+
+    async function resendRegistrationOtp() {
+        try {
+            const sent = await resend(form.email.trim());
+            if (sent) toast.success("New code sent");
+        } catch (requestError) {
+            const response = (requestError as { response?: { data?: { message?: string } } }).response;
+            toast.error("Could not resend code", { description: response?.data?.message || "Please try again later." });
+        }
     }
 
     useEffect(() => {
@@ -204,13 +216,14 @@ export function Registration() {
                     </label>
 
                     <button
-                        type="submit"
-                        disabled={state === "loading"}
-                        aria-busy={state === "loading"}
+                        type={state === "success" ? "button" : "submit"}
+                        onClick={state === "success" ? resendRegistrationOtp : undefined}
+                        disabled={state === "loading" || (state === "success" && (resending || !canResend))}
+                        aria-busy={state === "loading" || resending}
                         className={`flex h-12 w-full items-center justify-center gap-2 rounded-2xl border-0 bg-[#3ea6ff] text-sm font-medium text-[#0f0f0f] shadow-none transition-all duration-200 hover:bg-[#65b8ff] active:scale-[.98] disabled:cursor-wait disabled:opacity-60 ${FOCUS_RING}`}
                     >
-                        {state === "loading" && <Loader2 size={16} className="animate-spin" />}
-                        {state === "loading" ? "Creating" : "Create account"}
+                        {state === "loading" || resending ? <Loader2 size={16} className="animate-spin" /> : state === "success" ? <RefreshCw size={16} /> : null}
+                        {state === "loading" ? "Creating" : state === "success" ? (canResend ? `Resend OTP (${remaining} left)` : "Resend limit reached") : "Create account"}
                     </button>
 
                     {error && (
@@ -229,7 +242,7 @@ export function Registration() {
                                 <span className="font-semibold text-[#f1f1f1]">{form.email.trim()}</span>.
                             </p>
                         </div>
-                        <VerifyOTP identifier={form.email.trim()} delivery={otpDelivery} />
+                        <VerifyOTP key={resendCount} identifier={form.email.trim()} delivery={otpDelivery} embedded />
                     </div>
                 )}
 
