@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 import { NavbarLogo } from "./NavbarLogo";
 import { NavbarLinks } from "./NavbarLinks";
@@ -9,6 +10,7 @@ import { NavbarNotifications } from "./NavbarNotifications";
 import { NavbarProfile } from "./NavbarProfile";
 import { NavbarMobile } from "./NavbarMobile";
 import { NavbarMobileMenu } from "./NavbarMobileMenu";
+import { useSession } from "@/features/auth";
 
 // Centralized so every overlay in the app can be reasoned about relative to each other.
 const Z = {
@@ -21,6 +23,7 @@ export function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
 
     const [searchOpen, setSearchOpen] = useState(false);
+    const { isAuthenticated, isLoading: sessionLoading } = useSession();
 
     // Close the mobile search overlay on Escape for keyboard users.
     useEffect(() => {
@@ -79,6 +82,8 @@ export function Navbar() {
                         <NavbarMobile
                             onMenuOpen={() => setMenuOpen(true)}
                             onSearchOpen={() => setSearchOpen(true)}
+                            isAuthenticated={isAuthenticated}
+                            sessionLoading={sessionLoading}
                         />
 
                     </div>
@@ -119,7 +124,16 @@ export function Navbar() {
 
                             <NavbarNotifications />
 
-                            <NavbarProfile />
+                            {!sessionLoading && (isAuthenticated ? (
+                                <NavbarProfile />
+                            ) : (
+                                <Link
+                                    href="/signin"
+                                    className="rounded-full bg-[#3ea6ff] px-4 py-2 text-sm font-semibold text-[#0f0f0f] transition hover:bg-[#65b8ff]"
+                                >
+                                    Sign in
+                                </Link>
+                            ))}
 
                         </div>
 

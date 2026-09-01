@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 
 import { useClickOutside } from "@/features/search";
+import { AuthService, clearSession, useSession } from "@/features/auth";
+import { toast } from "sonner";
 
 interface NavbarUser {
     name: string;
@@ -29,7 +31,6 @@ interface NavbarProfileProps {
     user?: NavbarUser;
 }
 
-// TODO: replace with real session data from AuthService (GET /me)
 const FALLBACK_USER: NavbarUser = {
     name: "Guest User",
     email: "guest@studioos.app",
@@ -45,12 +46,61 @@ const WORKSPACE_LINKS = [
 ];
 
 export function NavbarProfile({ user = FALLBACK_USER }: NavbarProfileProps) {
-
     const [open, setOpen] = useState(false);
+    const [profile, setProfile] = useState<NavbarUser | null>(null);
+    const [loggingOut, setLoggingOut] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
 
     const pathname = usePathname();
+    const { session, isAuthenticated } = useSession();
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            setProfile(null);
+            return;
+        }
+
+        let active = true;
+        AuthService.getMyProfile()
+            .then((currentUser) => {
+                if (!active) return;
+                setProfile({
+                    name: currentUser.name,
+                    email: currentUser.email,
+                    role: currentUser.role,
+                    avatarUrl: currentUser.profileImageMedium || currentUser.profileImage,
+                });
+            })
+            .catch(() => {
+                // Session data remains available if the profile request is temporarily unavailable.
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [isAuthenticated]);
+
+    const currentUser: NavbarUser = profile || (session ? {
+        name: session.name,
+        email: session.email,
+        role: session.role,
+    } : user);
+
+    async function handleLogout() {
+        if (loggingOut) return;
+        setLoggingOut(true);
+        try {
+            await AuthService.logout();
+        } catch {
+            // Clear the local session even if the server is unavailable.
+        } finally {
+            clearSession();
+            setOpen(false);
+            setLoggingOut(false);
+            toast.success("You have been logged out");
+        }
+    }
 
     useClickOutside(containerRef, () => setOpen(false));
 
@@ -125,11 +175,11 @@ export function NavbarProfile({ user = FALLBACK_USER }: NavbarProfileProps) {
                             "
                         >
 
-                            {user.avatarUrl ? (
+                            {currentUser.avatarUrl ? (
 
                                 <Image
-                                    src={user.avatarUrl}
-                                    alt={user.name}
+                                    src={currentUser.avatarUrl}
+                                    alt={currentUser.name}
                                     fill
                                     className="object-cover"
                                 />
@@ -147,11 +197,11 @@ export function NavbarProfile({ user = FALLBACK_USER }: NavbarProfileProps) {
                         <div className="min-w-0 flex-1">
 
                             <p className="truncate text-sm font-semibold text-white">
-                                {user.name}
+                                {currentUser.name}
                             </p>
 
                             <p className="truncate text-xs text-[#aaaaaa]">
-                                {user.role ? `${user.role} · ` : ""}{user.email}
+                                {currentUser.role ? `${currentUser.role} · ` : ""}{currentUser.email}
                             </p>
 
                         </div>
@@ -204,6 +254,9 @@ export function NavbarProfile({ user = FALLBACK_USER }: NavbarProfileProps) {
                     <div className="border-t border-[#3f3f3f] p-2">
 
                         <button
+                            type="button"
+                            onClick={handleLogout}
+                            disabled={loggingOut}
                             className="
                                 flex
                                 w-full
@@ -217,10 +270,12 @@ export function NavbarProfile({ user = FALLBACK_USER }: NavbarProfileProps) {
                                 text-red-400
                                 transition
                                 hover:bg-red-500/10
+                                disabled:cursor-wait
+                                disabled:opacity-60
                             "
                         >
                             <LogOut size={18} />
-                            Logout
+                            {loggingOut ? "Logging out..." : "Logout"}
                         </button>
 
                     </div>

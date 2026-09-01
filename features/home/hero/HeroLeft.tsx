@@ -4,10 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Music2 } from "lucide-react";
 import { HeroAudienceToggle } from "./HeroAudienceToggle";
+import { useSession } from "@/features/auth";
 
 const genres = ["Hip-Hop", "Afrobeat", "R&B", "Podcast", "Gospel"];
 
 export function HeroLeft() {
+    const { isAuthenticated } = useSession();
+
     return (
         <div className="w-full max-w-3xl">
 
@@ -110,7 +113,7 @@ export function HeroLeft() {
             <div className="mt-5 flex flex-wrap gap-2.5 sm:mt-6 sm:gap-3">
 
                 <Link
-                    href="/studios"
+                    href={isAuthenticated ? "/studios" : "/register"}
                     className="
                         group
                         inline-flex
@@ -136,7 +139,7 @@ export function HeroLeft() {
                         sm:text-sm
                     "
                 >
-                    Book Studio
+                    {isAuthenticated ? "Book Studio" : "Register/signin to Book Studio"}
                     <ArrowRight
                         size={15}
                         className="transition-transform duration-300 group-hover:translate-x-1 sm:size-4"

@@ -1,6 +1,7 @@
 "use client";
 
 import { Search, Menu } from "lucide-react";
+import Link from "next/link";
 
 import { NavbarLogo } from "./NavbarLogo";
 import { NavbarNotifications } from "./NavbarNotifications";
@@ -9,11 +10,15 @@ import { NavbarProfile } from "./NavbarProfile";
 interface NavbarMobileProps {
     onMenuOpen: () => void;
     onSearchOpen: () => void;
+    isAuthenticated: boolean;
+    sessionLoading: boolean;
 }
 
 export function NavbarMobile({
     onMenuOpen,
     onSearchOpen,
+    isAuthenticated,
+    sessionLoading,
 }: NavbarMobileProps) {
 
     return (
@@ -73,7 +78,16 @@ export function NavbarMobile({
                 <NavbarNotifications />
 
                 <div className="ml-0.5 pl-1.5">
-                    <NavbarProfile />
+                    {!sessionLoading && (isAuthenticated ? (
+                        <NavbarProfile />
+                    ) : (
+                        <Link
+                            href="/signin"
+                            className="rounded-full bg-[#3ea6ff] px-3 py-2 text-xs font-semibold text-[#0f0f0f] transition hover:bg-[#65b8ff]"
+                        >
+                            Sign in
+                        </Link>
+                    ))}
                 </div>
 
             </div>
