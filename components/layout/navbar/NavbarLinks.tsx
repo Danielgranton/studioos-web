@@ -33,7 +33,7 @@ export function NavbarLinks() {
                             transition-colors
                             ${
                                 active
-                                    ? "bg-white/20 text-black"
+                                    ? "bg-white/20"
                                     : "text-[#f1f1f1] hover:bg-[#272727]"
                             }
                         `}

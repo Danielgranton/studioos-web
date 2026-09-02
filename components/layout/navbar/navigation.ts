@@ -18,7 +18,7 @@ export type NavbarNavItem = {
 };
 
 export const NAV_ITEMS: NavbarNavItem[] = [
-    { label: "Explore", href: "/explore", icon: Compass },
+    { label: "Explore", href: "/", icon: Compass },
     { label: "Studios", href: "/studios", icon: Building2 },
     { label: "Producers", href: "/producers", icon: Mic2 },
     { label: "Artists", href: "/artists", icon: User },
