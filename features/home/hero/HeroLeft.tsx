@@ -113,7 +113,7 @@ export function HeroLeft() {
             <div className="mt-5 flex flex-wrap gap-2.5 sm:mt-6 sm:gap-3">
 
                 <Link
-                    href={isAuthenticated ? "/studios" : "/register"}
+                    href={isAuthenticated ? "/studios" : "auth/register"}
                     className="
                         group
                         inline-flex
@@ -139,7 +139,7 @@ export function HeroLeft() {
                         sm:text-sm
                     "
                 >
-                    {isAuthenticated ? "Book Studio" : "Register/signin to Book Studio"}
+                    {isAuthenticated ? "Book Studio" : "Register/Sign in to Book Studio"}
                     <ArrowRight
                         size={15}
                         className="transition-transform duration-300 group-hover:translate-x-1 sm:size-4"
@@ -177,7 +177,7 @@ export function HeroLeft() {
                         size={15}
                         className="transition-transform duration-300 group-hover:rotate-12 sm:size-4"
                     />
-                    Explore Marketplace
+                    Explore Beate Marketplace
                 </Link>
 
             </div>

@@ -1,5 +1,6 @@
 export type RegisterRequest = {
     name: string;
+    username?: string;
     email: string;
     phone: string;
     password?: string;
@@ -12,6 +13,16 @@ export type VerifyOtpRequest = {
 
 export type LoginRequest = {
     identifier: string;
+    password?: string;
+};
+
+export type ForgotPasswordRequest = {
+    identifier: string;
+};
+
+export type ResetPasswordRequest = {
+    token: string;
+    newPassword: string;
 };
 
 export type OtpSentResponse = {
@@ -33,6 +44,7 @@ export type AuthResponse = {
 export type UserProfile = {
     id: number;
     name: string;
+    username?: string;
     email: string;
     phone?: string;
     role: AuthResponse["role"];
@@ -44,6 +56,22 @@ export type UserProfile = {
     location?: string;
     genre?: string;
     experience?: string;
+    instagram?: string;
+    youtube?: string;
+    link?: string;
+};
+
+export type AuthSession = {
+    sessionId: string;
+    userId: number;
+    deviceId?: string;
+    deviceName?: string;
+    userAgent?: string;
+    ipAddress?: string;
+    createdAt: string;
+    expiresAt: string;
+    revokedAt?: string;
+    active: boolean;
 };
 
 export type ApiResponse<T> = {

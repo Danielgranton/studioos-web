@@ -1,8 +1,17 @@
 export { Registration } from "./components/registration";
 export { Signin } from "./components/singin";
 export { VerifyOTP } from "./components/verifyOTP";
+export { ForgotPassword } from "./components/forgotPassword";
+export { ResetPassword } from "./components/resetPassword";
+export { EmailVerification } from "./components/emailVerification";
+export { PhoneVerification } from "./components/phoneVerification";
+export { SessionManagement } from "./components/sessionManagement";
 export { AuthService } from "./services/auth.service";
-export { clearSession } from "./services/session.service";
+export { clearSession, saveSession } from "./services/session.service";
 export { useSession } from "./hooks/useSession";
 export { useOtpResend } from "./hooks/useOtpResend";
+export { usePasswordReset } from "./hooks/usePasswordReset";
+export { usePasswordLogin } from "./hooks/usePasswordLogin";
+export { useEmailVerification } from "./hooks/useEmailVerification";
+export { usePhoneVerification } from "./hooks/usePhoneVerification";
 export * from "./types/auth";

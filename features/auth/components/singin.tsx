@@ -3,16 +3,18 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import PhoneInput from "react-phone-number-input";
-import { ArrowLeft, ArrowRight, Loader2, Mail, Phone, RefreshCw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Loader2, Mail, Phone, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { useLogin } from "../hooks/useLogin";
+import { usePasswordLogin } from "../hooks/usePasswordLogin";
 import { useOtpResend } from "../hooks/useOtpResend";
 import { CountryPicker } from "./registration";
 import { VerifyOTP } from "./verifyOTP";
 
 type IdentifierMode = "email" | "phone";
+type AuthMethod = "otp" | "password";
 
 const FOCUS_RING =
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ea6ff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]";
@@ -20,21 +22,32 @@ const FOCUS_RING =
 export function Signin() {
     const [identifier, setIdentifier] = useState("");
     const [mode, setMode] = useState<IdentifierMode>("email");
+    const [authMethod, setAuthMethod] = useState<AuthMethod>("otp");
+    const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [dismissedError, setDismissedError] = useState(false);
     const verifyRef = useRef<HTMLDivElement>(null);
     const { state, error, delivery, login } = useLogin();
+    const { loading: passwordLoading, error: passwordError, user: passwordUser, login: loginWithPassword } = usePasswordLogin();
     const { resend, resendCount, resending, remaining, canResend } = useOtpResend();
     const router = useRouter();
 
     async function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         setDismissedError(false);
-        await login(identifier);
+        if (authMethod === "password") await loginWithPassword(identifier, password);
+        else await login(identifier);
     }
 
     function switchMode(option: IdentifierMode) {
         setMode(option);
         setIdentifier("");
+        setDismissedError(true);
+    }
+
+    function switchAuthMethod(option: AuthMethod) {
+        setAuthMethod(option);
+        setPassword("");
         setDismissedError(true);
     }
 
@@ -51,7 +64,15 @@ export function Signin() {
     useEffect(() => {
         if (state === "success") toast.success("Verification code sent", { description: "Check your email or phone." });
         if (error) toast.error("Login failed", { description: error });
-    }, [error, state]);
+        if (passwordError) toast.error("Login failed", { description: passwordError });
+    }, [error, passwordError, state]);
+
+    useEffect(() => {
+        if (passwordUser) {
+            toast.success("Signed in", { description: "Welcome back to StudioOS." });
+            router.replace("/");
+        }
+    }, [passwordUser, router]);
 
     useEffect(() => {
         if (state === "success" && delivery) {
@@ -59,7 +80,9 @@ export function Signin() {
         }
     }, [delivery, state]);
 
-    const showError = error && !dismissedError;
+    const otpSuccess = authMethod === "otp" && state === "success" && Boolean(delivery);
+    const activeError = authMethod === "password" ? passwordError : error;
+    const showError = activeError && !dismissedError;
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-[#0f0f0f] px-4 py-10">
@@ -88,6 +111,14 @@ export function Signin() {
                     <div>
                         <h2 className="text-3xl font-semibold tracking-tight text-[#f1f1f1]">Sign in to StudioOS</h2>
                         <p className="mt-3 text-sm leading-6 text-[#999]">Use the email or phone number connected to your account.</p>
+                    </div>
+
+                    <div role="tablist" aria-label="Authentication method" className="grid grid-cols-2 rounded-xl border border-[#3f3f3f] bg-[#101010] p-1">
+                        {(["otp", "password"] as const).map((option) => (
+                            <button key={option} type="button" role="tab" aria-selected={authMethod === option} onClick={() => switchAuthMethod(option)} className={`rounded-lg py-2 text-xs font-medium capitalize transition ${FOCUS_RING} ${authMethod === option ? "bg-[#252525] text-[#f1f1f1]" : "text-[#777] hover:text-[#bdbdbd]"}`}>
+                                {option === "otp" ? "One-time code" : "Password"}
+                            </button>
+                        ))}
                     </div>
 
                     <div className="pt-4">
@@ -149,29 +180,43 @@ export function Signin() {
                         )}
                     </div>
 
+                    {authMethod === "password" && (
+                        <div className="relative">
+                            <label htmlFor="signin-password" className="sr-only">Password</label>
+                            <input id="signin-password" type={showPassword ? "text" : "password"} required minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Password" autoComplete="current-password" className={`w-full rounded-xl border border-[#3f3f3f] bg-[#101010] px-4 py-3 pr-12 text-sm text-[#f1f1f1] outline-none placeholder:text-[#5f5f5f] focus:border-[#3ea6ff]/70 ${FOCUS_RING}`} />
+                            <button type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? "Hide password" : "Show password"} className={`absolute right-3 top-1/2 -translate-y-1/2 text-[#777] hover:text-[#f1f1f1] ${FOCUS_RING}`}>{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button>
+                        </div>
+                    )}
+
                     {showError && (
                         <p
                             role="alert"
                             aria-live="polite"
                             className="rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-300"
                         >
-                            {error}
+                            {activeError}
                         </p>
                     )}
 
                     <button
-                        type={state === "success" ? "button" : "submit"}
-                        onClick={state === "success" ? resendLoginOtp : undefined}
-                        disabled={state === "loading" || (state === "success" && (resending || !canResend))}
-                        aria-busy={state === "loading" || resending}
+                        type={otpSuccess ? "button" : "submit"}
+                        onClick={otpSuccess ? resendLoginOtp : undefined}
+                        disabled={authMethod === "password" ? passwordLoading : state === "loading" || (otpSuccess && (resending || !canResend))}
+                        aria-busy={authMethod === "password" ? passwordLoading : state === "loading" || resending}
                         className={`flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#3ea6ff] text-sm font-medium text-[#0f0f0f] transition hover:bg-[#65b8ff] disabled:cursor-wait disabled:opacity-60 ${FOCUS_RING}`}
                     >
-                        {state === "loading" || resending ? <Loader2 size={16} className="animate-spin" /> : state === "success" ? <RefreshCw size={16} /> : <ArrowRight size={16} />}
-                        {state === "loading" ? "Sending code" : state === "success" ? (canResend ? `Resend OTP (${remaining} left)` : "Resend limit reached") : "Continue with OTP"}
+                        {authMethod === "password" ? (passwordLoading ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />) : state === "loading" || resending ? <Loader2 size={16} className="animate-spin" /> : otpSuccess ? <RefreshCw size={16} /> : <ArrowRight size={16} />}
+                        {authMethod === "password" ? (passwordLoading ? "Signing in" : "Sign in with password") : state === "loading" ? "Sending code" : otpSuccess ? (canResend ? `Resend OTP (${remaining} left)` : "Resend limit reached") : "Continue with OTP"}
                     </button>
                 </form>
 
-                {state === "success" && delivery && (
+                <div className="mt-4 text-center">
+                    <a href="/auth/forgot-password" className={`text-sm font-medium text-[#3ea6ff] hover:underline ${FOCUS_RING}`}>
+                        Forgot your password?
+                    </a>
+                </div>
+
+                {otpSuccess && delivery && (
                     <div ref={verifyRef} className="mt-6 border-t border-[#3f3f3f] pt-6">
                         <VerifyOTP key={resendCount} mode="login" identifier={identifier.trim()} delivery={delivery} embedded />
                     </div>
@@ -181,7 +226,7 @@ export function Signin() {
                     New to StudioOS?{" "}
                     <button
                         type="button"
-                        onClick={() => router.push("/register")}
+                        onClick={() => router.push("/auth/register")}
                         className={`font-medium text-[#3ea6ff] hover:underline ${FOCUS_RING} rounded-sm`}
                     >
                         Create an account

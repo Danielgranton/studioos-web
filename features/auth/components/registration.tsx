@@ -249,7 +249,7 @@ export function Registration() {
                 <p className="mt-4 text-center text-[13px] text-[#717171]">
                     Already have an account?{" "}
                     <button
-                        onClick={() => router.push("/signin")}
+                        onClick={() => router.push("/auth/signin")}
                         className={`font-medium text-[#3ea6ff] hover:underline ${FOCUS_RING} rounded-sm`}
                     >
                         Sign in
