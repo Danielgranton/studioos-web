@@ -128,7 +128,7 @@ export function Navbar() {
                                 <NavbarProfile />
                             ) : (
                                 <Link
-                                    href="auth/signin"
+                                    href="/auth/signin"
                                     className="rounded-full bg-[#3ea6ff] px-4 py-2 text-sm font-semibold text-[#0f0f0f] transition hover:bg-[#65b8ff]"
                                 >
                                     Sign in

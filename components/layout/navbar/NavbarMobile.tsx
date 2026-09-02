@@ -82,7 +82,7 @@ export function NavbarMobile({
                         <NavbarProfile />
                     ) : (
                         <Link
-                            href="/signin"
+                            href="/auth/signin"
                             className="rounded-full bg-[#3ea6ff] px-3 py-2 text-xs font-semibold text-[#0f0f0f] transition hover:bg-[#65b8ff]"
                         >
                             Sign in

@@ -8,6 +8,8 @@ import type {
     PhoneChangeRequest,
     UpdateProfileRequest,
     UpdateUsernameRequest,
+    ChangePasswordRequest,
+    UpdateRoleRequest,
 } from "../types/account";
 
 class AccountServiceClient {
@@ -18,6 +20,13 @@ class AccountServiceClient {
 
     async updateProfile(request: UpdateProfileRequest): Promise<AccountProfile> {
         const response = await api.put<ApiResponse<AccountProfile>>("/users/profile", request);
+        return response.data.data as AccountProfile;
+    }
+
+    async updateProfileImage(file: File): Promise<AccountProfile> {
+        const formData = new FormData();
+        formData.append("file", file);
+        const response = await api.post<ApiResponse<AccountProfile>>("/users/profile/image", formData);
         return response.data.data as AccountProfile;
     }
 
@@ -44,6 +53,25 @@ class AccountServiceClient {
     async verifyPhoneChange(request: VerifyOtpRequest): Promise<AuthResponse> {
         const response = await api.post<ApiResponse<AuthResponse>>("/auth/phone-change/verify", request);
         return response.data.data as AuthResponse;
+    }
+
+    async changePassword(request: ChangePasswordRequest): Promise<AuthResponse> {
+        const response = await api.post<ApiResponse<AuthResponse>>("/auth/password/change", request);
+        return response.data.data as AuthResponse;
+    }
+
+    async updateRole(request: UpdateRoleRequest): Promise<AuthResponse> {
+        const response = await api.put<ApiResponse<AuthResponse>>("/users/role", request);
+        return response.data.data as AuthResponse;
+    }
+
+    async deleteAccount(confirmation: string, currentPassword?: string): Promise<void> {
+        await api.delete("/users/me", { data: { confirmation, currentPassword } });
+    }
+
+    async exportData(): Promise<Blob> {
+        const response = await api.get<Blob>("/users/export", { responseType: "blob" });
+        return response.data;
     }
 }
 

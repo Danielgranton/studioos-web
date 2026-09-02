@@ -33,5 +33,10 @@ export type UpdateProfileRequest = {
 export type UpdateUsernameRequest = { username: string };
 export type EmailChangeRequest = { newEmail: string };
 export type PhoneChangeRequest = { newPhone: string };
+export type ChangePasswordRequest = {
+    currentPassword?: string;
+    newPassword: string;
+};
+export type UpdateRoleRequest = { role: AuthResponse["role"] };
 
 export type { AuthResponse, AuthSession, OtpSentResponse, VerifyOtpRequest };

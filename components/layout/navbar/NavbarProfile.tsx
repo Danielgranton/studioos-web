@@ -10,9 +10,8 @@ import {
     User,
     User2,
     LayoutDashboard,
-    FolderKanban,
-    Calendar,
     Settings,
+    Smartphone,
     LogOut,
 } from "lucide-react";
 
@@ -38,11 +37,10 @@ const FALLBACK_USER: NavbarUser = {
 };
 
 const WORKSPACE_LINKS = [
-    { href: "/dashboard/profile", label: "Manage your account", icon: <User2 size={18} /> },
     { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
-    { href: "/dashboard/projects", label: "Projects", icon: <FolderKanban size={18} /> },
-    { href: "/dashboard/sessions", label: "Sessions", icon: <Calendar size={18} /> },
+    { href: "/dashboard/profile", label: "Profile", icon: <User2 size={18} /> },
     { href: "/dashboard/settings", label: "Settings", icon: <Settings size={18} /> },
+    { href: "/dashboard/sessions", label: "Active sessions", icon: <Smartphone size={18} /> },
 ];
 
 export function NavbarProfile({ user = FALLBACK_USER }: NavbarProfileProps) {
@@ -214,9 +212,9 @@ export function NavbarProfile({ user = FALLBACK_USER }: NavbarProfileProps) {
 
                         {WORKSPACE_LINKS.map((link) => {
 
-                            const active =
-                                pathname === link.href ||
-                                pathname.startsWith(link.href + "/");
+                            const active = link.href === "/dashboard"
+                                ? pathname === link.href
+                                : pathname === link.href || pathname.startsWith(link.href + "/");
 
                             return (
 

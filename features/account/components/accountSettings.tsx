@@ -13,12 +13,19 @@ import {
     ShieldCheck,
     Smartphone,
     UserRound,
+    Upload,
 } from "lucide-react";
 import { useState } from "react";
 
 import { AuthService, clearSession, useSession } from "@/features/auth";
 import { EmailChangeForm } from "./emailChangeForm";
 import { PhoneChangeForm } from "./phoneChangeForm";
+import { ChangePasswordForm } from "./changePasswordForm";
+import { NotificationPreferences } from "./notificationPreferences";
+import { PrivacySettings } from "./privacySettings";
+import { DeleteAccount } from "./deleteAccount";
+import { DataExport } from "./dataExport";
+import { RoleManagement } from "./roleManagement";
 import { AccountService } from "../services/account.service";
 import { useAccountProfile } from "../hooks/useAccountProfile";
 import type { AccountProfile, UpdateProfileRequest } from "../types/account";
@@ -38,6 +45,7 @@ export function AccountSettings() {
     const [savingProfile, setSavingProfile] = useState(false);
     const [editingUsername, setEditingUsername] = useState(false);
     const [savingUsername, setSavingUsername] = useState(false);
+    const [uploadingImage, setUploadingImage] = useState(false);
 
     const user = profile || (session ? {
         id: session.userId,
@@ -108,6 +116,31 @@ export function AccountSettings() {
         }
     }
 
+    async function uploadProfileImage(event: React.ChangeEvent<HTMLInputElement>) {
+        const file = event.target.files?.[0];
+        event.target.value = "";
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+            toast.error("Choose an image file");
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error("Profile image must not exceed 5 MB");
+            return;
+        }
+
+        setUploadingImage(true);
+        try {
+            setProfile(await AccountService.updateProfileImage(file));
+            toast.success("Profile image updated");
+        } catch (error) {
+            const response = (error as { response?: { data?: { message?: string } } }).response;
+            toast.error("Could not update profile image", { description: response?.data?.message || "Please try again." });
+        } finally {
+            setUploadingImage(false);
+        }
+    }
+
     if (sessionLoading || loading) {
         return <div className="mx-auto max-w-6xl py-16 text-sm text-[#888]">Loading account...</div>;
     }
@@ -155,7 +188,7 @@ export function AccountSettings() {
                             <div className="flex items-center gap-4">
                                 <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#272727] text-[#777]">
                                     {profile?.profileImageMedium || profile?.profileImage ? (
-                                        <Image src={(profile.profileImageMedium || profile.profileImage) as string} alt={user?.name || "Profile"} fill className="object-cover" />
+                                        <Image unoptimized src={(profile.profileImageMedium || profile.profileImage) as string} alt={user?.name || "Profile"} fill className="object-cover" />
                                     ) : <ImageIcon size={22} />}
                                 </div>
                                 <div>
@@ -163,7 +196,14 @@ export function AccountSettings() {
                                 <p className="mt-1 text-sm text-[#888]">{user?.role?.replaceAll("_", " ") || "User"}</p>
                                 </div>
                             </div>
-                            <button type="button" onClick={() => setEditingProfile((current) => !current)} className="rounded-xl border border-[#3f3f3f] px-4 py-2 text-sm text-[#ddd] transition hover:border-[#3ea6ff]/50 hover:bg-[#222]">{editingProfile ? "Cancel" : "Edit profile"}</button>
+                            <div className="flex flex-wrap gap-2">
+                                <input id="account-profile-image" type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={uploadProfileImage} />
+                                <label htmlFor="account-profile-image" className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[#3f3f3f] px-4 py-2 text-sm text-[#ddd] transition hover:border-[#3ea6ff]/50 hover:bg-[#222]">
+                                    {uploadingImage ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#555] border-t-[#3ea6ff]" /> : <Upload size={15} />}
+                                    {uploadingImage ? "Uploading..." : "Change photo"}
+                                </label>
+                                <button type="button" onClick={() => setEditingProfile((current) => !current)} className="rounded-xl border border-[#3f3f3f] px-4 py-2 text-sm text-[#ddd] transition hover:border-[#3ea6ff]/50 hover:bg-[#222]">{editingProfile ? "Cancel" : "Edit profile"}</button>
+                            </div>
                         </div>
                         {editingProfile ? (
                             <ProfileForm profile={profile} saving={savingProfile} onSubmit={saveProfile} />
@@ -197,18 +237,21 @@ export function AccountSettings() {
 
                     <section id="security" className="scroll-mt-28 rounded-2xl border border-[#3f3f3f] bg-[#151515] p-5 sm:p-6">
                         <SectionHeading icon={<LockKeyhole size={18} />} title="Security" description="Keep your account protected and review active access." />
-                        <SettingsRow title="Password" description="Change your account password" href="/auth/forgot-password" />
+                        <ChangePasswordForm />
+                        {user?.role && <RoleManagement currentRole={user.role} />}
                         <SettingsRow title="Active sessions" description="Review and revoke signed-in devices" href="/dashboard/sessions" />
                     </section>
 
                     <section id="notifications" className="scroll-mt-28 rounded-2xl border border-[#3f3f3f] bg-[#151515] p-5 sm:p-6">
                         <SectionHeading icon={<Bell size={18} />} title="Notifications" description="Choose how StudioOS keeps you informed." />
-                        <p className="mt-5 rounded-xl border border-dashed border-[#3f3f3f] px-4 py-4 text-sm text-[#888]">Notification preferences will be available here.</p>
+                        <NotificationPreferences />
                     </section>
 
                     <section id="privacy" className="scroll-mt-28 rounded-2xl border border-[#3f3f3f] bg-[#151515] p-5 sm:p-6">
                         <SectionHeading icon={<ShieldCheck size={18} />} title="Privacy" description="Control your visibility and account data." />
-                        <p className="mt-5 rounded-xl border border-dashed border-[#3f3f3f] px-4 py-4 text-sm text-[#888]">Privacy controls will be available here.</p>
+                        <PrivacySettings />
+                        <DataExport />
+                        <DeleteAccount />
                     </section>
                 </div>
             </div>

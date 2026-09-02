@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useRegistration } from "../hooks/useRegistration";
 import { useOtpResend } from "../hooks/useOtpResend";
 import { VerifyOTP } from "./verifyOTP";
+import { AccountService } from "@/features/account";
 
 const FOCUS_RING =
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ea6ff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]";
@@ -17,6 +18,7 @@ const FOCUS_RING =
 export function Registration() {
     const inputRef = useRef<HTMLInputElement>(null);
     const [preview, setPreview] = useState<string | null>(null);
+    const [photoFile, setPhotoFile] = useState<File | null>(null);
     const [form, setForm] = useState({ name: "", email: "", phone: "", password: "", acceptedTerms: false });
     const { state, error, fieldErrors, otpDelivery, register } = useRegistration();
     const router = useRouter();
@@ -62,9 +64,27 @@ export function Registration() {
 
     function handlePhoto(event: React.ChangeEvent<HTMLInputElement>) {
         const file = event.target.files?.[0];
-        if (file) setPreview(URL.createObjectURL(file));
-        // TODO: hand `file` to register() once the endpoint accepts a photo —
-        // profile images are currently URL strings only (S3 upload deferred).
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+            toast.error("Choose an image file");
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error("Profile image must not exceed 5 MB");
+            return;
+        }
+        setPhotoFile(file);
+        setPreview(URL.createObjectURL(file));
+    }
+
+    async function uploadVerifiedPhoto() {
+        if (!photoFile) return;
+        try {
+            await AccountService.updateProfileImage(photoFile);
+        } catch (error) {
+            const response = (error as { response?: { data?: { message?: string } } }).response;
+            toast.error("Account verified, but photo upload failed", { description: response?.data?.message || "You can add it from account settings." });
+        }
     }
 
     return (
@@ -242,7 +262,7 @@ export function Registration() {
                                 <span className="font-semibold text-[#f1f1f1]">{form.email.trim()}</span>.
                             </p>
                         </div>
-                        <VerifyOTP key={resendCount} identifier={form.email.trim()} delivery={otpDelivery} embedded />
+                        <VerifyOTP key={resendCount} identifier={form.email.trim()} delivery={otpDelivery} embedded onVerified={uploadVerifiedPhoto} />
                     </div>
                 )}
 

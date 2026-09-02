@@ -7,16 +7,17 @@ import { toast } from "sonner";
 
 import { useVerifyRegistration } from "../hooks/useVerifyRegistration";
 import { useVerifyLogin } from "../hooks/useVerifyLogin";
-import { OtpSentResponse } from "../types/auth";
+import { AuthResponse, OtpSentResponse } from "../types/auth";
 
 type VerifyOTPProps = {
     identifier: string;
     delivery: OtpSentResponse;
     mode?: "registration" | "login";
     embedded?: boolean;
+    onVerified?: (user: AuthResponse) => void | Promise<void>;
 };
 
-export function VerifyOTP({ identifier, delivery, mode = "registration", embedded = false }: VerifyOTPProps) {
+export function VerifyOTP({ identifier, delivery, mode = "registration", embedded = false, onVerified }: VerifyOTPProps) {
     const [code, setCode] = useState("");
     const submittingRef = useRef(false);
     const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
@@ -26,13 +27,18 @@ export function VerifyOTP({ identifier, delivery, mode = "registration", embedde
     const activeLoading = mode === "login" ? loginVerification.loading : loading;
     const activeError = mode === "login" ? loginVerification.error : error;
     const activeUser = mode === "login" ? loginVerification.user : user;
+    const handledUserRef = useRef<number | null>(null);
 
     useEffect(() => {
-        if (activeUser) {
-            toast.success(mode === "login" ? "Signed in" : "Account verified", { description: "Welcome to StudioOS." });
-            router.replace("/");
+        if (activeUser && handledUserRef.current !== activeUser.userId) {
+            handledUserRef.current = activeUser.userId;
+            void (async () => {
+                await onVerified?.(activeUser);
+                toast.success(mode === "login" ? "Signed in" : "Account verified", { description: "Welcome to StudioOS." });
+                router.replace("/");
+            })();
         }
-    }, [activeUser, mode, router]);
+    }, [activeUser, mode, onVerified, router]);
 
     useEffect(() => {
         if (activeError) toast.error("Verification failed", { description: activeError });

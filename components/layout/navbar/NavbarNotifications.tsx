@@ -197,7 +197,7 @@ export function NavbarNotifications() {
                     )}
 
                     <Link
-                        href="/dashboard/notifications"
+                        href="/dashboard/settings#notifications"
                         onClick={() => setOpen(false)}
                         className="
                             block
@@ -212,7 +212,7 @@ export function NavbarNotifications() {
                             hover:bg-[#272727]
                         "
                     >
-                        View all notifications
+                        Manage notifications
                     </Link>
 
                 </div>
