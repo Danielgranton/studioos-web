@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowUpRight, Bell, LockKeyhole, UserRound } from "lucide-react";
+
+import { DashboardActivityPanels, DashboardDiscovery, DashboardErrorState, DashboardLoadingState, DashboardMetricCards, DashboardWelcome, RoleWorkspacePanel, useDashboardOverview } from "@/features/dashboard";
 
 const cards = [
     { href: "/dashboard/profile", label: "Profile", description: "Update your public identity, contact details, and role.", icon: UserRound },
@@ -8,11 +12,26 @@ const cards = [
 ];
 
 export default function DashboardPage() {
+    const { overview, loading, error, refresh } = useDashboardOverview();
+
+    if (loading) {
+        return <DashboardLoadingState />;
+    }
+
+    if (error || !overview) {
+        return <DashboardErrorState onRetry={() => void refresh()} />;
+    }
+
     return (
-        <div className="mx-auto max-w-6xl py-10 text-[#f1f1f1] sm:py-14">
-            <div className="mb-8">
+        <div className="mx-auto max-w-6xl px-4 py-7 text-[#f1f1f1] sm:px-6 sm:py-12">
+            <DashboardWelcome overview={overview} />
+            <DashboardMetricCards metrics={overview.metrics} />
+            <DashboardActivityPanels bookings={overview.upcomingBookings} activity={overview.recentActivity} />
+            <RoleWorkspacePanel workspace={overview.workspace} />
+            <DashboardDiscovery recommendations={overview.recommendations} />
+            <div className="mb-8 mt-10">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#3ea6ff]">Workspace</p>
-                <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Your StudioOS dashboard</h1>
+                <h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">Quick access</h2>
                 <p className="mt-2 max-w-xl text-sm leading-6 text-[#888]">A quick path to your account, preferences, and security controls.</p>
             </div>
 

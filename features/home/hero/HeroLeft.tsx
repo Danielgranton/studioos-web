@@ -113,7 +113,7 @@ export function HeroLeft() {
             <div className="mt-5 flex flex-wrap gap-2.5 sm:mt-6 sm:gap-3">
 
                 <Link
-                    href={isAuthenticated ? "/studios" : "auth/register"}
+                    href={isAuthenticated ? "/studios" : "/auth/register"}
                     className="
                         group
                         inline-flex
