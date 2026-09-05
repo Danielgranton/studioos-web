@@ -1,5 +1,5 @@
-import { AccountSettings } from "@/features/account";
+import { ProfileSettings } from "@/features/account";
 
 export default function ProfilePage() {
-    return <AccountSettings />;
+    return <ProfileSettings />;
 }

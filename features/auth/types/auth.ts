@@ -68,10 +68,15 @@ export type AuthSession = {
     deviceName?: string;
     userAgent?: string;
     ipAddress?: string;
+    deviceType?: "MOBILE" | "DESKTOP" | "UNKNOWN";
+    browser?: string;
+    operatingSystem?: string;
     createdAt: string;
+    lastActiveAt?: string;
     expiresAt: string;
     revokedAt?: string;
     active: boolean;
+    currentSession?: boolean;
 };
 
 export type ApiResponse<T> = {

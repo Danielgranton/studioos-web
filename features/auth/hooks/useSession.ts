@@ -13,15 +13,29 @@ export function useSession() {
 
     useEffect(() => {
         let active = true;
+        let validating = false;
+        let lastValidatedAt = 0;
+        const revalidationInterval = 30_000;
 
-        async function validateSession() {
+        async function validateSession(showLoading = false) {
+            const now = Date.now();
+            if (validating || (now - lastValidatedAt < revalidationInterval && !showLoading)) return;
+            validating = true;
+            lastValidatedAt = now;
             const storedSession = getStoredSession();
             if (!storedSession) {
-                if (active) setIsLoading(false);
+                if (active) {
+                    setSession(null);
+                    setIsLoading(false);
+                }
+                validating = false;
                 return;
             }
 
-            if (active) setSession(storedSession);
+            if (active) {
+                setSession(storedSession);
+                if (showLoading) setIsLoading(true);
+            }
             try {
                 const profile = await AuthService.getMyProfile();
                 if (active) {
@@ -36,26 +50,37 @@ export function useSession() {
                 }
             } catch (error) {
                 const status = (error as { response?: { status?: number } }).response?.status;
-                if (status === 401) clearSession();
+                if (status === 401) {
+                    clearSession();
+                    if (active) setSession(null);
+                }
             } finally {
+                validating = false;
                 if (active) setIsLoading(false);
             }
         }
 
-        void validateSession();
+        void validateSession(true);
 
         const sync = () => {
             const nextSession = getStoredSession();
             setSession(nextSession);
             if (!nextSession) setIsLoading(false);
         };
+        const revalidate = () => {
+            if (document.visibilityState === "visible") void validateSession();
+        };
         window.addEventListener("storage", sync);
         window.addEventListener("studioos:session-change", sync);
+        window.addEventListener("focus", revalidate);
+        document.addEventListener("visibilitychange", revalidate);
 
         return () => {
             active = false;
             window.removeEventListener("storage", sync);
             window.removeEventListener("studioos:session-change", sync);
+            window.removeEventListener("focus", revalidate);
+            document.removeEventListener("visibilitychange", revalidate);
         };
     }, []);
 

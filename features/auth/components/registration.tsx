@@ -11,6 +11,7 @@ import { useRegistration } from "../hooks/useRegistration";
 import { useOtpResend } from "../hooks/useOtpResend";
 import { VerifyOTP } from "./verifyOTP";
 import { AccountService } from "@/features/account";
+import { GoogleSignInButton } from "./googleSignInButton";
 
 const FOCUS_RING =
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ea6ff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]";
@@ -252,6 +253,9 @@ export function Registration() {
                         </p>
                     )}
                 </form>
+
+                <div className="my-5 flex items-center gap-3 text-[10px] uppercase tracking-[0.18em] text-[#666]"><span className="h-px flex-1 bg-[#303030]" /><span>Or</span><span className="h-px flex-1 bg-[#303030]" /></div>
+                <GoogleSignInButton />
 
                 {state === "success" && otpDelivery && (
                     <div ref={verifyRef} className="mt-8 border-t border-[#3f3f3f] pt-6">

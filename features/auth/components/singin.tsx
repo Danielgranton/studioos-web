@@ -12,6 +12,7 @@ import { usePasswordLogin } from "../hooks/usePasswordLogin";
 import { useOtpResend } from "../hooks/useOtpResend";
 import { CountryPicker } from "./registration";
 import { VerifyOTP } from "./verifyOTP";
+import { GoogleSignInButton } from "./googleSignInButton";
 
 type IdentifierMode = "email" | "phone";
 type AuthMethod = "otp" | "password";
@@ -209,6 +210,9 @@ export function Signin() {
                         {authMethod === "password" ? (passwordLoading ? "Signing in" : "Sign in with password") : state === "loading" ? "Sending code" : otpSuccess ? (canResend ? `Resend OTP (${remaining} left)` : "Resend limit reached") : "Continue with OTP"}
                     </button>
                 </form>
+
+                <div className="my-5 flex items-center gap-3 text-[10px] uppercase tracking-[0.18em] text-[#666]"><span className="h-px flex-1 bg-[#303030]" /><span>Or</span><span className="h-px flex-1 bg-[#303030]" /></div>
+                <GoogleSignInButton />
 
                 <div className="mt-4 text-center">
                     <a href="/auth/forgot-password" className={`text-sm font-medium text-[#3ea6ff] hover:underline ${FOCUS_RING}`}>

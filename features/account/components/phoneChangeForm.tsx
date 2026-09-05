@@ -5,7 +5,7 @@ import PhoneInput from "react-phone-number-input";
 import { Check, Loader2, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 
-import { saveSession } from "@/features/auth";
+import { CountryPicker, saveSession } from "@/features/auth";
 import { AccountService } from "../services/account.service";
 
 export function PhoneChangeForm({ currentPhone, onChanged }: { currentPhone?: string; onChanged: () => void }) {
@@ -65,7 +65,7 @@ export function PhoneChangeForm({ currentPhone, onChanged }: { currentPhone?: st
             </div>
             {!sent ? (
                 <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
-                    <label className="block flex-1 text-xs font-medium text-[#aaa]">New phone number<PhoneInput international defaultCountry="KE" value={newPhone} onChange={(value) => setNewPhone(value || "")} className="phone-field mt-1.5" /></label>
+                    <label className="block flex-1 text-xs font-medium text-[#aaa]">New phone number<PhoneInput international defaultCountry="KE" countryCallingCodeEditable={false} limitMaxLength value={newPhone || undefined} onChange={(value) => setNewPhone(value || "")} className="phone-field mt-1.5" countrySelectComponent={CountryPicker} numberInputProps={{ autoComplete: "tel", placeholder: "700 000 000", title: "Enter a valid international phone number" }} /></label>
                     <button type="button" onClick={() => void sendCode()} disabled={loading} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#3ea6ff] px-4 py-2.5 text-sm font-semibold text-[#0f0f0f] hover:bg-[#65b8ff] disabled:opacity-60">{loading && <Loader2 size={15} className="animate-spin" />}Send code</button>
                 </div>
             ) : (

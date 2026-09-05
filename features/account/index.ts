@@ -1,4 +1,5 @@
 export { AccountSettings } from "./components/accountSettings";
+export { ProfileSettings } from "./components/profileSettings";
 export { EmailChangeForm } from "./components/emailChangeForm";
 export { PhoneChangeForm } from "./components/phoneChangeForm";
 export { ChangePasswordForm } from "./components/changePasswordForm";

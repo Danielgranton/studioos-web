@@ -93,6 +93,24 @@ samp {
     scrollbar-width: none;
 }
 
+.dashboard-scrollbar {
+  scrollbar-color: #3f3f3f transparent;
+  scrollbar-width: thin;
+}
+
+.dashboard-scrollbar::-webkit-scrollbar {
+  width: 7px;
+}
+
+.dashboard-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dashboard-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #3f3f3f;
+}
+
 html {
     scrollbar-gutter: stable;
 }
