@@ -14,6 +14,7 @@ import { RoleManagement } from "./roleManagement";
 import { AccountService } from "../services/account.service";
 import { useAccountProfile } from "../hooks/useAccountProfile";
 import type { AccountProfile, UpdateProfileRequest } from "../types/account";
+import { getApiErrorMessage } from "@/lib/api/errorMessage";
 
 export function ProfileSettings() {
     const { session, isLoading: sessionLoading } = useSession();
@@ -63,7 +64,7 @@ export function ProfileSettings() {
         if (file.size > 5 * 1024 * 1024) { toast.error("Profile image must not exceed 5 MB"); return; }
         setUploadingImage(true);
         try { setProfile(await AccountService.updateProfileImage(file)); toast.success("Profile image updated"); }
-        catch (error) { const response = (error as { response?: { data?: { message?: string } } }).response; toast.error("Could not update profile image", { description: response?.data?.message || "Please try again." }); }
+        catch (error) { toast.error("Could not update profile image", { description: getApiErrorMessage(error, "The image could not be uploaded. Please try again.") }); }
         finally { setUploadingImage(false); }
     }
 

@@ -29,6 +29,7 @@ export type OtpSentResponse = {
     message: string;
     maskedEmail?: string;
     maskedPhone?: string;
+    otpSent?: boolean;
 };
 
 export type AuthResponse = {

@@ -11,6 +11,7 @@ import { useRegistration } from "../hooks/useRegistration";
 import { useOtpResend } from "../hooks/useOtpResend";
 import { VerifyOTP } from "./verifyOTP";
 import { AccountService } from "@/features/account";
+import { getApiErrorMessage } from "@/lib/api/errorMessage";
 import { GoogleSignInButton } from "./googleSignInButton";
 
 const FOCUS_RING =
@@ -83,8 +84,7 @@ export function Registration() {
         try {
             await AccountService.updateProfileImage(photoFile);
         } catch (error) {
-            const response = (error as { response?: { data?: { message?: string } } }).response;
-            toast.error("Account verified, but photo upload failed", { description: response?.data?.message || "You can add it from account settings." });
+            toast.error("Account verified, but photo upload failed", { description: getApiErrorMessage(error, "The image could not be uploaded. You can add it from your profile.") });
         }
     }
 

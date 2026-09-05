@@ -55,7 +55,7 @@ export function Signin() {
     async function resendLoginOtp() {
         try {
             const sent = await resend(identifier.trim());
-            if (sent) toast.success("New code sent");
+            if (sent) toast.success("Check your contact details", { description: "If an account exists, a new verification code was sent." });
         } catch (requestError) {
             const response = (requestError as { response?: { data?: { message?: string } } }).response;
             toast.error("Could not resend code", { description: response?.data?.message || "Please try again later." });
@@ -63,7 +63,7 @@ export function Signin() {
     }
 
     useEffect(() => {
-        if (state === "success") toast.success("Verification code sent", { description: "Check your email or phone." });
+        if (state === "success") toast.success("Check your contact details", { description: "If an account exists, a verification code was sent." });
         if (error) toast.error("Login failed", { description: error });
         if (passwordError) toast.error("Login failed", { description: passwordError });
     }, [error, passwordError, state]);
@@ -76,12 +76,12 @@ export function Signin() {
     }, [passwordUser, router]);
 
     useEffect(() => {
-        if (state === "success" && delivery) {
+        if (state === "success" && delivery?.otpSent) {
             window.requestAnimationFrame(() => verifyRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }));
         }
     }, [delivery, state]);
 
-    const otpSuccess = authMethod === "otp" && state === "success" && Boolean(delivery);
+    const otpSuccess = authMethod === "otp" && state === "success" && Boolean(delivery?.otpSent);
     const activeError = authMethod === "password" ? passwordError : error;
     const showError = activeError && !dismissedError;
 

@@ -19,8 +19,8 @@ export default function HomePage() {
             <ExploreSection />
             <TopProducers />
             <FeaturedStudios />
-            <FeaturedProjects/>
             <TrendingBeats />
+            <FeaturedProjects/>
             <TestimonialSection/>
             <ServiceSection />
         </div>

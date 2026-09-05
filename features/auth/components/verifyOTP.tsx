@@ -81,6 +81,7 @@ export function VerifyOTP({ identifier, delivery, mode = "registration", embedde
     }
 
     const target = delivery.maskedEmail || delivery.maskedPhone || identifier;
+    const isLogin = mode === "login";
 
     return (
         <section className={embedded ? "rounded-xl border border-[#3f3f3f] bg-[#151515] p-4 sm:p-5" : "min-h-[calc(100vh-5rem)] bg-[#0f0f0f] px-4 py-10 text-[#f1f1f1]"}>
@@ -89,7 +90,7 @@ export function VerifyOTP({ identifier, delivery, mode = "registration", embedde
                     <div>
                         <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#3ea6ff]">Verify your account</p>
                         <h2 className="mt-1 text-lg font-semibold text-[#f1f1f1]">Enter the code</h2>
-                        <p className="mt-1 text-xs text-[#888]">We sent a 6-digit code to {target}.</p>
+                        <p className="mt-1 text-xs text-[#888]">{isLogin ? "If an account exists, a 6-digit code was sent to the email or phone provided." : `We sent a 6-digit code to ${target}.`}</p>
                     </div>
                     <span className="rounded-md bg-[#3ea6ff]/10 px-1.5 py-1 font-mono text-[10px] text-[#3ea6ff]">OTP</span>
                 </div>
