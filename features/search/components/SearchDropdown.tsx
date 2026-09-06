@@ -55,21 +55,29 @@ export function SearchDropdown({
                 w-full
                 overflow-hidden
                 rounded-2xl
-                border-[#303030] bg-[#0F0F0F]/95 backdrop-blur-xl
+                border border-[#303030] bg-[#0F0F0F]/95 shadow-2xl shadow-black/30 backdrop-blur-xl
                 z-50
             "
         >
             {/* Empty Query */}
             {!hasQuery && (
-                <>
-                    <SearchRecent recent={recent} />
+                <div className="max-h-[min(62vh,460px)] overflow-y-auto overscroll-contain">
+                    <div className="grid md:grid-cols-[0.75fr_1.25fr]">
+                        <SearchRecent
+                            recent={recent}
+                            onSelect={onSelectQuery}
+                        />
 
-                    <SearchTrending trending={trending} />
+                        <SearchTrending
+                            trending={trending}
+                            onSelect={onSelectQuery}
+                        />
+                    </div>
 
                     {recent.length === 0 && trending.length === 0 && (
                         <SearchHomeEmpty onSelect={onSelectQuery} />
                     )}
-                </>
+                </div>
             )}
 
             {/* Search */}

@@ -1,6 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+import { StudioService } from "@/features/studio";
 import { SearchEntityType, SearchResponse } from "../types/search";
 
 interface SearchResultsProps {
@@ -20,9 +24,16 @@ const ENTITY_LABELS: Record<SearchEntityType, string> = {
 export function SearchResults({
     results,
 }: SearchResultsProps) {
+    const router = useRouter();
 
     if (!results || results.results.length === 0) {
         return null;
+    }
+
+    function openResult(entityType: SearchEntityType, id: string) {
+        if (entityType === SearchEntityType.STUDIO) {
+            router.push(`/studios/${id}`);
+        }
     }
 
     return (
@@ -32,6 +43,9 @@ export function SearchResults({
 
                 <button
                     key={`${item.entityType}-${item.id}`}
+                    type="button"
+                    onClick={() => openResult(item.entityType, item.id)}
+                    disabled={item.entityType !== SearchEntityType.STUDIO}
                     className="
                         flex
                         w-full
@@ -45,13 +59,7 @@ export function SearchResults({
                     "
                 >
 
-                    <Image
-                        src={"/images/avatar.png"}
-                        alt={item.title}
-                        width={40}
-                        height={40}
-                        className="rounded-md object-cover"
-                    />
+                    <SearchResultImage item={item} />
 
                     <div className="flex-1 text-left">
 
@@ -85,5 +93,41 @@ export function SearchResults({
             ))}
 
         </div>
+    );
+}
+
+function SearchResultImage({ item }: { item: SearchResponse["results"][number] }) {
+    const [image, setImage] = useState(item.image || "/images/avatar.png");
+
+    useEffect(() => {
+        if (item.entityType !== SearchEntityType.STUDIO || item.image) return;
+
+        let active = true;
+        void StudioService.getStudio(item.id)
+            .then((studio) => {
+                if (!active) return;
+                setImage(
+                    studio.profileImageThumbnail ||
+                        studio.profileImageMedium ||
+                        studio.profileImage ||
+                        "/images/avatar.png",
+                );
+            })
+            .catch(() => undefined);
+
+        return () => {
+            active = false;
+        };
+    }, [item.entityType, item.id, item.image]);
+
+    return (
+        <Image
+            src={image}
+            alt={item.title}
+            width={40}
+            height={40}
+            unoptimized
+            className="h-10 w-10 rounded-md object-cover"
+        />
     );
 }

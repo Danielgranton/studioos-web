@@ -6,35 +6,42 @@ import { RecentSearch } from "../types/search";
 
 interface SearchRecentProps {
     recent: RecentSearch[];
+    onSelect?: (value: string) => void;
 }
 
 export function SearchRecent({
     recent,
+    onSelect,
 }: SearchRecentProps) {
 
     if (recent.length === 0) return null;
 
     return (
-        <div className="p-4">
+        <div className="p-4 sm:p-5">
 
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Recent
+            <h3 className="mb-3 flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                <span>Recent searches</span>
+                <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[9px] tracking-normal text-slate-500">
+                    {recent.length}
+                </span>
             </h3>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
 
-                {recent.map((item) => (
+                {recent.slice(0, 8).map((item) => (
 
                     <button
                         key={item.id}
-                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition hover:bg-slate-800"
+                        type="button"
+                        onClick={() => onSelect?.(item.query)}
+                        className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition hover:bg-slate-800"
                     >
                         <Clock3
-                            size={16}
+                            size={14}
                             className="text-slate-500"
                         />
 
-                        <span className="text-sm text-white">
+                        <span className="truncate text-xs text-white">
                             {item.query}
                         </span>
 

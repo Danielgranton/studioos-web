@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { ArrowRight, Music2 } from "lucide-react";
+import { PlatformStatsService, type PlatformStats } from "../services/platformStats.service";
 import { HeroAudienceToggle } from "./HeroAudienceToggle";
 import { useSession } from "@/features/auth";
 
@@ -10,6 +12,27 @@ const genres = ["Hip-Hop", "Afrobeat", "R&B", "Podcast", "Gospel"];
 
 export function HeroLeft() {
     const { isAuthenticated } = useSession();
+    const [platformStats, setPlatformStats] = useState<PlatformStats | null>(null);
+
+    useEffect(() => {
+        let active = true;
+        void PlatformStatsService.getStats()
+            .then((stats) => {
+                if (active) setPlatformStats(stats);
+            })
+            .catch(() => undefined);
+
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    const stats = [
+        [platformStats?.studios, "Studios"],
+        [platformStats?.producers, "Producers"],
+        [platformStats?.beats, "Beats"],
+        [platformStats?.artists, "Artists"],
+    ] as const;
 
     return (
         <div className="w-full max-w-3xl">
@@ -323,12 +346,7 @@ export function HeroLeft() {
             {/* Stats */}
             <div className="mt-6 grid grid-cols-2 gap-2.5 sm:mt-8 sm:gap-3 md:grid-cols-4">
 
-                {[
-                    ["8,000+", "Studios"],
-                    ["12,000+", "Producers"],
-                    ["1M+", "Beats"],
-                    ["250K+", "Artists"],
-                ].map(([value, label]) => (
+                {stats.map(([value, label]) => (
                     <div
                         key={label}
                         className="
@@ -346,7 +364,7 @@ export function HeroLeft() {
                         "
                     >
                         <p className="font-mono text-lg font-bold text-[#f5f4f1] sm:text-xl">
-                            {value}
+                            {value == null ? "—" : value.toLocaleString()}
                         </p>
 
                         <p className="mt-0.5 text-[11px] text-[#9a978f] sm:text-xs">

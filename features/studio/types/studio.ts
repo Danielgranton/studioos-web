@@ -21,6 +21,7 @@ export type Studio = {
     profileImageThumbnail?: string;
     ownerId: number;
     ownerName: string;
+    ownerProfileImageThumbnail?: string;
     services: string[];
     media?: StudioMedia[];
     averageRating?: number;

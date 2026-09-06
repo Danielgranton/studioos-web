@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, ArrowLeft, RefreshCw } from "lucide-react";
+import Link from "next/link";
 
 import { FeaturedStudios, type FeaturedStudio } from "@/features/home";
 
@@ -66,7 +67,25 @@ export function StudiosBrowsePage() {
         );
     }
 
-    return <FeaturedStudios studios={studios} />;
+    return (
+        <main className="min-h-screen bg-[#0f0f0f] pt-6 text-[#f5f4f1]">
+            <div className="px-4 sm:px-6 lg:px-8">
+                <Link
+                    href="/"
+                    className="group inline-flex items-center gap-2 rounded-full border border-[#302d28] bg-[#161513] px-3.5 py-2 text-[11px] font-semibold text-[#aaa69d] shadow-lg shadow-black/10 transition hover:border-[#e8a33d]/40 hover:bg-[#1c1a17] hover:text-[#f5f4f1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a33d]/60"
+                >
+                    <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
+                    Back to home
+                </Link>
+            </div>
+            <FeaturedStudios
+                studios={studios}
+                showBrowseCta={false}
+                showFeaturedBadge={false}
+                showSearch
+            />
+        </main>
+    );
 }
 
 function toFeaturedStudio(studio: Studio): FeaturedStudio {
@@ -89,6 +108,7 @@ function toFeaturedStudio(studio: Studio): FeaturedStudio {
         verified: studio.verified,
         badge: studio.badge || "Standard listing",
         available: studio.available,
+        price: studio.pricing,
         priceLabel: `From KSh ${studio.pricing.toLocaleString()}/hr`,
         services: studio.services,
         genres: studio.genres,

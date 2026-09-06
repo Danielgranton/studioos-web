@@ -34,7 +34,7 @@ export function useSearchHome() {
 
                 SearchService.recent(),
 
-                SearchService.trending(SearchEntityType.STUDIO, 10),
+                SearchService.trending(SearchEntityType.STUDIO, 20),
 
             ]);
 
