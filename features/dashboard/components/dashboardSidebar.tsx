@@ -4,7 +4,9 @@ import { ChevronRight, Clock3, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
+import { AuthService } from "@/features/auth";
 import { useDashboardSession } from "./dashboardAuthGuard";
 import { filterDashboardItems, getDashboardNavigation, isDashboardRole } from "../config/navigation";
 
@@ -86,13 +88,36 @@ export function DashboardSidebar() {
 }
 
 function SidebarIdentity({ session, compact = false }: { session: ReturnType<typeof useDashboardSession>; compact?: boolean }) {
+    const [avatarUrl, setAvatarUrl] = useState<string>();
     const name = session?.name || "StudioOS user";
     const initials = name.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase();
     const role = session?.role?.replaceAll("_", " ") || "User";
 
+    useEffect(() => {
+        let active = true;
+
+        AuthService.getMyProfile()
+            .then((profile) => {
+                if (active) {
+                    setAvatarUrl(profile.profileImageThumbnail || profile.profileImageMedium || profile.profileImage);
+                }
+            })
+            .catch(() => {
+                // Keep the initials fallback when the profile request is unavailable.
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [session?.userId]);
+
     return <div className={compact ? "flex items-center gap-3" : "border-b border-[#2b2b2b] p-4"}>
-        <div className="relative shrink-0">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[#4a4a4a] bg-gradient-to-br from-[#303030] to-[#171717] text-xs font-bold tracking-[0.12em] text-[#f1f1f1] shadow-[0_4px_18px_rgb(0_0_0_/_25%)]">{initials}</div>
+        <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border border-[#4a4a4a] bg-gradient-to-br from-[#303030] to-[#171717] shadow-[0_4px_18px_rgb(0_0_0_/_25%)]">
+            {avatarUrl ? (
+                <Image src={avatarUrl} alt={`${name} profile`} fill sizes="44px" className="object-cover" />
+            ) : (
+                <div className="flex h-full w-full items-center justify-center text-xs font-bold tracking-[0.12em] text-[#f1f1f1]">{initials}</div>
+            )}
             <span aria-label="Online" className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#121212] bg-emerald-400" />
         </div>
         <div className="min-w-0">

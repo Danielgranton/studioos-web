@@ -31,8 +31,9 @@ export function NavbarLogo({ compact = false }: NavbarLogoProps) {
                 <Image
                     src="/images/logo.png"
                     alt=""
-                    width={compact ? 28 : 32}
-                    height={compact ? 28 : 32}
+                    width={425}
+                    height={588}
+                    className={compact ? "h-7 w-auto" : "h-8 w-auto"}
                     priority
                 />
             </span>

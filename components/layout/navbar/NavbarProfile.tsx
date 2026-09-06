@@ -52,11 +52,24 @@ export function NavbarProfile({ user = FALLBACK_USER }: NavbarProfileProps) {
 
     const pathname = usePathname();
     const { session, isAuthenticated } = useSession();
+    const sessionName = session?.name;
+    const sessionEmail = session?.email;
+    const sessionRole = session?.role;
 
     useEffect(() => {
         if (!isAuthenticated) {
             setProfile(null);
             return;
+        }
+
+        // Reflect local session changes immediately, then confirm with the API.
+        if (sessionName && sessionEmail && sessionRole) {
+            setProfile((current) => ({
+                ...current,
+                name: sessionName,
+                email: sessionEmail,
+                role: sessionRole,
+            }));
         }
 
         let active = true;
@@ -67,7 +80,7 @@ export function NavbarProfile({ user = FALLBACK_USER }: NavbarProfileProps) {
                     name: currentUser.name,
                     email: currentUser.email,
                     role: currentUser.role,
-                    avatarUrl: currentUser.profileImageMedium || currentUser.profileImage,
+                    avatarUrl: currentUser.profileImageThumbnail || currentUser.profileImageMedium || currentUser.profileImage,
                 });
             })
             .catch(() => {
@@ -77,7 +90,7 @@ export function NavbarProfile({ user = FALLBACK_USER }: NavbarProfileProps) {
         return () => {
             active = false;
         };
-    }, [isAuthenticated]);
+    }, [isAuthenticated, sessionEmail, sessionName, sessionRole]);
 
     const currentUser: NavbarUser = profile || (session ? {
         name: session.name,
@@ -179,6 +192,7 @@ export function NavbarProfile({ user = FALLBACK_USER }: NavbarProfileProps) {
                                     src={currentUser.avatarUrl}
                                     alt={currentUser.name}
                                     fill
+                                    sizes="40px"
                                     className="object-cover"
                                 />
 

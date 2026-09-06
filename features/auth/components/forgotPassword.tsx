@@ -67,7 +67,7 @@ function AuthShell({ children, onBack }: { children: React.ReactNode; onBack: ()
         <main className="flex min-h-screen items-center justify-center bg-[#0f0f0f] px-4 py-10 text-[#f1f1f1]">
             <section className="w-full max-w-2xl rounded-[20px] border border-[#3f3f3f] bg-[#151515] p-6 sm:p-8">
                 <div className="mb-8 flex items-center gap-3 border-b border-[#3f3f3f] pb-6">
-                    <Image src="/images/logo.png" alt="StudioOS" width={32} height={32} priority />
+                    <Image src="/images/logo.png" alt="StudioOS" width={425} height={588} className="h-8 w-auto" priority />
                     <div>
                         <p className="text-lg font-bold tracking-tight text-[#f1f1f1]">StudioOS<span className="text-[#3ea6ff]">.</span></p>
                         <p className="text-xs text-[#777]">Creator workspace</p>

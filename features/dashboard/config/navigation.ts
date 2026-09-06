@@ -10,6 +10,7 @@ import {
     SlidersHorizontal,
     Sparkles,
     UsersRound,
+    WalletCards,
 } from "lucide-react";
 
 import type { DashboardNavItem, DashboardRole } from "../types/dashboard";
@@ -68,6 +69,8 @@ const roleGroups: Record<DashboardRole, DashboardNavigationGroup> = {
     PRODUCER: {
         label: "Producer workspace",
         items: [
+            { label: "My studio", href: "/dashboard/studios", description: "Register and manage your studio listing.", icon: Compass, roles: ["PRODUCER"] },
+            { label: "Wallet", href: "/dashboard/wallet", description: "Track studio earnings and request payouts.", icon: WalletCards, roles: ["PRODUCER"] },
             { label: "Booking requests", href: "/dashboard/requests", description: "Respond to new booking opportunities.", icon: CalendarCheck, comingSoon: true },
         ],
     },

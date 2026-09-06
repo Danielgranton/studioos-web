@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 interface FeaturedStudioCardProps {
-    id: number;
+    id: number | string;
     slug: string;
     name: string;
     location: string;

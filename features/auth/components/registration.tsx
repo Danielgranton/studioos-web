@@ -94,7 +94,7 @@ export function Registration() {
                 <div className="mb-10 flex items-start justify-between">
                     <div className="flex items-center gap-4">
                         <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[#3ea6ff]/20 bg-[#3ea6ff]/10">
-                            <Image src="/images/logo.png" alt="StudioOS" width={30} height={30} priority style={{ width: "auto", height: "auto" }} />
+                            <Image src="/images/logo.png" alt="StudioOS" width={425} height={588} priority className="h-7 w-auto" />
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold tracking-tight text-[#f1f1f1]">

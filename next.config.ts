@@ -7,6 +7,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "i.pravatar.cc",
       },
+      {
+        protocol: "https",
+        hostname: "stub-media.local",
+      },
+      {
+        protocol: "https",
+        hostname: "studioos-files.s3.eu-north-1.amazonaws.com",
+      },
     ],
   },
 };

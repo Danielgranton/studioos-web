@@ -1,5 +1,6 @@
 export { ExploreSection } from "./explore";
 export { FeaturedStudios } from "./studios";
+export type { FeaturedStudio } from "./studios/FeaturedStudios";
 export { Hero } from "./hero";
 export { TopProducers } from "./producers";
 export { TrendingBeats } from "./trending-beats";

@@ -34,13 +34,19 @@ export function RoleManagement({ currentRole }: { currentRole: AuthResponse["rol
                 <BriefcaseBusiness size={17} className="mt-0.5 text-[#3ea6ff]" />
                 <div><h3 className="text-sm font-medium">Your StudioOS role</h3><p className="mt-1 text-xs leading-5 text-[#777]">Choose the role that best describes how you use StudioOS. Admin roles are assigned separately.</p></div>
             </div>
-            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+            <div className="mt-4 grid gap-2 sm:grid-cols-3" role="radiogroup" aria-label="StudioOS role">
                 {roles.map((option) => (
-                    <label key={option.value} className={`cursor-pointer rounded-xl border px-3 py-3 transition ${role === option.value ? "border-[#3ea6ff]/70 bg-[#3ea6ff]/10" : "border-[#303030] hover:bg-[#181818]"}`}>
-                        <input type="radio" name="role" value={option.value} checked={role === option.value} onChange={() => setRole(option.value)} className="sr-only" />
+                    <button
+                        key={option.value}
+                        type="button"
+                        role="radio"
+                        aria-checked={role === option.value}
+                        onClick={() => setRole(option.value)}
+                        className={`cursor-pointer rounded-xl border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ea6ff] ${role === option.value ? "border-[#3ea6ff]/70 bg-[#3ea6ff]/10" : "border-[#303030] hover:bg-[#181818]"}`}
+                    >
                         <span className="block text-sm font-medium text-[#ddd]">{option.label}</span>
                         <span className="mt-1 block text-xs leading-5 text-[#777]">{option.description}</span>
-                    </label>
+                    </button>
                 ))}
             </div>
             <div className="mt-4 flex justify-end"><button type="submit" disabled={loading || role === currentRole} className="rounded-lg bg-[#3ea6ff] px-4 py-2 text-xs font-semibold text-[#0f0f0f] transition hover:bg-[#65b8ff] disabled:opacity-60">{loading ? "Updating..." : "Update role"}</button></div>

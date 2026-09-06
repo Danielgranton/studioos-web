@@ -109,8 +109,9 @@ export function NavbarMobileMenu({
                     <Image
                         src="/images/logo.png"
                         alt="StudioOS logo"
-                        width={36}
-                        height={36}
+                        width={425}
+                        height={588}
+                        className="h-9 w-auto"
                         priority
                     />
 

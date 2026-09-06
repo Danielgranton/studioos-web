@@ -6,7 +6,28 @@ import { ArrowRight } from "lucide-react";
 import { FeaturedStudioCard } from "./FeaturedStudioCard";
 import { featuredStudios } from "./featuredStudiosData";
 
-export function FeaturedStudios() {
+export type FeaturedStudio = {
+    id: number | string;
+    slug: string;
+    name: string;
+    location: string;
+    rating: number;
+    reviews: number;
+    bookings: number;
+    verified: boolean;
+    badge: string;
+    available: boolean;
+    priceLabel: string;
+    services: string[];
+    genres: string[];
+    image: string;
+};
+
+type FeaturedStudiosProps = {
+    studios?: FeaturedStudio[];
+};
+
+export function FeaturedStudios({ studios = featuredStudios }: FeaturedStudiosProps) {
     return (
         <section
             id="studios"
@@ -255,7 +276,7 @@ export function FeaturedStudios() {
                         lg:grid-cols-5
                     "
                 >
-                    {featuredStudios.map((studio) => (
+                    {studios.map((studio) => (
                         <FeaturedStudioCard
                             key={studio.id}
                             {...studio}

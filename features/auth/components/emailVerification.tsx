@@ -51,7 +51,7 @@ export function EmailVerification() {
     return (
         <main className="flex min-h-screen items-center justify-center bg-[#0f0f0f] px-4 py-10 text-[#f1f1f1]">
             <section className="w-full max-w-2xl rounded-[20px] border border-[#3f3f3f] bg-[#151515] p-6 sm:p-8">
-                <div className="mb-8 flex items-center gap-3 border-b border-[#3f3f3f] pb-6"><Image src="/images/logo.png" alt="StudioOS" width={32} height={32} priority /><p className="text-lg font-bold">StudioOS<span className="text-[#3ea6ff]">.</span></p></div>
+                <div className="mb-8 flex items-center gap-3 border-b border-[#3f3f3f] pb-6"><Image src="/images/logo.png" alt="StudioOS" width={425} height={588} className="h-8 w-auto" priority /><p className="text-lg font-bold">StudioOS<span className="text-[#3ea6ff]">.</span></p></div>
                 <button type="button" onClick={() => router.back()} className={`inline-flex items-center gap-2 text-sm text-[#888] hover:text-[#f1f1f1] ${FOCUS_RING}`}><ArrowLeft size={16} /> Back</button>
                 <div className="mx-auto mt-8 max-w-xl">
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#3ea6ff]/10 text-[#3ea6ff]"><Mail size={22} /></div>
