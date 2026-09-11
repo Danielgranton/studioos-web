@@ -70,6 +70,9 @@ export function useSession() {
         const revalidate = () => {
             if (document.visibilityState === "visible") void validateSession();
         };
+        const validationTimer = window.setInterval(() => {
+            if (document.visibilityState === "visible") void validateSession();
+        }, revalidationInterval);
         window.addEventListener("storage", sync);
         window.addEventListener("studioos:session-change", sync);
         window.addEventListener("focus", revalidate);
@@ -77,6 +80,7 @@ export function useSession() {
 
         return () => {
             active = false;
+            window.clearInterval(validationTimer);
             window.removeEventListener("storage", sync);
             window.removeEventListener("studioos:session-change", sync);
             window.removeEventListener("focus", revalidate);

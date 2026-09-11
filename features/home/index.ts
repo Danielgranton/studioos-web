@@ -3,6 +3,7 @@ export { FeaturedStudios } from "./studios";
 export type { FeaturedStudio } from "./studios/FeaturedStudios";
 export { Hero } from "./hero";
 export { TopProducers } from "./producers";
+export type { ProducerCardProps } from "./producers/ProducerCard";
 export { TrendingBeats } from "./trending-beats";
 export { PlatformStatsService } from "./services/platformStats.service";
 export type { PlatformStats } from "./services/platformStats.service";

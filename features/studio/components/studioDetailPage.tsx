@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
     ArrowLeft,
+    ArrowUpRight,
     BadgeCheck,
     Building2,
     CalendarCheck,
@@ -87,14 +88,18 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
                     </div>
 
                     <div className="flex flex-wrap items-center justify-end gap-2">
-                        <div className="flex items-center gap-2 rounded-xl border border-[#2a2825] bg-[#161513] px-2.5 py-2">
-                            <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[#e8a33d]/10 text-[11px] font-semibold text-[#e8a33d]">
+                        <Link
+                            href={`/producers/${studio.ownerId}`}
+                            aria-label={`View ${studio.ownerName || "studio producer"}'s profile`}
+                            className="group flex min-w-[220px] items-center gap-3 rounded-2xl border border-[#302d28] bg-[#191714] px-3 py-2.5 text-left transition hover:border-[#e8a33d]/50 hover:bg-[#211e19]"
+                        >
+                            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#e8a33d]/20 bg-[#e8a33d]/10 text-xs font-bold text-[#e8a33d]">
                                 {studio.ownerProfileImageThumbnail ? (
                                     <Image
                                         src={studio.ownerProfileImageThumbnail}
                                         alt={`${studio.ownerName} profile`}
                                         fill
-                                        sizes="32px"
+                                        sizes="40px"
                                         unoptimized
                                         className="object-cover"
                                     />
@@ -102,11 +107,12 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
                                     studio.ownerName?.charAt(0).toUpperCase() || "P"
                                 )}
                             </div>
-                            <div className="pr-1">
-                                <p className="text-[9px] uppercase tracking-[0.14em] text-[#6b685f]">Meet the producer</p>
-                                <p className="mt-0.5 max-w-[130px] truncate text-xs font-semibold text-[#f5f4f1]">{studio.ownerName || "Studio producer"}</p>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#e8a33d]">Studio producer</p>
+                                <p className="mt-1 truncate text-sm font-semibold text-[#f5f4f1]">{studio.ownerName || "Studio producer"}</p>
+                                <span className="mt-1 inline-flex items-center gap-1 text-[10px] text-[#888176]">View profile <ArrowUpRight size={11} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#e8a33d]" /></span>
                             </div>
-                        </div>
+                        </Link>
                         {studio.badge && (
                             <span className="rounded-full border border-[#e8a33d]/20 bg-[#e8a33d]/10 px-2.5 py-1 text-[10px] font-semibold text-[#e8a33d]">
                                 {studio.badge}

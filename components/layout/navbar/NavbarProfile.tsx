@@ -193,6 +193,7 @@ export function NavbarProfile({ user = FALLBACK_USER }: NavbarProfileProps) {
                                     alt={currentUser.name}
                                     fill
                                     sizes="40px"
+                                    unoptimized
                                     className="object-cover"
                                 />
 

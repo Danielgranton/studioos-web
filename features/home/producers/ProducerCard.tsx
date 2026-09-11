@@ -1,41 +1,37 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { BadgeCheck, Clock3, FolderOpen, Star, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, BadgeCheck, Building2, Clock3, MapPin, Star } from "lucide-react";
 
-interface ProducerCardProps {
+export interface ProducerCardProps {
     id: number;
     slug: string;
     name: string;
     avatar: string;
     verified: boolean;
-    featured: boolean;
     genre: string;
+    location: string;
+    studioNames: string[];
+    available: boolean;
     rating: number;
     reviews: number;
-    completedProjects: number;
     responseTime: string;
     priceLabel: string;
     badge: string;
-    skills: string[];
+    services: string[];
 }
 
-// Deterministic little "waveform" so it doesn't jump every render
-function Waveform({ active }: { active: boolean }) {
+function Waveform() {
     const bars = [4, 9, 6, 13, 8, 5, 11, 7, 4, 9, 6, 3];
+
     return (
-        <div className="flex h-4 items-end gap-[2px]">
-            {bars.map((h, i) => (
+        <div aria-hidden="true" className="flex h-4 items-end gap-[2px] opacity-40 transition-opacity group-hover:opacity-100">
+            {bars.map((height, index) => (
                 <span
-                    key={i}
-                    className="w-[2px] rounded-full bg-[#e8a33d] transition-all duration-300 ease-out"
-                    style={{
-                        height: active ? `${h}px` : "3px",
-                        opacity: active ? 1 : 0.35,
-                        transitionDelay: `${i * 18}ms`,
-                    }}
+                    key={index}
+                    className="w-[2px] rounded-full bg-[#e8a33d] transition-all duration-300 group-hover:animate-pulse"
+                    style={{ height: `${height}px`, animationDelay: `${index * 18}ms` }}
                 />
             ))}
         </div>
@@ -43,100 +39,37 @@ function Waveform({ active }: { active: boolean }) {
 }
 
 export function ProducerCard({
-    slug,
+    id,
     name,
     avatar,
     verified,
-    featured,
     genre,
+    location,
+    studioNames,
+    available,
     rating,
     reviews,
-    completedProjects,
     responseTime,
     priceLabel,
     badge,
-    skills,
+    services,
 }: ProducerCardProps) {
-    const [hover, setHover] = useState(false);
-
     return (
         <Link
-            href={`/producers/${slug}`}
-            onMouseEnter={() => setHover(true)}
-            onMouseLeave={() => setHover(false)}
-            className={`
-                group
-                relative
-                flex
-                min-h-[280px]
-                flex-col
-                justify-between
-                overflow-hidden
-                rounded-xl
-                border
-                bg-[#161513]
-                p-4
-                transition-all
-                duration-300
-                hover:-translate-y-1
-                hover:shadow-2xl
-                hover:shadow-black/40
-                ${featured ? "border-[#e8a33d]/30" : "border-[#2a2825]"}
-            `}
+            href={`/producers/${id}`}
+            className="group relative flex min-h-[250px] flex-col justify-between overflow-hidden rounded-xl border border-[#2a2825] bg-[#161513] p-3.5 transition-all duration-300 hover:-translate-y-1 hover:border-[#e8a33d]/30 hover:shadow-2xl hover:shadow-black/40"
         >
-            {/* hairline "tape" accent at top instead of a glow blob */}
-            <div
-                className={`
-                    absolute
-                    inset-x-0
-                    top-0
-                    h-[2px]
-                    bg-gradient-to-r
-                    from-transparent
-                    via-[#e8a33d]
-                    to-transparent
-                    transition-opacity
-                    duration-300
-                    ${featured ? "opacity-70" : "opacity-0 group-hover:opacity-40"}
-                `}
-            />
+            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#e8a33d] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-40" />
 
-            {featured && (
-                <span
-                    className="
-                        absolute
-                        left-4
-                        top-3
-                        rounded-full
-                        border
-                        border-[#e8a33d]/30
-                        bg-[#e8a33d]/10
-                        px-2
-                        py-0.5
-                        text-[9px]
-                        font-semibold
-                        uppercase
-                        tracking-widest
-                        text-[#e8a33d]
-                    "
-                >
-                    Featured
-                </span>
-            )}
-
-            {/* Header */}
-            <div className={`relative flex items-center gap-3 ${featured ? "mt-6" : ""}`}>
-                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-white/10">
+            <div className="relative flex items-start gap-3">
+                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/10">
                     <Image
                         src={avatar}
                         alt={name}
                         fill
-                        className="
-                            object-cover
-                            transition-transform
-                            duration-500
-                            group-hover:scale-110
-                        "
+                        sizes="56px"
+                        unoptimized
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                 </div>
 
@@ -145,76 +78,63 @@ export function ProducerCard({
                         <h3 className="truncate text-sm font-semibold tracking-tight text-[#f5f4f1]">
                             {name}
                         </h3>
-                        {verified && (
-                            <BadgeCheck size={14} className="shrink-0 text-[#5eead4]" />
-                        )}
+                        {verified && <BadgeCheck size={14} className="shrink-0 text-[#5eead4]" />}
                     </div>
-                    <p className="mt-0.5 truncate text-xs text-[#9a978f]">{genre}</p>
+                    <p className="mt-0.5 truncate text-[11px] text-[#9a978f]">{genre}</p>
+                    <p className="mt-1 flex items-center gap-1 truncate text-[10px] text-[#6b685f]">
+                        <MapPin size={10} />
+                        {location}
+                    </p>
+                    {studioNames.length > 0 && (
+                        <p className="mt-1 flex items-center gap-1 truncate text-[10px] text-[#8f887c]">
+                            <Building2 size={10} className="shrink-0 text-[#e8a33d]" />
+                            <span className="truncate">{studioNames[0]}</span>
+                            {studioNames.length > 1 && <span className="shrink-0 text-[#6b685f]">+{studioNames.length - 1} more</span>}
+                        </p>
+                    )}
                 </div>
 
-                <Waveform active={hover} />
+                <Waveform />
             </div>
 
-            {/* Meter readout row — monospace like a display panel */}
-            <div className="relative mt-4 flex items-center justify-between font-mono text-xs">
+            <div className="relative mt-4 flex items-center justify-between gap-2 font-mono text-xs">
                 <div className="flex items-center gap-1.5 text-[#f5f4f1]">
                     <Star size={13} className="fill-[#e8a33d] text-[#e8a33d]" />
                     <span className="font-semibold">{rating.toFixed(1)}</span>
-                    <span className="text-[#6b685f]">/{reviews}</span>
+                    <span className="text-[10px] text-[#6b685f]">({reviews})</span>
                 </div>
 
-                <span className="rounded border border-[#2a2825] bg-[#1c1a17] px-2 py-0.5 text-[9px] uppercase tracking-wider text-[#c9a45f]">
-                    {badge}
+                <span className={`rounded-full px-2 py-1 text-[9px] font-semibold uppercase tracking-wide ${available ? "bg-emerald-400/10 text-emerald-300" : "bg-[#27231e] text-[#8f887c]"}`}>
+                    {available ? "Available" : "Busy"}
                 </span>
-
-                <div className="flex items-center gap-1 text-[#9a978f]">
-                    <FolderOpen size={12} />
-                    <span>{completedProjects}</span>
-                </div>
             </div>
 
-            {/* Skills — patch-cable label style */}
             <div className="relative mt-3 flex flex-wrap gap-1.5">
-                {skills.map((skill) => (
-                    <span
-                        key={skill}
-                        className="rounded-md border border-[#2a2825] bg-[#1c1a17] px-2 py-0.5 text-[10px] text-[#b5b2a8]"
-                    >
-                        {skill}
+                {services.slice(0, 3).map((service) => (
+                    <span key={service} className="rounded-md border border-[#2a2825] bg-[#1c1a17] px-2 py-0.5 text-[10px] text-[#b5b2a8]">
+                        {service}
                     </span>
                 ))}
             </div>
 
-            {/* Footer */}
             <div className="relative mt-4 border-t border-[#2a2825] pt-3">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <p className="font-mono text-[10px] uppercase tracking-wider text-[#6b685f]">
-                            From
-                        </p>
-                        <p className="text-sm font-semibold text-[#f5f4f1]">{priceLabel}</p>
+                <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                        <p className="font-mono text-[9px] uppercase tracking-wider text-[#6b685f]">Starting at</p>
+                        <p className="truncate text-xs font-semibold text-[#f5f4f1]">{priceLabel}</p>
                     </div>
-
-                    <div className="flex items-center gap-1.5 font-mono text-[10px] text-[#9a978f]">
+                    <div className="flex shrink-0 items-center gap-1 font-mono text-[10px] text-[#9a978f]">
                         <Clock3 size={12} />
                         <span>{responseTime}</span>
                     </div>
                 </div>
 
                 <div className="mt-3 flex items-center justify-between">
-                    <span className="text-sm font-semibold text-[#e8a33d]">
-                        Hire Producer
+                    <span className="text-xs font-semibold text-[#e8a33d]">View producer</span>
+                    <span className="flex items-center gap-1 text-[10px] text-[#e8a33d]">
+                        {badge}
+                        <ArrowUpRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </span>
-                    <ArrowUpRight
-                        size={16}
-                        className="
-                            text-[#e8a33d]
-                            transition-transform
-                            duration-300
-                            group-hover:translate-x-0.5
-                            group-hover:-translate-y-0.5
-                        "
-                    />
                 </div>
             </div>
         </Link>

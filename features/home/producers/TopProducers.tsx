@@ -1,16 +1,61 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 import { useState } from "react";
 
-import { ProducerCard } from "./ProducerCard";
+import { ProducerCard, type ProducerCardProps } from "./ProducerCard";
 import { producerData } from "./producerData";
 
-const filters = ["All", "Hip-Hop", "Afrobeat", "R&B", "Available Now"];
+const filters = [
+    "All",
+    "Available Now",
+    "Verified",
+    "Top Rated",
+    "Has Studio",
+];
 
-export function TopProducers() {
+type TopProducersProps = {
+    producers?: ProducerCardProps[];
+    showBrowseCta?: boolean;
+    showSearch?: boolean;
+    showBadge?: boolean;
+};
+
+export function TopProducers({
+    producers = producerData,
+    showBrowseCta = true,
+    showSearch = false,
+    showBadge = true,
+}: TopProducersProps) {
     const [activeFilter, setActiveFilter] = useState("All");
+    const [searchTerm, setSearchTerm] = useState("");
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const visibleProducers = producers.filter((producer) => {
+        const matchesSearch = !normalizedSearch || [
+            producer.name,
+            producer.genre,
+            producer.location,
+            ...producer.services,
+            ...producer.studioNames,
+        ].some((value) => value.toLowerCase().includes(normalizedSearch));
+        const producerServices = producer.services.map((service) => service.toLowerCase());
+        const producerGenre = producer.genre.toLowerCase().replace("-", "");
+        const filterValue = activeFilter.toLowerCase().replace("-", "");
+        const matchesFilter = activeFilter === "All"
+            || (activeFilter === "Available Now" && producer.available)
+            || (activeFilter === "Verified" && producer.verified)
+            || (activeFilter === "Top Rated" && producer.rating >= 4.8)
+            || (activeFilter === "Has Studio" && producer.studioNames.length > 0)
+            || producerServices.some((service) => service.includes(filterValue))
+            || producerGenre.includes(filterValue);
+
+        return matchesSearch && matchesFilter;
+    });
+    const ratedProducers = producers.filter((producer) => producer.rating > 0);
+    const averageRating = ratedProducers.length > 0
+        ? ratedProducers.reduce((total, producer) => total + producer.rating, 0) / ratedProducers.length
+        : 0;
 
     return (
         <section
@@ -37,7 +82,7 @@ export function TopProducers() {
                     <div className="max-w-2xl">
 
                         {/* Badge — same pulsing-dot pattern used sitewide */}
-                        <span
+                        {showBadge && <span
                             className="
                                 inline-flex
                                 items-center
@@ -71,7 +116,7 @@ export function TopProducers() {
                                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#e8a33d]" />
                             </span>
                             Top Producers
-                        </span>
+                        </span>}
 
                         {/* Heading — single line, fluid size so it never wraps or overflows */}
                         <h2
@@ -134,8 +179,8 @@ export function TopProducers() {
                         {/* Trust signal strip — mono numbers, same convention as every card */}
                         <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 sm:mt-6 sm:gap-x-6">
                             {[
-                                { value: "12K+", label: "producers" },
-                                { value: "4.9★", label: "avg rating" },
+                                { value: producers.length.toLocaleString(), label: "producers" },
+                                { value: `${averageRating.toFixed(1)}★`, label: "avg rating" },
                             ].map((stat) => (
                                 <div key={stat.label} className="flex items-baseline gap-1.5">
                                     <span className="font-mono text-sm font-bold text-[#f5f4f1] sm:text-base">
@@ -162,9 +207,23 @@ export function TopProducers() {
                             lg:items-end
                         "
                     >
-                        <Link
-                            href="/producers"
-                            className="
+                        {showSearch && (
+                            <label className="flex w-full items-center gap-2 rounded-full border border-[#2a2825] bg-[#161513] px-4 py-2.5 text-sm text-[#9a978f] sm:min-w-[280px]">
+                                <Search size={15} className="shrink-0 text-[#e8a33d]" />
+                                <span className="sr-only">Search producers</span>
+                                <input
+                                    value={searchTerm}
+                                    onChange={(event) => setSearchTerm(event.target.value)}
+                                    placeholder="Search producers"
+                                    className="w-full bg-transparent text-sm text-[#f5f4f1] outline-none placeholder:text-[#6b685f]"
+                                />
+                            </label>
+                        )}
+
+                        {showBrowseCta && (
+                            <Link
+                                href="/producers"
+                                className="
                                 group
                                 inline-flex
                                 w-full
@@ -185,14 +244,15 @@ export function TopProducers() {
                                 hover:gap-3
                                 sm:w-fit
                             "
-                        >
-                            View All
+                            >
+                                View All
 
-                            <ArrowRight
-                                size={17}
-                                className="transition-transform duration-300 group-hover:translate-x-1"
-                            />
-                        </Link>
+                                <ArrowRight
+                                    size={17}
+                                    className="transition-transform duration-300 group-hover:translate-x-1"
+                                />
+                            </Link>
+                        )}
 
                         {/* Quick filter chips */}
                         <div className="flex flex-wrap gap-1.5 sm:gap-2">
@@ -226,6 +286,12 @@ export function TopProducers() {
 
                 </div>
 
+                {visibleProducers.length === 0 && (
+                    <div className="mt-8 rounded-2xl border border-dashed border-[#2a2825] px-6 py-12 text-center text-sm text-[#9a978f]">
+                        No producers match your search.
+                    </div>
+                )}
+
                 {/* Cards */}
                 <div
                     className="
@@ -238,7 +304,7 @@ export function TopProducers() {
                     "
                 >
 
-                    {producerData.map((producer) => (
+                    {visibleProducers.map((producer) => (
 
                         <ProducerCard
                             key={producer.id}

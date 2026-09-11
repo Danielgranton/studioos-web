@@ -5,14 +5,13 @@ export const producerData = [
         name: "Jay Beatz",
         avatar: "/images/avatar.png",
         verified: true,
-        featured: true,
-
         genre: "Afrobeats",
+        location: "Westlands, Nairobi",
+        studioNames: ["Pulse Studio"],
+        available: true,
 
         rating: 4.9,
         reviews: 382,
-
-        completedProjects: 620,
 
         responseTime: "10 min",
 
@@ -20,7 +19,7 @@ export const producerData = [
 
         badge: "Top Rated",
 
-        skills: [
+        services: [
             "Beat Production",
             "Mixing",
             "Mastering",
@@ -33,14 +32,13 @@ export const producerData = [
         name: "Emma Pro",
         avatar: "/images/avatar.png",
         verified: true,
-        featured: true,
-
         genre: "Hip-Hop",
+        location: "Kilimani, Nairobi",
+        studioNames: ["Dream Records", "Emma Pro Room"],
+        available: true,
 
         rating: 5.0,
         reviews: 270,
-
-        completedProjects: 510,
 
         responseTime: "15 min",
 
@@ -48,7 +46,7 @@ export const producerData = [
 
         badge: "Award Winner",
 
-        skills: [
+        services: [
             "Production",
             "Recording",
             "Mixing",
@@ -64,15 +62,14 @@ export const producerData = [
 
         verified: true,
 
-        featured: true,
-
         genre: "Gospel",
+        location: "Milimani, Kisumu",
+        studioNames: [],
+        available: false,
 
         rating: 4.8,
 
         reviews: 198,
-
-        completedProjects: 430,
 
         responseTime: "8 min",
 
@@ -80,7 +77,7 @@ export const producerData = [
 
         badge: "Fast Response",
 
-        skills: [
+        services: [
             "Mastering",
             "Recording",
             "Arrangement",
@@ -97,15 +94,14 @@ export const producerData = [
 
         verified: true,
 
-        featured: true,
-
         genre: "Amapiano",
+        location: "Nyali, Mombasa",
+        studioNames: ["BlueWave Studio"],
+        available: true,
 
         rating: 4.9,
 
         reviews: 451,
-
-        completedProjects: 730,
 
         responseTime: "12 min",
 
@@ -113,7 +109,7 @@ export const producerData = [
 
         badge: "Most Booked",
 
-        skills: [
+        services: [
             "Production",
             "Mixing",
             "Songwriting",
@@ -125,14 +121,13 @@ export const producerData = [
         name: "Nia Waves",
         avatar: "/images/avatar.png",
         verified: true,
-        featured: false,
-
         genre: "R&B",
+        location: "Karen, Nairobi",
+        studioNames: ["Nia Waves Room", "Karen Sound Lab"],
+        available: true,
 
         rating: 4.7,
         reviews: 156,
-
-        completedProjects: 340,
 
         responseTime: "20 min",
 
@@ -140,7 +135,7 @@ export const producerData = [
 
         badge: "Rising Talent",
 
-        skills: [
+        services: [
             "Vocal Production",
             "Mixing",
             "Mastering",
