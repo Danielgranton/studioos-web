@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { ArrowRight, Music2 } from "lucide-react";
-import { PlatformStatsService, type PlatformStats } from "../services/platformStats.service";
+import { PlatformStatsService, type FeaturedCreators, type PlatformStats } from "../services/platformStats.service";
 import { HeroAudienceToggle } from "./HeroAudienceToggle";
 import { useSession } from "@/features/auth";
 
@@ -13,12 +13,19 @@ const genres = ["Hip-Hop", "Afrobeat", "R&B", "Podcast", "Gospel"];
 export function HeroLeft() {
     const { isAuthenticated } = useSession();
     const [platformStats, setPlatformStats] = useState<PlatformStats | null>(null);
+    const [featuredCreators, setFeaturedCreators] = useState<FeaturedCreators | null>(null);
 
     useEffect(() => {
         let active = true;
         void PlatformStatsService.getStats()
             .then((stats) => {
                 if (active) setPlatformStats(stats);
+            })
+            .catch(() => undefined);
+
+        void PlatformStatsService.getFeaturedCreators(4)
+            .then((creators) => {
+                if (active) setFeaturedCreators(creators);
             })
             .catch(() => undefined);
 
@@ -33,6 +40,12 @@ export function HeroLeft() {
         [platformStats?.beats, "Beats"],
         [platformStats?.artists, "Artists"],
     ] as const;
+    const creatorRating = featuredCreators?.averageRating ?? 0;
+    const creatorCount = featuredCreators?.creatorCount ?? 0;
+    const creatorCountLabel = new Intl.NumberFormat("en", {
+        notation: "compact",
+        maximumFractionDigits: 1,
+    }).format(creatorCount);
 
     return (
         <div className="w-full max-w-3xl">
@@ -240,65 +253,36 @@ export function HeroLeft() {
 
                 <div className="flex -space-x-2 sm:-space-x-2.5">
 
-                    {[
-                        "https://i.pravatar.cc/40?img=12",
-                        "https://i.pravatar.cc/40?img=32",
-                        "https://i.pravatar.cc/40?img=47",
-                        "https://i.pravatar.cc/40?img=5",
-                    ].map((src, i) => (
-                        <Image
-                            key={i}
-                            src={src}
-                            alt=""
-                            width={32}
-                            height={32}
-                            className="
-                                h-7
-                                w-7
-                                rounded-full
-                                border-2
-                                border-[#0e0d0c]
-                                object-cover
-                                sm:h-8
-                                sm:w-8
-                            "
-                        />
+                    {featuredCreators?.creators.map((creator) => (
+                        <div key={creator.id} className="relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border-2 border-[#0e0d0c] bg-[#e8a33d]/15 text-[9px] font-semibold text-[#e8a33d] sm:h-8 sm:w-8 sm:text-[10px]">
+                            {creator.profileImageThumbnail ? (
+                                <Image
+                                    src={creator.profileImageThumbnail}
+                                    alt={`${creator.name} profile`}
+                                    fill
+                                    sizes="32px"
+                                    unoptimized
+                                    className="object-cover"
+                                />
+                            ) : creator.name.charAt(0).toUpperCase()}
+                        </div>
                     ))}
 
-                    <div
-                        className="
-                            flex
-                            h-7
-                            w-7
-                            items-center
-                            justify-center
-                            rounded-full
-                            border-2
-                            border-[#0e0d0c]
-                            bg-gradient-to-br
-                            from-[#e8a33d]
-                            to-[#d97757]
-                            font-mono
-                            text-[9px]
-                            font-semibold
-                            text-[#161513]
-                            sm:h-8
-                            sm:w-8
-                            sm:text-[10px]
-                        "
-                    >
-                        250K+
-                    </div>
+                    {creatorCount > 0 && (
+                        <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#0e0d0c] bg-gradient-to-br from-[#e8a33d] to-[#d97757] font-mono text-[9px] font-semibold text-[#161513] sm:h-8 sm:w-8 sm:text-[10px]">
+                            {creatorCountLabel}+
+                        </div>
+                    )}
 
                 </div>
 
                 <div>
                     <p className="text-xs text-[#e8a33d] sm:text-sm">
-                        ★★★★★
+                        {creatorRating > 0 ? `${"★".repeat(Math.round(creatorRating))} ${creatorRating.toFixed(1)}` : "New creator network"}
                     </p>
 
                     <p className="text-[11px] text-[#9a978f] sm:text-xs">
-                        Trusted by creators worldwide
+                        {creatorCount > 0 ? "Creators building on StudioOS" : "Creators are joining StudioOS"}
                     </p>
                 </div>
 

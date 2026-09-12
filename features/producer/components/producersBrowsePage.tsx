@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertCircle, ArrowLeft, RefreshCw } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { AlertCircle, Music2, RefreshCw, Sparkles } from "lucide-react";
 
+import BackButton from "@/constants/BackButton";
 import { TopProducers, type ProducerCardProps } from "@/features/home";
 
 import { ProducerService } from "../services/producer.service";
 import type { ProducerSearchResult } from "../types/producer";
 
 export function ProducersBrowsePage() {
-    const router = useRouter();
     const [producers, setProducers] = useState<ProducerCardProps[] | null>(null);
     const [error, setError] = useState(false);
 
@@ -57,10 +56,19 @@ export function ProducersBrowsePage() {
 
     if (producers.length === 0) {
         return (
-            <main className="flex min-h-screen items-center justify-center bg-[#0f0f0f] px-6 text-center text-[#f5f4f1]">
-                <div>
-                    <h1 className="text-2xl font-bold">No producers are listed yet</h1>
-                    <p className="mt-3 text-sm text-[#888]">Check back soon for new creative partners.</p>
+            <main className="min-h-screen bg-[#0f0f0f] px-6 py-16 text-[#f5f4f1] lg:px-20 lg:py-24">
+                <div className="mx-auto max-w-2xl overflow-hidden rounded-3xl border border-[#302d28] bg-gradient-to-br from-[#1b1813] to-[#151311] px-6 py-16 text-center shadow-[0_20px_70px_rgba(0,0,0,0.18)] sm:px-10">
+                    <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-[#e8a33d]/20 bg-[#e8a33d]/10 text-[#e8a33d]">
+                        <Music2 size={25} />
+                    </span>
+                    <p className="mt-6 inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e8a33d]">
+                        <Sparkles size={12} />
+                        Producer directory
+                    </p>
+                    <h1 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">The next sound is taking shape</h1>
+                    <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#888176]">
+                        Producers are joining StudioOS and building their creative spaces. Check back soon to find your next collaborator.
+                    </p>
                 </div>
             </main>
         );
@@ -69,14 +77,7 @@ export function ProducersBrowsePage() {
     return (
         <main className="min-h-screen bg-[#0f0f0f] pt-6 text-[#f5f4f1]">
             <div className="px-4 sm:px-6 lg:px-8">
-                <button
-                    type="button"
-                    onClick={() => router.back()}
-                    className="group inline-flex items-center gap-2 rounded-full border border-[#302d28] bg-[#161513] px-3.5 py-2 text-[11px] font-semibold text-[#aaa69d] shadow-lg shadow-black/10 transition hover:border-[#e8a33d]/40 hover:bg-[#1c1a17] hover:text-[#f5f4f1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a33d]/60"
-                >
-                    <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
-                    Back
-                </button>
+                <BackButton />
             </div>
             <TopProducers
                 producers={producers}

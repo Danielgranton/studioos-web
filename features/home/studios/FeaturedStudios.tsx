@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Search } from "lucide-react";
-import { useState } from "react";
+import { ArrowRight, Search, Sparkles, Star } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import { StudioService, type Studio } from "@/features/studio";
 
 import { FeaturedStudioCard } from "./FeaturedStudioCard";
-import { featuredStudios } from "./featuredStudiosData";
 
 export type FeaturedStudio = {
     id: number | string;
@@ -27,6 +28,7 @@ export type FeaturedStudio = {
 
 type FeaturedStudiosProps = {
     studios?: FeaturedStudio[];
+    initialFilter?: string;
     showHeader?: boolean;
     showBrowseCta?: boolean;
     showFeaturedBadge?: boolean;
@@ -34,16 +36,48 @@ type FeaturedStudiosProps = {
 };
 
 export function FeaturedStudios({
-    studios = featuredStudios,
+    studios,
+    initialFilter = "Top rated",
     showHeader = true,
     showBrowseCta = true,
     showFeaturedBadge = true,
     showSearch = false,
 }: FeaturedStudiosProps) {
+    const [fetchedStudios, setFetchedStudios] = useState<FeaturedStudio[] | null>(null);
+    const [isLoading, setIsLoading] = useState(!studios);
+    const [hasError, setHasError] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
-    const [activeFilter, setActiveFilter] = useState("All studios");
+    const [activeFilter, setActiveFilter] = useState(initialFilter);
+
+    useEffect(() => {
+        if (studios) {
+            setIsLoading(false);
+            return;
+        }
+
+        let active = true;
+        setIsLoading(true);
+        setHasError(false);
+
+        void StudioService.getFeaturedStudios(toApiFilter(activeFilter), 10)
+            .then((response) => {
+                if (active) setFetchedStudios(response.content.map(toFeaturedStudio));
+            })
+            .catch(() => {
+                if (active) setHasError(true);
+            })
+            .finally(() => {
+                if (active) setIsLoading(false);
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [activeFilter, studios]);
+
+    const sourceStudios = studios ?? fetchedStudios ?? [];
     const normalizedSearch = searchTerm.trim().toLowerCase();
-    const visibleStudios = studios.filter((studio) => {
+    const filteredStudios = sourceStudios.filter((studio) => {
         const matchesSearch = !normalizedSearch || [
             studio.name,
             studio.location,
@@ -56,7 +90,8 @@ export function FeaturedStudios({
         const matchesFilter = {
             "All studios": true,
             "Available today": studio.available,
-            "Top rated": studio.rating >= 4.8,
+            "Top rated": true,
+            "Most booked": true,
             Recording: services.includes("recording"),
             "Mixing & mastering": services.some(
                 (service) => service.includes("mix") || service.includes("master"),
@@ -64,30 +99,41 @@ export function FeaturedStudios({
             Podcast: services.includes("podcast") || genres.includes("podcast"),
             Premium: studio.price != null && studio.price >= 3000,
             Affordable: studio.price != null && studio.price <= 2000,
-            "Near me": true,
         }[activeFilter];
 
-        return matchesSearch && matchesFilter;
+        // The home section is already filtered and capped by the API. Browse pages
+        // pass their own collection and still need the local chip filtering.
+        return matchesSearch && (studios ? matchesFilter : true);
     });
 
+    const visibleStudios = studios
+        ? [...filteredStudios].sort((first, second) => {
+            if (activeFilter === "Most booked") return second.bookings - first.bookings;
+            if (activeFilter === "Top rated" || activeFilter !== "All studios") {
+                return second.rating - first.rating || second.reviews - first.reviews;
+            }
+            return 0;
+        })
+        : filteredStudios;
+
     const filters = [
-        "All studios",
-        "Available today",
+        ...(studios ? ["All studios"] : []),
         "Top rated",
+        "Available today",
+        "Most booked",
         "Recording",
         "Mixing & mastering",
         "Podcast",
         "Premium",
         "Affordable",
-        "Near me",
     ];
-    const totalBookings = studios.reduce((total, studio) => total + studio.bookings, 0);
-    const ratedStudios = studios.filter((studio) => studio.rating > 0);
+    const totalBookings = sourceStudios.reduce((total, studio) => total + studio.bookings, 0);
+    const ratedStudios = sourceStudios.filter((studio) => studio.rating > 0);
     const averageRating = ratedStudios.length
         ? ratedStudios.reduce((total, studio) => total + studio.rating, 0) / ratedStudios.length
         : 0;
     const stats = [
-        { value: studios.length.toLocaleString(), label: "Studios" },
+        { value: sourceStudios.length.toLocaleString(), label: "Studios" },
         { value: totalBookings.toLocaleString(), label: "Bookings" },
         { value: `${averageRating.toFixed(1)}★`, label: "Avg rating" },
     ];
@@ -342,28 +388,65 @@ export function FeaturedStudios({
                 </div>
 
                 {/* Grid */}
-                <div
-                    className="
-                        grid
-                        grid-cols-2
-                        gap-3
-                        sm:gap-4
-                        md:grid-cols-3
-                        lg:grid-cols-5
-                    "
-                >
-                    {visibleStudios.map((studio) => (
-                        <FeaturedStudioCard
-                            key={studio.id}
-                            {...studio}
-                        />
-                    ))}
-                </div>
-
-                {visibleStudios.length === 0 && (
-                    <div className="mt-8 rounded-2xl border border-dashed border-[#2a2825] px-6 py-12 text-center text-sm text-[#9a978f]">
-                        No studios match your search.
+                {isLoading ? (
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-5">
+                        {Array.from({ length: 5 }).map((_, index) => (
+                            <div key={index} className="animate-pulse rounded-2xl border border-[#2a2825] bg-[#161513] p-2.5">
+                                <div className="aspect-[4/3] rounded-xl bg-[#24211d]" />
+                                <div className="mt-4 h-4 w-2/3 rounded bg-[#24211d]" />
+                                <div className="mt-3 h-3 w-1/2 rounded bg-[#24211d]" />
+                            </div>
+                        ))}
                     </div>
+                ) : hasError ? (
+                    <div className="rounded-2xl border border-dashed border-[#3a3027] px-6 py-10 text-center text-sm text-[#9a978f]">
+                        Featured studios are temporarily unavailable.
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-5">
+                        {visibleStudios.map((studio) => (
+                            <FeaturedStudioCard key={studio.id} {...studio} />
+                        ))}
+                    </div>
+                )}
+
+                {!isLoading && !hasError && visibleStudios.length === 0 && (
+                    studios ? (
+                        <div className="mt-8 rounded-3xl border border-dashed border-[#3a3027] bg-[#151311] px-6 py-16 text-center">
+                            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[#e8a33d]/15 bg-[#e8a33d]/[0.06] text-[#e8a33d]">
+                                <Search size={22} />
+                            </span>
+                            <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8f887c]">Studio directory</p>
+                            <h3 className="mt-2 text-xl font-semibold text-[#f5f4f1]">
+                                {normalizedSearch ? "No studios match your search" : `No ${activeFilter.toLowerCase()} studios found`}
+                            </h3>
+                            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#888176]">
+                                {normalizedSearch
+                                    ? "Try another name, location, service, or genre."
+                                    : "Try another filter to explore more spaces in StudioOS."}
+                            </p>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setSearchTerm("");
+                                    setActiveFilter("All studios");
+                                }}
+                                className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#4a4032] bg-[#211e19] px-4 py-2.5 text-xs font-semibold text-[#e8a33d] transition hover:bg-[#29231b]"
+                            >
+                                <Star size={14} />
+                                View all studios
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="mt-8 rounded-2xl border border-[#302d28] bg-gradient-to-br from-[#1b1813] to-[#151311] px-6 py-10 text-center">
+                            <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full border border-[#e8a33d]/20 bg-[#e8a33d]/10 text-[#e8a33d]">
+                                <Sparkles size={18} />
+                            </span>
+                            <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e8a33d]">Featured selection</p>
+                            <h3 className="mt-2 text-base font-semibold text-[#f5f4f1]">The next great room is on its way</h3>
+                            <p className="mx-auto mt-2 max-w-md text-xs leading-5 text-[#888176]">New studios will appear here as producers bring their spaces to StudioOS.</p>
+                        </div>
+                    )
                 )}
 
             </div>
@@ -385,4 +468,45 @@ export function FeaturedStudios({
             `}</style>
         </section>
     );
+}
+
+function toApiFilter(filter: string): string {
+    return {
+        "Top rated": "top-rated",
+        "Available today": "available",
+        "Most booked": "most-booked",
+        Premium: "premium",
+        Affordable: "affordable",
+        Recording: "recording",
+        "Mixing & mastering": "mixing-mastering",
+        Podcast: "podcast",
+    }[filter] || "top-rated";
+}
+
+function toFeaturedStudio(studio: Studio): FeaturedStudio {
+    const image =
+        studio.profileImageLarge ||
+        studio.profileImageMedium ||
+        studio.profileImage ||
+        studio.media?.find((media) => media.type === "IMAGE")?.largeUrl ||
+        studio.media?.find((media) => media.type === "IMAGE")?.url ||
+        "/images/beats.png";
+
+    return {
+        id: studio.id,
+        slug: studio.id,
+        name: studio.studioName,
+        location: studio.location,
+        rating: studio.averageRating ?? 0,
+        reviews: studio.totalRatings ?? 0,
+        bookings: studio.bookings,
+        verified: studio.verified,
+        badge: studio.badge || "Standard listing",
+        available: studio.available,
+        price: studio.pricing,
+        priceLabel: `From KSh ${(studio.pricing ?? 0).toLocaleString()}/hr`,
+        services: studio.services,
+        genres: studio.genres,
+        image,
+    };
 }

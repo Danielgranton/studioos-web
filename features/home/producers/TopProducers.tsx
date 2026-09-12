@@ -1,18 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Search } from "lucide-react";
-import { useState } from "react";
+import { ArrowRight, BadgeCheck, Music2, Search, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import { SearchService, type ProducerSearchResult } from "@/features/search";
 
 import { ProducerCard, type ProducerCardProps } from "./ProducerCard";
-import { producerData } from "./producerData";
 
-const filters = [
+const browseFilters = [
     "All",
     "Available Now",
     "Verified",
     "Top Rated",
     "Has Studio",
+];
+
+const homeFilters = [
+    "Top Rated",
+    "Has Studio",
+    "Available Now",
+    "Verified",
 ];
 
 type TopProducersProps = {
@@ -23,15 +31,46 @@ type TopProducersProps = {
 };
 
 export function TopProducers({
-    producers = producerData,
+    producers,
     showBrowseCta = true,
     showSearch = false,
     showBadge = true,
 }: TopProducersProps) {
-    const [activeFilter, setActiveFilter] = useState("All");
+    const [fetchedProducers, setFetchedProducers] = useState<ProducerCardProps[] | null>(null);
+    const [isLoading, setIsLoading] = useState(!producers);
+    const [hasError, setHasError] = useState(false);
+    const sourceProducers = producers ?? fetchedProducers ?? [];
+    const isBrowsePage = Boolean(producers);
+    const [activeFilter, setActiveFilter] = useState(isBrowsePage ? "All" : "Top Rated");
     const [searchTerm, setSearchTerm] = useState("");
     const normalizedSearch = searchTerm.trim().toLowerCase();
-    const visibleProducers = producers.filter((producer) => {
+
+    useEffect(() => {
+        if (producers) {
+            setIsLoading(false);
+            return;
+        }
+
+        let active = true;
+        setIsLoading(true);
+        setHasError(false);
+
+        void SearchService.producers(undefined, 0, 50)
+            .then((response) => {
+                if (active) setFetchedProducers(response.results.map(toProducerCard));
+            })
+            .catch(() => {
+                if (active) setHasError(true);
+            })
+            .finally(() => {
+                if (active) setIsLoading(false);
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [producers]);
+    const filteredProducers = sourceProducers.filter((producer) => {
         const matchesSearch = !normalizedSearch || [
             producer.name,
             producer.genre,
@@ -45,14 +84,18 @@ export function TopProducers({
         const matchesFilter = activeFilter === "All"
             || (activeFilter === "Available Now" && producer.available)
             || (activeFilter === "Verified" && producer.verified)
-            || (activeFilter === "Top Rated" && producer.rating >= 4.8)
+            || activeFilter === "Top Rated"
             || (activeFilter === "Has Studio" && producer.studioNames.length > 0)
             || producerServices.some((service) => service.includes(filterValue))
             || producerGenre.includes(filterValue);
 
         return matchesSearch && matchesFilter;
     });
-    const ratedProducers = producers.filter((producer) => producer.rating > 0);
+    const visibleProducers = (isBrowsePage && activeFilter === "All"
+        ? filteredProducers
+        : [...filteredProducers].sort((first, second) => second.rating - first.rating || second.reviews - first.reviews)
+    ).slice(0, isBrowsePage ? filteredProducers.length : 10);
+    const ratedProducers = sourceProducers.filter((producer) => producer.rating > 0);
     const averageRating = ratedProducers.length > 0
         ? ratedProducers.reduce((total, producer) => total + producer.rating, 0) / ratedProducers.length
         : 0;
@@ -179,7 +222,7 @@ export function TopProducers({
                         {/* Trust signal strip — mono numbers, same convention as every card */}
                         <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 sm:mt-6 sm:gap-x-6">
                             {[
-                                { value: producers.length.toLocaleString(), label: "producers" },
+                                { value: sourceProducers.length.toLocaleString(), label: "producers" },
                                 { value: `${averageRating.toFixed(1)}★`, label: "avg rating" },
                             ].map((stat) => (
                                 <div key={stat.label} className="flex items-baseline gap-1.5">
@@ -256,7 +299,7 @@ export function TopProducers({
 
                         {/* Quick filter chips */}
                         <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                            {filters.map((filter) => (
+                            {(isBrowsePage ? browseFilters : homeFilters).map((filter) => (
                                 <button
                                     key={filter}
                                     onClick={() => setActiveFilter(filter)}
@@ -286,14 +329,56 @@ export function TopProducers({
 
                 </div>
 
-                {visibleProducers.length === 0 && (
-                    <div className="mt-8 rounded-2xl border border-dashed border-[#2a2825] px-6 py-12 text-center text-sm text-[#9a978f]">
-                        No producers match your search.
+                {isLoading ? (
+                    <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-5">
+                        {Array.from({ length: 5 }).map((_, index) => (
+                            <div key={index} className="animate-pulse rounded-xl border border-[#2a2825] bg-[#161513] p-3.5">
+                                <div className="h-14 w-14 rounded-full bg-[#24211d]" />
+                                <div className="mt-5 h-4 w-2/3 rounded bg-[#24211d]" />
+                                <div className="mt-3 h-3 w-1/2 rounded bg-[#24211d]" />
+                                <div className="mt-8 h-3 w-full rounded bg-[#24211d]" />
+                            </div>
+                        ))}
+                    </div>
+                ) : hasError ? (
+                    <div className="rounded-3xl border border-dashed border-[#3a3027] bg-[#151311] px-6 py-12 text-center text-sm text-[#9a978f]">
+                        Producers are temporarily unavailable.
+                    </div>
+                ) : visibleProducers.length === 0 && (
+                    <div className="mt-8 rounded-3xl border border-dashed border-[#3a3027] bg-gradient-to-br from-[#1b1813] to-[#151311] px-6 py-14 text-center">
+                        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[#e8a33d]/20 bg-[#e8a33d]/10 text-[#e8a33d]">
+                            {activeFilter === "Verified" ? <BadgeCheck size={23} /> : normalizedSearch ? <Search size={22} /> : <Music2 size={23} />}
+                        </span>
+                        <p className="mt-5 inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e8a33d]">
+                            <Sparkles size={12} />
+                            Producer directory
+                        </p>
+                        <h3 className="mt-2 text-xl font-semibold text-[#f5f4f1]">
+                            {normalizedSearch
+                                ? "No producers match your search"
+                                : `No ${activeFilter.toLowerCase()} producers found`}
+                        </h3>
+                        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#888176]">
+                            {normalizedSearch
+                                ? "Try another name, location, genre, or service."
+                                : "Try another filter to discover more creative partners on StudioOS."}
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setSearchTerm("");
+                                setActiveFilter("All");
+                            }}
+                            className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#4a4032] bg-[#211e19] px-4 py-2.5 text-xs font-semibold text-[#e8a33d] transition hover:bg-[#29231b]"
+                        >
+                            <Music2 size={14} />
+                            View all producers
+                        </button>
                     </div>
                 )}
 
                 {/* Cards */}
-                <div
+                {!isLoading && !hasError && visibleProducers.length > 0 && <div
                     className="
                         grid
                         grid-cols-2
@@ -313,7 +398,7 @@ export function TopProducers({
 
                     ))}
 
-                </div>
+                </div>}
 
             </div>
 
@@ -335,4 +420,26 @@ export function TopProducers({
 
         </section>
     );
+}
+
+function toProducerCard(producer: ProducerSearchResult): ProducerCardProps {
+    return {
+        id: producer.id,
+        slug: String(producer.id),
+        name: producer.name,
+        avatar: producer.profileImageThumbnail || producer.profileImage || "/images/avatar.png",
+        verified: producer.verified ?? false,
+        genre: producer.genre || "Music producer",
+        location: producer.location || "Location not listed",
+        studioNames: producer.studioNames || [],
+        available: producer.available ?? false,
+        rating: producer.averageRating ?? 0,
+        reviews: producer.reviewCount ?? 0,
+        responseTime: producer.responseTime || "Response time varies",
+        priceLabel: producer.startingPrice != null
+            ? `From KSh ${producer.startingPrice.toLocaleString()}`
+            : "Contact for rates",
+        badge: producer.verified ? "Verified" : "Producer",
+        services: producer.services || [],
+    };
 }

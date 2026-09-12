@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertCircle, ArrowLeft, RefreshCw } from "lucide-react";
-import { useRouter } from "next/navigation"
+import { AlertCircle, RefreshCw } from "lucide-react";
 
+import BackButton from "@/constants/BackButton";
 import { FeaturedStudios, type FeaturedStudio } from "@/features/home";
 
 import { StudioService } from "../services/studio.service";
@@ -13,14 +13,12 @@ export function StudiosBrowsePage() {
     const [studios, setStudios] = useState<FeaturedStudio[] | null>(null);
     const [error, setError] = useState(false);
 
-    const router = useRouter();
-
     async function loadStudios() {
         setError(false);
 
         try {
-            const response = await StudioService.getStudios({ page: 0, size: 12 });
-            setStudios(response.content.map(toFeaturedStudio));
+            const response = await StudioService.getAllStudios();
+            setStudios(response.map(toFeaturedStudio));
         } catch {
             setError(true);
         }
@@ -72,16 +70,11 @@ export function StudiosBrowsePage() {
     return (
         <main className="min-h-screen bg-[#0f0f0f] pt-6 text-[#f5f4f1]">
             <div className="px-4 sm:px-6 lg:px-8">
-                <button
-                    onClick={() => router.back()}
-                    className="group inline-flex items-center gap-2 rounded-full border border-[#302d28] bg-[#161513] px-3.5 py-2 text-[11px] font-semibold text-[#aaa69d] shadow-lg shadow-black/10 transition hover:border-[#e8a33d]/40 hover:bg-[#1c1a17] hover:text-[#f5f4f1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a33d]/60"
-                >
-                    <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
-                    Back to home
-                </button>
+                <BackButton />
             </div>
             <FeaturedStudios
                 studios={studios}
+                initialFilter="All studios"
                 showBrowseCta={false}
                 showFeaturedBadge={false}
                 showSearch

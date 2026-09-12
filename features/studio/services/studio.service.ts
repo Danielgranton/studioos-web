@@ -20,6 +20,28 @@ class StudioServiceClient {
         return response.data.data as StudioPage;
     }
 
+    async getAllStudios(): Promise<Studio[]> {
+        const studios: Studio[] = [];
+        let page = 0;
+        let last = false;
+
+        while (!last) {
+            const response = await this.getStudios({ page, size: 50 });
+            studios.push(...response.content);
+            last = response.last || response.content.length === 0;
+            page += 1;
+        }
+
+        return studios;
+    }
+
+    async getFeaturedStudios(filter = "top-rated", size = 10): Promise<StudioPage> {
+        const response = await api.get<ApiResponse<StudioPage>>("/studios/featured", {
+            params: { filter, page: 0, size: Math.min(size, 10) },
+        });
+        return response.data.data as StudioPage;
+    }
+
     async getStudio(studioId: string): Promise<Studio> {
         const response = await api.get<ApiResponse<Studio>>(`/studios/${studioId}`);
         return response.data.data as Studio;

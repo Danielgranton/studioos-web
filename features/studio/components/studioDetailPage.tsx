@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-    ArrowLeft,
     ArrowUpRight,
     BadgeCheck,
     Building2,
@@ -19,6 +18,7 @@ import {
 
 import { StudioService } from "../services/studio.service";
 import type { Studio, StudioMedia } from "../types/studio";
+import BackButton from "@/constants/BackButton";
 
 type GalleryItem = {
     id: string;
@@ -65,13 +65,7 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
     return (
         <main className="min-h-screen bg-[#0f0f0f] text-[#f5f4f1]">
             <div className="mx-auto max-w-[1280px] px-6 py-6 lg:px-20 lg:py-9">
-                <Link
-                    href="/studios"
-                    className="inline-flex items-center gap-2 text-xs text-[#9a978f] transition hover:text-white"
-                >
-                    <ArrowLeft size={16} />
-                    All studios
-                </Link>
+                <BackButton />
 
                 <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div>

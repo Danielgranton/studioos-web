@@ -202,10 +202,8 @@ export function FeaturedStudioCard({
                     "
                 >
                     <Star size={10} className="fill-[#e8a33d] text-[#e8a33d] sm:size-3 lg:size-[11px]" />
-                    {rating.toFixed(1)}
-                    <span className="hidden text-[#a19d92] sm:inline">
-                        ({reviews})
-                    </span>
+                    {rating > 0 ? rating.toFixed(1) : "New"}
+                    {reviews > 0 && <span className="hidden text-[#a19d92] sm:inline">({reviews})</span>}
                 </div>
 
                 {/* Price */}

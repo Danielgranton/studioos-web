@@ -86,13 +86,21 @@ export interface BeatSearchResult {
 export interface ProducerSearchResult {
     id: number;
     name: string;
-    location: string;
-    genre: string;
-    bio: string;
-    profileImage: string;
-    averageRating: number;
-    reviewCount: number;
-    score: number;
+    location?: string;
+    genre?: string;
+    bio?: string;
+    profileImage?: string;
+    profileImageThumbnail?: string;
+    verified?: boolean;
+    studioNames?: string[];
+    studioCount?: number;
+    available?: boolean;
+    startingPrice?: number;
+    responseTime?: string;
+    services?: string[];
+    averageRating?: number;
+    reviewCount?: number;
+    score?: number;
 }
 
 export interface AdvertisementSearchResult {

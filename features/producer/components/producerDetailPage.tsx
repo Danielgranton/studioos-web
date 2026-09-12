@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, BadgeCheck, Building2, CalendarCheck, Clock3, MapPin, Music2, Star, Users } from "lucide-react";
 
 import type { Studio } from "@/features/studio";
@@ -16,7 +17,7 @@ export function ProducerDetailPage({ producerId }: { producerId: string }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        let active = true;
+        let active = true; 
         const id = Number(producerId);
         if (!Number.isInteger(id)) {
             setLoading(false);
