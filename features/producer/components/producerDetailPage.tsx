@@ -3,9 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowUpRight, BadgeCheck, Building2, CalendarCheck, Clock3, MapPin, Music2, Star, Users } from "lucide-react";
+import { ArrowUpRight, BadgeCheck, Building2, CalendarCheck, Clock3, MapPin, Music2, Star, Users } from "lucide-react";
 
+import BackButton from "@/constants/BackButton";
 import type { Studio } from "@/features/studio";
 
 import { ProducerProfileService } from "../services/producerProfile.service";
@@ -48,7 +48,7 @@ export function ProducerDetailPage({ producerId }: { producerId: string }) {
     return (
         <main className="min-h-screen bg-[#0f0f0f] text-[#f5f4f1]">
             <div className="mx-auto max-w-[1280px] px-6 py-7 lg:px-20 lg:py-10">
-                <Link href="/producers" className="group inline-flex items-center gap-2 rounded-full border border-[#302d28] bg-[#161513] px-3.5 py-2 text-[11px] font-semibold text-[#aaa69d] transition hover:border-[#e8a33d]/40 hover:bg-[#1c1a17] hover:text-white"><ArrowLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />All producers</Link>
+                <BackButton />
 
                 <div className="mt-6 grid items-start gap-5 lg:grid-cols-2">
                 <section className="relative overflow-hidden rounded-3xl border border-[#2a2825] bg-[#161513]">
@@ -61,7 +61,7 @@ export function ProducerDetailPage({ producerId }: { producerId: string }) {
                         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
                             <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4">
                                 <div className="relative flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-4 border-[#161513] bg-[#e8a33d]/10 text-2xl font-bold text-[#e8a33d] shadow-xl shadow-black/30">{avatar ? <Image src={avatar} alt={`${producer.name} profile`} fill sizes="112px" unoptimized className="object-cover" /> : producer.name.charAt(0)}</div>
-                                <div className="min-w-0"><p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e8a33d]">Producer profile</p><div className="flex items-center gap-2"><h1 className="truncate text-2xl font-black tracking-tight sm:text-4xl">{producer.name}</h1>{producer.role === "PRODUCER" && <BadgeCheck size={19} className="shrink-0 text-[#5eead4]" />}</div><p className="mt-1 text-xs text-[#aaa69d]">{producer.genre || "Music producer"}</p></div>
+                                <div className="min-w-0"><p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e8a33d]">Producer profile</p><div className="flex items-center gap-2"><h1 className="truncate text-2xl font-black tracking-tight sm:text-4xl">{producer.name}</h1>{producer.role === "PRODUCER" && <BadgeCheck size={19} className="shrink-0 text-[#5eead4]" />}</div>{producer.email && <p className="mt-1 truncate text-xs text-[#aaa69d]">{producer.email}</p>}<p className="mt-1 text-xs text-[#777168]">{producer.genre || "Music producer"}</p></div>
                             </div>
                             <span className={`inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-semibold ${available ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300" : "border-[#3b352c] bg-[#27231e] text-[#9a978f]"}`}><span className={`h-1.5 w-1.5 rounded-full ${available ? "bg-emerald-300" : "bg-[#777]"}`} />{available ? "Available for work" : "Currently unavailable"}</span>
                         </div>
@@ -84,7 +84,7 @@ export function ProducerDetailPage({ producerId }: { producerId: string }) {
     );
 }
 
-function OwnedStudio({ studio }: { studio: Studio }) { const image = studio.profileImageMedium || studio.profileImage; return <Link href={`/studios/${studio.id}`} className="group flex gap-3 rounded-xl border border-[#2a2825] bg-[#161513] p-2.5 transition hover:border-[#e8a33d]/40"><div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-[#0e0d0c]">{image ? <Image src={image} alt="" fill sizes="80px" unoptimized className="object-cover transition group-hover:scale-105" /> : <div className="flex h-full items-center justify-center"><Building2 size={18} className="text-[#45413b]" /></div>}</div><div className="min-w-0 py-1"><p className="truncate text-sm font-semibold text-[#f5f4f1]">{studio.studioName}</p><p className="mt-1 flex items-center gap-1 text-[10px] text-[#777]"><MapPin size={11} />{studio.location}</p><p className="mt-2 text-[10px] text-[#e8a33d]">View studio <ArrowUpRight size={11} className="inline" /></p></div></Link>; }
+function OwnedStudio({ studio }: { studio: Studio }) { const image = studio.profileImageMedium || studio.profileImage; const price = studio.pricing > 0 ? `From KSh ${studio.pricing.toLocaleString()}/hr` : "Contact for rates"; return <Link href={`/studios/${studio.id}`} className="group flex gap-3 rounded-xl border border-[#2a2825] bg-[#161513] p-2.5 transition hover:border-[#e8a33d]/40"><div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-[#0e0d0c]">{image ? <Image src={image} alt="" fill sizes="80px" unoptimized className="object-cover transition group-hover:scale-105" /> : <div className="flex h-full items-center justify-center"><Building2 size={18} className="text-[#45413b]" /></div>}</div><div className="min-w-0 py-1"><p className="truncate text-sm font-semibold text-[#f5f4f1]">{studio.studioName}</p><p className="mt-1 flex items-center gap-1 text-[10px] text-[#777]"><MapPin size={11} /><span className="truncate">{studio.location}</span></p><p className="mt-2 inline-flex rounded-md border border-[#e8a33d]/25 bg-[#e8a33d]/10 px-2 py-1 text-[11px] font-semibold text-[#f0bd65]">{price}</p><p className="mt-2 text-[10px] text-[#e8a33d]">View studio <ArrowUpRight size={11} className="inline" /></p></div></Link>; }
 function OwnedStudiosPanel({ producerName, studios }: { producerName: string; studios: Studio[] }) { return <section className="rounded-2xl border border-[#2a2825] bg-[#161513] p-4 sm:p-5"><div className="flex items-end justify-between gap-3"><div><Label>Owned studios</Label><p className="mt-2 text-xs leading-5 text-[#777]">Spaces managed by {producerName}</p></div><span className="shrink-0 text-[10px] text-[#777]">{studios.length} listed</span></div>{studios.length ? <div className="mt-4 space-y-3">{studios.map((studio) => <OwnedStudio key={studio.id} studio={studio} />)}</div> : <p className="mt-4 rounded-xl border border-dashed border-[#2a2825] px-4 py-8 text-center text-xs text-[#777]">This producer has not listed a studio yet.</p>}</section>; }
 function Label({ children }: { children: React.ReactNode }) { return <h2 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e8a33d]">{children}</h2>; }
 function HeroStat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) { return <div className="flex min-w-0 items-center gap-2 rounded-xl bg-[#11100e]/60 px-3 py-2"><span className="shrink-0 text-[#e8a33d]">{icon}</span><div className="min-w-0"><p className="text-[9px] uppercase tracking-[0.14em] text-[#6b685f]">{label}</p><p className="truncate text-xs font-medium text-[#e5e1d8]">{value}</p></div></div>; }

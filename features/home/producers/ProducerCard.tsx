@@ -20,6 +20,8 @@ export interface ProducerCardProps {
     priceLabel: string;
     badge: string;
     services: string[];
+    profileHref?: string;
+    creatorLabel?: string;
 }
 
 function Waveform() {
@@ -53,10 +55,12 @@ export function ProducerCard({
     priceLabel,
     badge,
     services,
+    profileHref = `/producers/${id}`,
+    creatorLabel = "producer",
 }: ProducerCardProps) {
     return (
         <Link
-            href={`/producers/${id}`}
+            href={profileHref}
             className="group relative flex min-h-[250px] flex-col justify-between overflow-hidden rounded-xl border border-[#2a2825] bg-[#161513] p-3.5 transition-all duration-300 hover:-translate-y-1 hover:border-[#e8a33d]/30 hover:shadow-2xl hover:shadow-black/40"
         >
             <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#e8a33d] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-40" />
@@ -118,19 +122,19 @@ export function ProducerCard({
             </div>
 
             <div className="relative mt-4 border-t border-[#2a2825] pt-3">
-                <div className="flex items-center justify-between gap-2">
-                    <div className="min-w-0">
+                <div className="flex flex-col items-start gap-2">
+                    <div className="min-w-0 max-w-full flex items-center gap-5">
                         <p className="font-mono text-[9px] uppercase tracking-wider text-[#6b685f]">Starting at</p>
-                        <p className="truncate text-xs font-semibold text-[#f5f4f1]">{priceLabel}</p>
+                        <p className="mt-1 inline-flex max-w-full rounded-md border border-[#e8a33d]/25 bg-[#e8a33d]/10 px-2 py-1 text-xs font-semibold text-[#f0bd65]">{priceLabel}</p>
                     </div>
-                    <div className="flex shrink-0 items-center gap-1 font-mono text-[10px] text-[#9a978f]">
+                    <div className="flex items-center gap-1 font-mono text-[10px] text-[#9a978f]">
                         <Clock3 size={12} />
                         <span>{responseTime}</span>
                     </div>
                 </div>
 
                 <div className="mt-3 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-[#e8a33d]">View producer</span>
+                    <span className="text-xs font-semibold text-[#e8a33d]">View {creatorLabel}</span>
                     <span className="flex items-center gap-1 text-[10px] text-[#e8a33d]">
                         {badge}
                         <ArrowUpRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

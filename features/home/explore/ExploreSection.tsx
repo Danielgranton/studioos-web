@@ -1,9 +1,43 @@
 "use client";
 
+import Image from "next/image";
+import { useEffect, useState } from "react";
+
+import { PlatformStatsService, type FeaturedCreators, type PlatformStats } from "../services/platformStats.service";
 import { ExploreCard } from "./ExploreCard";
 import { exploreItems } from "./exploreData";
 
 export function ExploreSection() {
+    const [platformStats, setPlatformStats] = useState<PlatformStats | null>(null);
+    const [featuredCreators, setFeaturedCreators] = useState<FeaturedCreators | null>(null);
+
+    useEffect(() => {
+        let active = true;
+        void PlatformStatsService.getStats()
+            .then((stats) => {
+                if (active) setPlatformStats(stats);
+            })
+            .catch(() => undefined);
+
+        void PlatformStatsService.getFeaturedCreators(4)
+            .then((creators) => {
+                if (active) setFeaturedCreators(creators);
+            })
+            .catch(() => undefined);
+
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    const items = exploreItems.map((item) => ({
+        ...item,
+        stats: platformStats ? getExploreStats(item.title, platformStats) : "Loading...",
+    }));
+    const creatorCount = featuredCreators?.creatorCount ?? (platformStats ? platformStats.producers + platformStats.artists : 0);
+    const creators = featuredCreators?.creators ?? [];
+    const remainingCreators = Math.max(creatorCount - creators.length, 0);
+
     return (
         <section
             id="explore"
@@ -140,33 +174,32 @@ export function ExploreSection() {
                         "
                     >
                         <div className="flex -space-x-2">
-                            <div className="h-7 w-7 rounded-full border-2 border-[#161513]" style={{ background: "linear-gradient(to bottom right, #7fa9ac, #5a8386)" }} />
-                            <div className="h-7 w-7 rounded-full border-2 border-[#161513]" style={{ background: "linear-gradient(to bottom right, #a58bc4, #7d63a0)" }} />
-                            <div className="h-7 w-7 rounded-full border-2 border-[#161513]" style={{ background: "linear-gradient(to bottom right, #8fae82, #6b8a5e)" }} />
-                            <div className="h-7 w-7 rounded-full border-2 border-[#161513]" style={{ background: "linear-gradient(to bottom right, #e8a33d, #cf8452)" }} />
-                            <div
-                                className="
-                                    flex
-                                    h-7
-                                    w-7
-                                    items-center
-                                    justify-center
-                                    rounded-full
-                                    border-2
-                                    border-[#161513]
-                                    bg-[#2a2825]
-                                    text-[9px]
-                                    font-bold
-                                    text-[#b5b2a8]
-                                "
-                            >
-                                +
-                            </div>
+                            {creators.length > 0 ? creators.map((creator) => (
+                                <div key={creator.id} className="relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border-2 border-[#161513] bg-[#e8a33d]/15 text-[9px] font-semibold text-[#e8a33d]">
+                                    {creator.profileImageThumbnail ? (
+                                        <Image
+                                            src={creator.profileImageThumbnail}
+                                            alt={`${creator.name} profile`}
+                                            fill
+                                            sizes="28px"
+                                            unoptimized
+                                            className="object-cover"
+                                        />
+                                    ) : creator.name.charAt(0).toUpperCase()}
+                                </div>
+                            )) : Array.from({ length: 4 }).map((_, index) => (
+                                <span key={index} className="h-7 w-7 animate-pulse rounded-full border-2 border-[#161513] bg-[#2a2825]" />
+                            ))}
+                            {remainingCreators > 0 && (
+                                <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#161513] bg-[#2a2825] text-[9px] font-bold text-[#b5b2a8]">
+                                    +{formatCount(remainingCreators)}
+                                </div>
+                            )}
                         </div>
 
                         <div>
                             <p className="text-xs font-semibold text-[#f5f4f1]">
-                                Join <span className="font-mono text-[#e8a33d]">250K+</span> creators
+                                Join <span className="font-mono text-[#e8a33d]">{platformStats ? formatCount(creatorCount) : "..."}</span> creators
                             </p>
                             <p className="text-[11px] text-[#6b685f]">
                                 Studios • Artists • Producers
@@ -187,7 +220,7 @@ export function ExploreSection() {
                         lg:grid-cols-6
                     "
                 >
-                    {exploreItems.map((item) => (
+                    {items.map((item) => (
                         <ExploreCard
                             key={item.title}
                             {...item}
@@ -215,4 +248,24 @@ export function ExploreSection() {
 
         </section>
     );
+}
+
+function getExploreStats(title: string, stats: PlatformStats): string {
+    const values: Record<string, [number, string]> = {
+        "Recording Studios": [stats.studios, "Studios"],
+        Producers: [stats.producers, "Producers"],
+        Artists: [stats.artists, "Artists"],
+        "Beat Marketplace": [stats.beats, "Beats"],
+        "Creative Services": [stats.services, "Services"],
+        Advertise: [stats.campaigns, "Campaigns"],
+    };
+    const [value, label] = values[title] || [0, "Listings"];
+    return `${formatCount(value)} ${label}`;
+}
+
+function formatCount(value: number): string {
+    return new Intl.NumberFormat("en", {
+        notation: "compact",
+        maximumFractionDigits: 1,
+    }).format(value);
 }

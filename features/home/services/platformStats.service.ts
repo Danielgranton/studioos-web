@@ -5,6 +5,8 @@ export type PlatformStats = {
     producers: number;
     beats: number;
     artists: number;
+    services: number;
+    campaigns: number;
 };
 
 export type FeaturedCreator = {
