@@ -33,8 +33,8 @@ export function DashboardSidebar() {
 
     return (
         <>
-            <aside className="dashboard-scrollbar hidden h-full w-72 shrink-0 overflow-y-auto border-r border-[#2b2b2b] bg-[#121212] lg:block">
-                <div className="border-b border-[#2b2b2b] p-4">
+            <aside className="hidden h-full w-72 shrink-0 flex-col overflow-hidden border-r border-[#2b2b2b] bg-[#121212] lg:flex">
+                <div className="shrink-0 border-b border-[#2b2b2b] p-5">
                     <SidebarIdentity session={session} compact />
                 </div>
                 <SidebarNavigation groups={groups} pathname={pathname} onNavigate={() => undefined} />
@@ -66,9 +66,9 @@ export function DashboardSidebar() {
                         role="dialog"
                         aria-modal="true"
                         aria-label="Dashboard navigation"
-                        className="relative flex h-full w-[min(86vw,320px)] flex-col border-r border-[#363636] bg-[#121212] shadow-2xl"
+                        className="relative flex h-full w-[min(86vw,320px)] flex-col overflow-hidden border-r border-[#363636] bg-[#121212] shadow-2xl"
                     >
-                        <div className="flex items-center justify-between border-b border-[#2b2b2b] px-5 py-4">
+                        <div className="flex shrink-0 items-center justify-between border-b border-[#2b2b2b] px-5 py-4">
                             <SidebarIdentity session={session} compact />
                             <button
                                 type="button"
@@ -112,13 +112,15 @@ function SidebarIdentity({ session, compact = false }: { session: ReturnType<typ
     }, [session?.userId]);
 
     return <div className={compact ? "flex items-center gap-3" : "border-b border-[#2b2b2b] p-4"}>
-        <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border border-[#4a4a4a] bg-gradient-to-br from-[#303030] to-[#171717] shadow-[0_4px_18px_rgb(0_0_0_/_25%)]">
-            {avatarUrl ? (
-                <Image src={avatarUrl} alt={`${name} profile`} fill sizes="44px" className="object-cover" />
-            ) : (
-                <div className="flex h-full w-full items-center justify-center text-xs font-bold tracking-[0.12em] text-[#f1f1f1]">{initials}</div>
-            )}
-            <span aria-label="Online" className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#121212] bg-emerald-400" />
+        <div className="relative h-14 w-14 shrink-0">
+            <div className="absolute inset-0 overflow-hidden rounded-full border border-[#4a4a4a] bg-gradient-to-br from-[#303030] to-[#171717] shadow-[0_4px_18px_rgb(0_0_0_/_25%)]">
+                {avatarUrl ? (
+                    <Image src={avatarUrl} alt={`${name} profile`} fill sizes="56px" className="object-cover" />
+                ) : (
+                    <div className="flex h-full w-full items-center justify-center text-xs font-bold tracking-[0.12em] text-[#f1f1f1]">{initials}</div>
+                )}
+            </div>
+            <span aria-label="Online" className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-[#121212] bg-emerald-400" />
         </div>
         <div className="min-w-0">
             {!compact && <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#666]">Your workspace</p>}
@@ -138,7 +140,7 @@ function SidebarNavigation({
     onNavigate: () => void;
 }) {
     return (
-        <nav aria-label="Dashboard navigation" className="space-y-7 p-4">
+        <nav aria-label="Dashboard navigation" className="dashboard-scrollbar min-h-0 flex-1 space-y-7 overflow-y-auto p-4">
             {groups.map((group) => (
                 <div key={group.label}>
                     <div className="flex items-center gap-3 px-3"><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#666]">{group.label}</p><span className="h-px flex-1 bg-[#252525]" /></div>

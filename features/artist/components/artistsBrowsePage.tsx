@@ -9,7 +9,7 @@ import { ArtistService } from "../services/artist.service";
 import type { Artist } from "../types/artist";
 import { ArtistCard } from "./ArtistCard";
 
-const filters = ["All", "Verified", "Services available"];
+const filters = ["All", "Top Rated", "Verified", "Services available", "Featured"];
 
 export function ArtistsBrowsePage() {
     const [artists, setArtists] = useState<Artist[] | null>(null);
@@ -33,7 +33,7 @@ export function ArtistsBrowsePage() {
 
     const visibleArtists = useMemo(() => {
         const query = searchTerm.trim().toLowerCase();
-        return (artists ?? []).filter((artist) => {
+        const filtered = (artists ?? []).filter((artist) => {
             const searchable = [
                 artist.name,
                 artist.genre,
@@ -44,12 +44,24 @@ export function ArtistsBrowsePage() {
 
             const matchesSearch = !query || searchable.includes(query);
             const matchesFilter = activeFilter === "All"
+                || activeFilter === "Top Rated"
                 || (activeFilter === "Verified" && artist.verified)
-                || (activeFilter === "Services available" && artist.services.some((service) => service.active));
+                || (activeFilter === "Services available" && artist.services.some((service) => service.active))
+                || (activeFilter === "Featured" && artist.featured);
 
             return matchesSearch && matchesFilter;
         });
+        return activeFilter === "Featured"
+            ? filtered.sort((first, second) => (second.popularityScore ?? 0) - (first.popularityScore ?? 0))
+            : activeFilter === "Top Rated"
+                ? filtered.sort((first, second) => second.averageRating - first.averageRating || second.reviewCount - first.reviewCount)
+                : filtered;
     }, [activeFilter, artists, searchTerm]);
+
+    const ratedArtists = (artists ?? []).filter((artist) => artist.averageRating > 0);
+    const averageRating = ratedArtists.length
+        ? ratedArtists.reduce((total, artist) => total + artist.averageRating, 0) / ratedArtists.length
+        : 0;
 
     if (artists === null && !hasError) return <ArtistsLoading />;
 
@@ -59,8 +71,8 @@ export function ArtistsBrowsePage() {
                 <BackButton />
             </div>
 
-            <section className="relative scroll-mt-28">
-                <div className="mx-auto max-w-[1600px] px-6 py-10 lg:px-20 lg:py-14">
+            <section className="relative scroll-mt-10">
+                <div className="mx-auto max-w-[1600px] px-6 py-5 lg:px-6 lg:py-8">
                     <div className="mb-8 flex flex-col gap-6 lg:mb-10 lg:flex-row lg:items-end lg:justify-between">
                         <div className="max-w-2xl">
                             <span className="inline-flex items-center gap-2 rounded-full border border-[#e8a33d]/20 bg-[#e8a33d]/10 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#e8a33d]">
@@ -73,9 +85,15 @@ export function ArtistsBrowsePage() {
                             <p className="mt-3 max-w-xl text-sm leading-7 text-[#9a978f] sm:text-base">
                                 Discover verified artists and book focused creative services for your next release.
                             </p>
-                            <div className="mt-5 flex items-baseline gap-2">
-                                <span className="font-mono text-base font-bold text-[#f5f4f1]">{artists?.length ?? 0}</span>
-                                <span className="text-xs text-[#6b685f]">artists available</span>
+                            <div className="mt-5 flex flex-wrap items-baseline gap-x-5 gap-y-2">
+                                <span className="flex items-baseline gap-2">
+                                    <span className="font-mono text-base font-bold text-[#f5f4f1]">{artists?.length ?? 0}</span>
+                                    <span className="text-xs text-[#6b685f]">artists available</span>
+                                </span>
+                                <span className="flex items-baseline gap-2">
+                                    <span className="font-mono text-base font-bold text-[#f5f4f1]">{averageRating.toFixed(1)}★</span>
+                                    <span className="text-xs text-[#6b685f]">avg rating</span>
+                                </span>
                             </div>
                         </div>
 

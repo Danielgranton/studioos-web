@@ -100,6 +100,11 @@ export interface ProducerSearchResult {
     services?: string[];
     averageRating?: number;
     reviewCount?: number;
+    followerCount?: number;
+    beatCount?: number;
+    popularityScore?: number;
+    trendingScore?: number;
+    featured?: boolean;
     score?: number;
 }
 

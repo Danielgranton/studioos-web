@@ -2,6 +2,8 @@
 
 import { usePathname } from "next/navigation";
 
+import BackButton from "@/constants/BackButton";
+
 import { DashboardSidebar } from "./dashboardSidebar";
 
 const pageLabels: Record<string, string> = {
@@ -27,23 +29,27 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             <a href="#dashboard-main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-40 focus:rounded-lg focus:bg-[#3ea6ff] focus:px-3 focus:py-2 focus:text-xs focus:font-semibold focus:text-[#0f0f0f]">
                 Skip to dashboard content
             </a>
-            <div className="mx-auto flex h-full min-h-0 w-full max-w-[1600px] flex-col">
-                <div className="flex min-h-16 shrink-0 items-center justify-between gap-4 border-b border-[#252525] bg-[#111111] px-4 sm:px-6">
-                    <div className="min-w-0">
-                        <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#666]">
-                            <span>Workspace</span>
-                            <span aria-hidden="true" className="text-[#444]">/</span>
-                            <span className="text-[#999]">{pageLabel}</span>
+            <div className="mx-auto flex h-full min-h-0 w-full max-w-[1600px] flex-col lg:flex-row">
+                <DashboardSidebar />
+
+                <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+                    <div className="flex min-h-16 shrink-0 items-center justify-between gap-4 border-b border-[#252525] bg-[#111111] px-4 sm:px-6">
+                        <div className="flex min-w-0 items-center gap-3">
+                            <BackButton />
+                            <div className="min-w-0">
+                                <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#666]">
+                                    <span>Workspace</span>
+                                    <span aria-hidden="true" className="text-[#444]">/</span>
+                                    <span className="text-[#999]">{pageLabel}</span>
+                                </div>
+                                <p className="mt-1 truncate text-xs text-[#777]">{pageDescriptions[pathname] || "Your StudioOS workspace"}</p>
+                            </div>
                         </div>
-                        <p className="mt-1 truncate text-xs text-[#777]">{pageDescriptions[pathname] || "Your StudioOS workspace"}</p>
+                        <div className="hidden shrink-0 items-center gap-2 rounded-full border border-[#2f3a34] bg-[#172019] px-3 py-1.5 text-[10px] font-medium text-[#9bd3aa] sm:flex">
+                            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                            Workspace ready
+                        </div>
                     </div>
-                    <div className="hidden shrink-0 items-center gap-2 rounded-full border border-[#2f3a34] bg-[#172019] px-3 py-1.5 text-[10px] font-medium text-[#9bd3aa] sm:flex">
-                        <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                        Workspace ready
-                    </div>
-                </div>
-                <div className="flex min-h-0 min-w-0 flex-1">
-                    <DashboardSidebar />
                     <main id="dashboard-main" tabIndex={-1} className="dashboard-scrollbar min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain outline-none">{children}</main>
                 </div>
             </div>

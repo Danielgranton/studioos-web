@@ -8,6 +8,9 @@ export type ArtistService = {
     active: boolean;
 };
 
+export type VerificationStatus = "UNVERIFIED" | "PENDING_REVIEW" | "VERIFIED" | "REJECTED";
+export type AvailabilityStatus = "AVAILABLE" | "AWAY" | "UNAVAILABLE";
+
 export type Artist = {
     id: number;
     name: string;
@@ -21,6 +24,17 @@ export type Artist = {
     profileImageMedium?: string;
     profileImageThumbnail?: string;
     verified: boolean;
+    verificationStatus?: VerificationStatus;
+    availabilityStatus?: AvailabilityStatus;
+    averageRating: number;
+    reviewCount: number;
+    followerCount: number;
+    popularityScore?: number;
+    trendingScore?: number;
+    featured?: boolean;
+    releasedProjectCount: number;
+    available: boolean;
+    specialties: string[];
     services: ArtistService[];
 };
 

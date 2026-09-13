@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertCircle, Music2, RefreshCw, Sparkles } from "lucide-react";
+import { AlertCircle, Music2, RefreshCw, Search, Sparkles } from "lucide-react";
 
 import BackButton from "@/constants/BackButton";
 import { TopProducers, type ProducerCardProps } from "@/features/home";
@@ -20,6 +20,7 @@ export function ProducersBrowsePage() {
             const response = await ProducerService.getProducers(0, 20);
             setProducers(response.results.map(toProducerCard));
         } catch {
+            setProducers([]);
             setError(true);
         }
     }
@@ -28,29 +29,7 @@ export function ProducersBrowsePage() {
         void loadProducers();
     }, []);
 
-    if (error) {
-        return (
-            <main className="min-h-screen bg-[#0f0f0f] px-6 py-24 text-[#f5f4f1] lg:px-20">
-                <div className="mx-auto flex max-w-xl flex-col items-center rounded-2xl border border-[#3a3027] bg-[#181512] px-6 py-16 text-center">
-                    <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#e8a33d]/10 text-[#e8a33d]">
-                        <AlertCircle size={22} />
-                    </span>
-                    <h1 className="mt-5 text-lg font-semibold">Producers are taking a moment</h1>
-                    <p className="mt-2 text-sm leading-6 text-[#888]">
-                        We could not load the latest producer profiles.
-                    </p>
-                    <button
-                        type="button"
-                        onClick={() => void loadProducers()}
-                        className="mt-6 inline-flex items-center gap-2 rounded-xl border border-[#4a4032] px-4 py-2.5 text-sm font-medium text-[#ddd] transition hover:bg-[#242019]"
-                    >
-                        <RefreshCw size={15} />
-                        Try again
-                    </button>
-                </div>
-            </main>
-        );
-    }
+    if (error) return <ProducerDirectoryError onRetry={() => void loadProducers()} />;
 
     if (!producers) return <ProducersLoading />;
 
@@ -84,8 +63,72 @@ export function ProducersBrowsePage() {
                 showBrowseCta={false}
                 showSearch
                 showBadge={false}
+                loadError={error}
+                onRetry={() => void loadProducers()}
             />
         </main>
+    );
+}
+
+function ProducerDirectoryError({ onRetry }: { onRetry: () => void }) {
+    const filters = ["All", "Available Now", "Verified", "Top Rated", "Has Studio", "Featured", "Trending"];
+
+    return (
+        <main className="min-h-screen bg-[#0f0f0f] pt-6 text-[#f5f4f1]">
+            <div className="px-4 sm:px-6 lg:px-8">
+                <BackButton />
+            </div>
+            <section className="relative scroll-mt-10">
+                <div className="mx-auto max-w-[1600px] px-6 py-5 lg:px-6 lg:py-8">
+                    <div className="mb-8 flex flex-col gap-6 lg:mb-10 lg:flex-row lg:items-end lg:justify-between">
+                        <div className="max-w-2xl">
+                            <span className="inline-flex items-center gap-2 rounded-full border border-[#e8a33d]/20 bg-[#e8a33d]/10 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#e8a33d]">
+                                <span className="h-1.5 w-1.5 rounded-full bg-[#e8a33d]" />
+                                Producer directory
+                            </span>
+                            <h1 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl">
+                                Find your next <span className="text-blue-500">creative partner</span>
+                            </h1>
+                            <p className="mt-3 max-w-xl text-sm leading-7 text-[#9a978f] sm:text-base">
+                                Discover experienced producers and connect with the people shaping the sound of the next release.
+                            </p>
+                            <div className="mt-5 flex flex-wrap items-baseline gap-x-5 gap-y-2">
+                                <span className="flex items-baseline gap-2"><span className="font-mono text-base font-bold">0</span><span className="text-xs text-[#6b685f]">producers available</span></span>
+                                <span className="flex items-baseline gap-2"><span className="font-mono text-base font-bold">0.0</span><span className="text-xs text-[#6b685f]">avg rating</span></span>
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-start gap-3 lg:items-end">
+                            <label className="flex w-full items-center gap-2 rounded-full border border-[#2a2825] bg-[#161513] px-4 py-2.5 text-sm text-[#9a978f] sm:min-w-[280px]">
+                                <Search size={15} className="shrink-0 text-[#e8a33d]" />
+                                <span className="sr-only">Search producers</span>
+                                <input placeholder="Search producers" className="w-full bg-transparent text-sm text-[#f5f4f1] outline-none placeholder:text-[#6b685f]" />
+                            </label>
+                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                                {filters.map((filter) => <button key={filter} type="button" className={`rounded-full border px-3 py-1.5 text-xs font-medium ${filter === "All" ? "border-[#e8a33d]/40 bg-[#e8a33d]/10 text-[#e8a33d]" : "border-[#2a2825] bg-[#161513] text-[#9a978f]"}`}>{filter}</button>)}
+                            </div>
+                        </div>
+                    </div>
+                    <DirectoryMessage
+                        icon={<AlertCircle size={22} />}
+                        title="Producers are taking a moment"
+                        message="We could not load the producer directory. Try again in a moment."
+                        action={<button type="button" onClick={onRetry} className="mt-6 inline-flex items-center gap-2 rounded-xl border border-[#4a4032] px-4 py-2.5 text-sm font-medium text-[#ddd] transition hover:bg-[#242019]"><RefreshCw size={15} />Try again</button>}
+                    />
+                </div>
+            </section>
+        </main>
+    );
+}
+
+function DirectoryMessage({ icon, title, message, action }: { icon: React.ReactNode; title: string; message: string; action: React.ReactNode }) {
+    return (
+        <div className="rounded-3xl border border-dashed border-[#3a3027] bg-gradient-to-br from-[#1b1813] to-[#151311] px-6 py-14 text-center">
+            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[#e8a33d]/20 bg-[#e8a33d]/10 text-[#e8a33d]">{icon}</span>
+            <p className="mt-5 inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e8a33d]"><Sparkles size={12} />Producer directory</p>
+            <h2 className="mt-2 text-xl font-semibold text-[#f5f4f1]">{title}</h2>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#888176]">{message}</p>
+            {action}
+        </div>
     );
 }
 
@@ -108,6 +151,11 @@ function toProducerCard(producer: ProducerSearchResult): ProducerCardProps {
         available: producer.available ?? false,
         rating: producer.averageRating ?? 0,
         reviews: producer.reviewCount ?? 0,
+        followerCount: producer.followerCount ?? 0,
+        beatCount: producer.beatCount ?? 0,
+        popularityScore: producer.popularityScore ?? 0,
+        trendingScore: producer.trendingScore ?? 0,
+        featured: producer.featured ?? false,
         responseTime: producer.responseTime || "Response time varies",
         priceLabel: producer.startingPrice != null
             ? `From KSh ${producer.startingPrice.toLocaleString()}`

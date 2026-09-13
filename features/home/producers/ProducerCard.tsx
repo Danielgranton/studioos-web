@@ -16,12 +16,19 @@ export interface ProducerCardProps {
     available: boolean;
     rating: number;
     reviews: number;
+    followerCount?: number;
+    releaseCount?: number;
+    beatCount?: number;
+    popularityScore?: number;
+    trendingScore?: number;
+    featured?: boolean;
     responseTime: string;
     priceLabel: string;
     badge: string;
     services: string[];
     profileHref?: string;
     creatorLabel?: string;
+    showGenre?: boolean;
 }
 
 function Waveform() {
@@ -51,13 +58,19 @@ export function ProducerCard({
     available,
     rating,
     reviews,
+    followerCount = 0,
+    releaseCount = 0,
+    beatCount = 0,
     responseTime,
     priceLabel,
     badge,
     services,
     profileHref = `/producers/${id}`,
     creatorLabel = "producer",
+    showGenre = true,
 }: ProducerCardProps) {
+    const workLabel = creatorLabel === "artist" ? "releases" : "produced";
+
     return (
         <Link
             href={profileHref}
@@ -79,12 +92,12 @@ export function ProducerCard({
 
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1">
-                        <h3 className="truncate text-sm font-semibold tracking-tight text-[#f5f4f1]">
+                        <h3 className="line-clamp-2 break-words text-sm font-semibold leading-5 tracking-tight text-[#f5f4f1]">
                             {name}
                         </h3>
                         {verified && <BadgeCheck size={14} className="shrink-0 text-[#5eead4]" />}
                     </div>
-                    <p className="mt-0.5 truncate text-[11px] text-[#9a978f]">{genre}</p>
+                    {showGenre && <p className="mt-0.5 truncate text-[11px] text-[#9a978f]">{genre}</p>}
                     <p className="mt-1 flex items-center gap-1 truncate text-[10px] text-[#6b685f]">
                         <MapPin size={10} />
                         {location}
@@ -119,6 +132,18 @@ export function ProducerCard({
                         {service}
                     </span>
                 ))}
+            </div>
+
+            <div className="relative mt-3 flex items-center gap-3 text-[10px] text-[#8f887c]">
+                <span>{followerCount.toLocaleString()} followers</span>
+                <span className="h-1 w-1 rounded-full bg-[#4b473f]" />
+                <span>{releaseCount.toLocaleString()} {workLabel}</span>
+                {creatorLabel === "producer" && (
+                    <>
+                        <span className="h-1 w-1 rounded-full bg-[#4b473f]" />
+                        <span>{beatCount.toLocaleString()} beats</span>
+                    </>
+                )}
             </div>
 
             <div className="relative mt-4 border-t border-[#2a2825] pt-3">

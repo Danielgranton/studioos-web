@@ -15,6 +15,11 @@ export type Studio = {
     nextAvailable?: string;
     bookings: number;
     verified: boolean;
+    verificationStatus?: "UNVERIFIED" | "PENDING_REVIEW" | "VERIFIED" | "REJECTED";
+    availabilityStatus?: "AVAILABLE" | "AWAY" | "UNAVAILABLE";
+    popularityScore?: number;
+    trendingScore?: number;
+    featured?: boolean;
     profileImage?: string;
     profileImageLarge?: string;
     profileImageMedium?: string;

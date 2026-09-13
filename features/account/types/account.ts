@@ -1,5 +1,8 @@
 import type { AuthResponse, AuthSession, OtpSentResponse, VerifyOtpRequest } from "@/features/auth";
 
+export type VerificationStatus = "UNVERIFIED" | "PENDING_REVIEW" | "VERIFIED" | "REJECTED";
+export type AvailabilityStatus = "AVAILABLE" | "AWAY" | "UNAVAILABLE";
+
 export type AccountProfile = {
     id: number;
     name: string;
@@ -7,6 +10,8 @@ export type AccountProfile = {
     email: string;
     phone?: string;
     role: AuthResponse["role"];
+    verificationStatus?: VerificationStatus;
+    availabilityStatus?: AvailabilityStatus;
     profileImage?: string;
     profileImageLarge?: string;
     profileImageMedium?: string;
@@ -15,6 +20,7 @@ export type AccountProfile = {
     location?: string;
     genre?: string;
     experience?: string;
+    available?: boolean;
     instagram?: string;
     youtube?: string;
     link?: string;
@@ -25,6 +31,7 @@ export type UpdateProfileRequest = {
     location?: string;
     genre?: string;
     experience?: string;
+    available?: boolean;
     instagram?: string;
     youtube?: string;
     link?: string;

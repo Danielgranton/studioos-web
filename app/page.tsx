@@ -1,11 +1,11 @@
 import {
     ExploreSection,
-    FeaturedProjects,
     FeaturedStudios,
     Hero,
     ServiceSection,
     TestimonialSection,
     TopProducers,
+    TopArtists,
     TrendingBeats,
 } from "@/features/home";
 
@@ -20,7 +20,7 @@ export default function HomePage() {
             <TopProducers />
             <FeaturedStudios />
             <TrendingBeats />
-            <FeaturedProjects/>
+            <TopArtists />
             <TestimonialSection/>
             <ServiceSection />
         </div>

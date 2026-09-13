@@ -14,6 +14,8 @@ const browseFilters = [
     "Verified",
     "Top Rated",
     "Has Studio",
+    "Featured",
+    "Trending",
 ];
 
 const homeFilters = [
@@ -28,6 +30,8 @@ type TopProducersProps = {
     showBrowseCta?: boolean;
     showSearch?: boolean;
     showBadge?: boolean;
+    loadError?: boolean;
+    onRetry?: () => void;
 };
 
 export function TopProducers({
@@ -35,6 +39,8 @@ export function TopProducers({
     showBrowseCta = true,
     showSearch = false,
     showBadge = true,
+    loadError = false,
+    onRetry,
 }: TopProducersProps) {
     const [fetchedProducers, setFetchedProducers] = useState<ProducerCardProps[] | null>(null);
     const [isLoading, setIsLoading] = useState(!producers);
@@ -86,6 +92,8 @@ export function TopProducers({
             || (activeFilter === "Verified" && producer.verified)
             || activeFilter === "Top Rated"
             || (activeFilter === "Has Studio" && producer.studioNames.length > 0)
+            || (activeFilter === "Featured" && producer.featured)
+            || (activeFilter === "Trending" && (producer.trendingScore ?? 0) > 0)
             || producerServices.some((service) => service.includes(filterValue))
             || producerGenre.includes(filterValue);
 
@@ -93,7 +101,11 @@ export function TopProducers({
     });
     const visibleProducers = (isBrowsePage && activeFilter === "All"
         ? filteredProducers
-        : [...filteredProducers].sort((first, second) => second.rating - first.rating || second.reviews - first.reviews)
+        : [...filteredProducers].sort((first, second) => activeFilter === "Trending"
+            ? (second.trendingScore ?? 0) - (first.trendingScore ?? 0)
+            : activeFilter === "Featured"
+                ? (second.popularityScore ?? 0) - (first.popularityScore ?? 0)
+                : second.rating - first.rating || second.reviews - first.reviews)
     ).slice(0, isBrowsePage ? filteredProducers.length : 10);
     const ratedProducers = sourceProducers.filter((producer) => producer.rating > 0);
     const averageRating = ratedProducers.length > 0
@@ -340,9 +352,27 @@ export function TopProducers({
                             </div>
                         ))}
                     </div>
-                ) : hasError ? (
-                    <div className="rounded-3xl border border-dashed border-[#3a3027] bg-[#151311] px-6 py-12 text-center text-sm text-[#9a978f]">
-                        Producers are temporarily unavailable.
+                ) : hasError || loadError ? (
+                    <div className="rounded-3xl border border-dashed border-[#3a3027] bg-gradient-to-br from-[#1b1813] to-[#151311] px-6 py-14 text-center">
+                        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[#e8a33d]/20 bg-[#e8a33d]/10 text-[#e8a33d]">
+                            <Music2 size={23} />
+                        </span>
+                        <p className="mt-5 inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e8a33d]">
+                            <Sparkles size={12} />
+                            Producer directory
+                        </p>
+                        <h3 className="mt-2 text-xl font-semibold text-[#f5f4f1]">Producers are taking a moment</h3>
+                        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#888176]">
+                            We could not load the latest producer profiles. Try again in a moment.
+                        </p>
+                        <button
+                            type="button"
+                            onClick={onRetry}
+                            className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#4a4032] bg-[#211e19] px-4 py-2.5 text-xs font-semibold text-[#e8a33d] transition hover:bg-[#29231b]"
+                        >
+                            <Music2 size={14} />
+                            Try again
+                        </button>
                     </div>
                 ) : visibleProducers.length === 0 && (
                     <div className="mt-8 rounded-3xl border border-dashed border-[#3a3027] bg-gradient-to-br from-[#1b1813] to-[#151311] px-6 py-14 text-center">
@@ -435,6 +465,11 @@ function toProducerCard(producer: ProducerSearchResult): ProducerCardProps {
         available: producer.available ?? false,
         rating: producer.averageRating ?? 0,
         reviews: producer.reviewCount ?? 0,
+        followerCount: producer.followerCount ?? 0,
+        beatCount: producer.beatCount ?? 0,
+        popularityScore: producer.popularityScore ?? 0,
+        trendingScore: producer.trendingScore ?? 0,
+        featured: producer.featured ?? false,
         responseTime: producer.responseTime || "Response time varies",
         priceLabel: producer.startingPrice != null
             ? `From KSh ${producer.startingPrice.toLocaleString()}`
