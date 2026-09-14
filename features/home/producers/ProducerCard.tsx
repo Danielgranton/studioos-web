@@ -29,6 +29,8 @@ export interface ProducerCardProps {
     profileHref?: string;
     creatorLabel?: string;
     showGenre?: boolean;
+    showPrice?: boolean;
+    servicesTitle?: string;
 }
 
 function Waveform() {
@@ -68,6 +70,8 @@ export function ProducerCard({
     profileHref = `/producers/${id}`,
     creatorLabel = "producer",
     showGenre = true,
+    showPrice = true,
+    servicesTitle,
 }: ProducerCardProps) {
     const workLabel = creatorLabel === "artist" ? "releases" : "produced";
 
@@ -126,12 +130,14 @@ export function ProducerCard({
                 </span>
             </div>
 
-            <div className="relative mt-3 flex flex-wrap gap-1.5">
+            {servicesTitle && <p className="relative mt-3 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#6b685f]">{servicesTitle}</p>}
+            <div className={`${servicesTitle ? "mt-1.5" : "mt-3"} relative flex flex-wrap gap-1.5`}>
                 {services.slice(0, 3).map((service) => (
                     <span key={service} className="rounded-md border border-[#2a2825] bg-[#1c1a17] px-2 py-0.5 text-[10px] text-[#b5b2a8]">
                         {service}
                     </span>
                 ))}
+                {servicesTitle && services.length === 0 && <span className="text-[10px] text-[#666]">No services listed</span>}
             </div>
 
             <div className="relative mt-3 flex items-center gap-3 text-[10px] text-[#8f887c]">
@@ -148,10 +154,10 @@ export function ProducerCard({
 
             <div className="relative mt-4 border-t border-[#2a2825] pt-3">
                 <div className="flex flex-col items-start gap-2">
-                    <div className="min-w-0 max-w-full flex items-center gap-5">
-                        <p className="font-mono text-[9px] uppercase tracking-wider text-[#6b685f]">Starting at</p>
-                        <p className="mt-1 inline-flex max-w-full rounded-md border border-[#e8a33d]/25 bg-[#e8a33d]/10 px-2 py-1 text-xs font-semibold text-[#f0bd65]">{priceLabel}</p>
-                    </div>
+                        {showPrice && <div className="min-w-0 max-w-full flex items-center gap-5">
+                            <p className="font-mono text-[9px] uppercase tracking-wider text-[#6b685f]">Starting at</p>
+                            <p className="mt-1 inline-flex max-w-full rounded-md border border-[#e8a33d]/25 bg-[#e8a33d]/10 px-2 py-1 text-xs font-semibold text-[#f0bd65]">{priceLabel}</p>
+                        </div>}
                     <div className="flex items-center gap-1 font-mono text-[10px] text-[#9a978f]">
                         <Clock3 size={12} />
                         <span>{responseTime}</span>

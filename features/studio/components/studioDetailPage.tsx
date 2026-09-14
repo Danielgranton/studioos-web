@@ -19,6 +19,7 @@ import {
 import { StudioService } from "../services/studio.service";
 import type { Studio, StudioMedia } from "../types/studio";
 import BackButton from "@/constants/BackButton";
+import { ReviewList } from "@/features/reviews";
 
 type GalleryItem = {
     id: string;
@@ -281,6 +282,7 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
                         </button>
                     </aside>
                 </div>
+                <div className="mt-7"><ReviewList target="STUDIO" targetId={studioId} /></div>
             </div>
         </main>
     );

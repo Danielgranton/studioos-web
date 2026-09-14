@@ -15,6 +15,7 @@ import { AccountService } from "../services/account.service";
 import { useAccountProfile } from "../hooks/useAccountProfile";
 import type { AccountProfile, UpdateProfileRequest } from "../types/account";
 import { getApiErrorMessage } from "@/lib/api/errorMessage";
+import { VerificationGuide } from "@/features/verification";
 
 export function ProfileSettings() {
     const { session, isLoading: sessionLoading } = useSession();
@@ -82,6 +83,7 @@ export function ProfileSettings() {
             {user?.email && <EmailChangeForm currentEmail={user.email} onChanged={() => { void refresh(); }} />}<PhoneChangeForm currentPhone={user?.phone} onChanged={() => { void refresh(); }} />
             <div className="mt-3 rounded-xl border border-[#303030] bg-[#101010] px-4 py-3">{editingUsername ? <form onSubmit={saveUsername} className="flex flex-col gap-3 sm:flex-row sm:items-end"><Field label="Username" name="username" defaultValue={profile?.username} placeholder="your_username" /><div className="flex gap-2 sm:shrink-0"><button type="button" onClick={() => setEditingUsername(false)} className="rounded-lg border border-[#3f3f3f] px-3 py-2 text-xs text-[#aaa]">Cancel</button><button type="submit" disabled={savingUsername} className="rounded-lg bg-[#3ea6ff] px-3 py-2 text-xs font-semibold text-[#0f0f0f] disabled:opacity-60">{savingUsername ? "Saving..." : "Save"}</button></div></form> : <div className="flex items-center justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.16em] text-[#666]">Username</p><p className="mt-1 text-sm text-[#ddd]">{profile?.username ? `@${profile.username}` : "Not set"}</p></div><button type="button" onClick={() => setEditingUsername(true)} className="text-xs font-medium text-[#3ea6ff] hover:text-[#65b8ff]">{profile?.username ? "Change" : "Add username"}</button></div>}</div>
         </section>
+        {(user?.role === "PRODUCER" || user?.role === "ARTIST") && <VerificationGuide subject="profile" status={profile?.verificationStatus} items={[{ label: "Use a clear profile photo", complete: Boolean(profile?.profileImage || profile?.profileImageMedium || profile?.profileImageThumbnail) }, { label: "Add a useful bio", complete: Boolean(profile?.bio?.trim()) }, { label: "Add your location and genre", complete: Boolean(profile?.location?.trim() && profile?.genre?.trim()) }, { label: "Add your experience", complete: Boolean(profile?.experience?.trim()) }, { label: "Verify your email and phone", complete: Boolean(user?.email && user?.phone) }, { label: "Add a portfolio or social link", complete: Boolean(profile?.link || profile?.instagram || profile?.youtube) }]} />}
         <section className="mt-5 rounded-2xl border border-[#3f3f3f] bg-[#151515] p-5 sm:p-6">
             <SectionHeading icon={<LockKeyhole size={18} />} title="Security and role" description="Update your password and manage your account role." />
             <ChangePasswordForm />

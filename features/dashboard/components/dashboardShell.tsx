@@ -11,6 +11,7 @@ const pageLabels: Record<string, string> = {
     "/dashboard/profile": "Profile",
     "/dashboard/sessions": "Sessions",
     "/dashboard/settings": "Settings",
+    "/dashboard/services": "Services",
 };
 
 const pageDescriptions: Record<string, string> = {
@@ -18,6 +19,7 @@ const pageDescriptions: Record<string, string> = {
     "/dashboard/profile": "Your public identity and creator details",
     "/dashboard/sessions": "Review your signed-in sessions",
     "/dashboard/settings": "Manage your account preferences",
+    "/dashboard/services": "Publish services and manage requests",
 };
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
@@ -25,7 +27,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     const pageLabel = pageLabels[pathname] || "Workspace";
 
     return (
-        <div className="flex h-[calc(100dvh-4rem)] min-h-0 flex-col overflow-hidden border-x border-[#252525]/70 bg-[#101010] lg:h-[calc(100dvh-7rem)]">
+        <div className="relative flex h-[calc(100dvh-4rem)] min-h-0 flex-col overflow-hidden border-x border-[#252525]/70 bg-[#101010] lg:h-[calc(100dvh-7rem)]">
             <a href="#dashboard-main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-40 focus:rounded-lg focus:bg-[#3ea6ff] focus:px-3 focus:py-2 focus:text-xs focus:font-semibold focus:text-[#0f0f0f]">
                 Skip to dashboard content
             </a>

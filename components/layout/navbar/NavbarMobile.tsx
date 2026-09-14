@@ -48,7 +48,7 @@ export function NavbarMobile({
                     <Menu size={22} strokeWidth={2} />
                 </button>
 
-                <NavbarLogo compact />
+                <NavbarLogo />
 
             </div>
 

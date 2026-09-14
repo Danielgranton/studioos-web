@@ -47,3 +47,17 @@ export type ArtistPage = {
     last: boolean;
     first: boolean;
 };
+
+export type ArtistServiceRequest = {
+    id: string;
+    serviceId: string;
+    serviceName: string;
+    requesterId: number;
+    requesterName: string;
+    requestNote?: string;
+    amount: number;
+    currency: string;
+    status: "PENDING" | "PAID" | "DELIVERED" | "CANCELLED";
+    createdAt: string;
+    updatedAt: string;
+};

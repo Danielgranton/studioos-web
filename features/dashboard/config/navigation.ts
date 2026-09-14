@@ -33,6 +33,8 @@ const sharedGroups: DashboardNavigationGroup[] = [
             { label: "Overview", href: "/dashboard", description: "Your StudioOS activity at a glance.", icon: BarChart3 },
             { label: "Bookings", href: "/dashboard/bookings", description: "Track upcoming and past bookings.", icon: CalendarCheck, comingSoon: true },
             { label: "Projects", href: "/dashboard/projects", description: "Keep releases and collaborations moving.", icon: FolderKanban, comingSoon: true },
+            { label: "My releases", href: "/dashboard/releases", description: "Organize your release pipeline.", icon: SlidersHorizontal, comingSoon: true, roles: ["ARTIST"] },
+            { label: "Services", href: "/dashboard/services", description: "Publish services and manage client requests.", icon: WalletCards, roles: ["ARTIST"] },
             { label: "My studio", href: "/dashboard/studios", description: "Register and manage your studio listing.", icon: Compass, roles: ["PRODUCER"] },
             { label: "Wallet", href: "/dashboard/wallet", description: "Track studio earnings and request payouts.", icon: WalletCards, roles: ["PRODUCER"] },
         ],
@@ -64,9 +66,7 @@ const roleGroups: Record<DashboardRole, DashboardNavigationGroup> = {
     },
     ARTIST: {
         label: "Artist workspace",
-        items: [
-            { label: "My releases", href: "/dashboard/releases", description: "Organize your release pipeline.", icon: SlidersHorizontal, comingSoon: true },
-        ],
+        items: [],
     },
     PRODUCER: {
         label: "Producer workspace",

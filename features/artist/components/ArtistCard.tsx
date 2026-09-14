@@ -5,6 +5,7 @@ import type { Artist } from "../types/artist";
 export function ArtistCard({ artist }: { artist: Artist }) {
     const services = artist.services ?? [];
     const specialties = artist.specialties ?? [];
+    const serviceNames = services.slice(0, 3).map((service) => service.name);
     const lowestService = services
         .filter((service) => service.active)
         .sort((first, second) => first.price - second.price)[0];
@@ -31,12 +32,12 @@ export function ArtistCard({ artist }: { artist: Artist }) {
             ? `From ${lowestService.currency} ${lowestService.price.toLocaleString()}`
             : "Services on profile",
         badge: artist.verified ? "Verified" : "Artist",
-        services: specialties.length > 0
-            ? specialties.slice(0, 3)
-            : [artist.genre || "Creative services"],
+        services: serviceNames.length > 0 ? serviceNames : specialties.slice(0, 3),
         profileHref: `/artists/${artist.id}`,
         creatorLabel: "artist",
         showGenre: false,
+        showPrice: false,
+        servicesTitle: "Services",
     };
 
     return <ProducerCard {...card} />;

@@ -53,20 +53,23 @@ export function DashboardSidebar() {
                 </button>
             </div>
 
-            {mobileOpen && (
-                <div className="fixed inset-0 z-[70] lg:hidden">
+            <div
+                className={`absolute inset-0 z-[70] lg:hidden transition-opacity duration-300 ease-out ${mobileOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
+                aria-hidden={!mobileOpen}
+            >
                     <button
                         type="button"
                         aria-label="Close dashboard menu"
                         onClick={() => setMobileOpen(false)}
-                        className="absolute inset-0 bg-black/70"
+                        tabIndex={mobileOpen ? 0 : -1}
+                        className="absolute inset-0 bg-black/70 transition-colors duration-300"
                     />
                     <aside
                         id="dashboard-mobile-navigation"
                         role="dialog"
                         aria-modal="true"
                         aria-label="Dashboard navigation"
-                        className="relative flex h-full w-[min(86vw,320px)] flex-col overflow-hidden border-r border-[#363636] bg-[#121212] shadow-2xl"
+                        className={`relative flex h-full w-[min(86vw,320px)] flex-col overflow-hidden border-r border-[#363636] bg-[#121212] shadow-2xl transition-transform duration-300 ease-out ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}
                     >
                         <div className="flex shrink-0 items-center justify-between border-b border-[#2b2b2b] px-5 py-4">
                             <SidebarIdentity session={session} compact />
@@ -74,6 +77,7 @@ export function DashboardSidebar() {
                                 type="button"
                                 onClick={() => setMobileOpen(false)}
                                 aria-label="Close dashboard menu"
+                                tabIndex={mobileOpen ? 0 : -1}
                                 className="rounded-lg p-2 text-[#888] transition hover:bg-[#222] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3ea6ff]"
                             >
                                 <X size={18} />
@@ -81,8 +85,7 @@ export function DashboardSidebar() {
                         </div>
                         <SidebarNavigation groups={groups} pathname={pathname} onNavigate={() => setMobileOpen(false)} />
                     </aside>
-                </div>
-            )}
+            </div>
         </>
     );
 }

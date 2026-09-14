@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -20,6 +20,8 @@ export function NavbarMobileMenu({
 }: NavbarMobileMenuProps) {
 
     const pathname = usePathname();
+    const menuRef = useRef<HTMLElement>(null);
+    const closeButtonRef = useRef<HTMLButtonElement>(null);
 
     // Lock body scroll while the drawer is open, compensating for the
     // scrollbar's width so page content doesn't shift when it disappears.
@@ -48,16 +50,30 @@ export function NavbarMobileMenu({
 
     }, [open]);
 
+    useEffect(() => {
+        if (open) closeButtonRef.current?.focus();
+    }, [open]);
+
+    function handleClose() {
+        const activeElement = document.activeElement;
+        if (activeElement instanceof HTMLElement && menuRef.current?.contains(activeElement)) {
+            activeElement.blur();
+        }
+        onClose();
+    }
+
     return (
 
         <>
 
             <div
-                onClick={onClose}
+                onClick={handleClose}
                 aria-hidden="true"
                 className={`
                     fixed
-                    inset-0
+                    inset-x-0
+                    bottom-0
+                    top-16
                     z-40
                     bg-black/60
                     backdrop-blur-sm
@@ -73,16 +89,18 @@ export function NavbarMobileMenu({
                 role="dialog"
                 aria-modal="true"
                 aria-hidden={!open}
+                inert={!open}
                 aria-label="Navigation menu"
+                ref={menuRef}
                 className={`
                     fixed
                     left-0
-                    top-0
+                    top-16
                     z-[70]
                     flex
-                    h-screen
-                    w-60
-                    max-w-[85vw]
+                    h-[calc(100dvh-4rem)]
+                    w-72
+                    max-w-[88vw]
                     flex-col
                     bg-[#0f0f0f]
                     shadow-2xl
@@ -116,7 +134,8 @@ export function NavbarMobileMenu({
                     />
 
                     <button
-                        onClick={onClose}
+                        ref={closeButtonRef}
+                        onClick={handleClose}
                         aria-label="Close menu"
                         className="
                             rounded-full
@@ -142,7 +161,7 @@ export function NavbarMobileMenu({
                                     href={link.href}
                                     icon={<Icon size={20} className="text-blue-500" />}
                                     active={pathname === link.href || pathname.startsWith(link.href + "/")}
-                                    onNavigate={onClose}
+                                    onNavigate={handleClose}
                                 >
                                     {link.label}
                                 </MenuItem>

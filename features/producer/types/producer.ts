@@ -16,6 +16,7 @@ export type ProducerSearchResult = {
     averageRating?: number;
     reviewCount?: number;
     followerCount?: number;
+    releaseCount?: number;
     beatCount?: number;
     popularityScore?: number;
     trendingScore?: number;
@@ -45,6 +46,9 @@ export type ProducerProfile = {
     profileImageLarge?: string;
     profileImageMedium?: string;
     profileImageThumbnail?: string;
+    followerCount?: number;
+    releaseCount?: number;
+    beatCount?: number;
     instagram?: string;
     youtube?: string;
     link?: string;
