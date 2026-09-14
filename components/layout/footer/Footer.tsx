@@ -25,7 +25,6 @@ type FooterLink = {
 
 const exploreLinks: FooterLink[] = [
     { label: "Hero", href: "/#hero" },
-    { label: "Explore", href: "/#explore" },
     { label: "Studios", href: "/#studios" },
     { label: "Producers", href: "/#producers" },
 ];
@@ -33,7 +32,6 @@ const exploreLinks: FooterLink[] = [
 const creatorLinks: FooterLink[] = [
     { label: "Beats", href: "/#beats" },
     { label: "Projects", href: "/#projects" },
-    { label: "Testimonials", href: "/#testimonials" },
     { label: "Marketplace", href: "/marketplace" },
 ];
 

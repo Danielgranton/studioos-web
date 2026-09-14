@@ -1,4 +1,3 @@
-export { ExploreSection } from "./explore";
 export { FeaturedStudios } from "./studios";
 export type { FeaturedStudio } from "./studios/FeaturedStudios";
 export { Hero } from "./hero";
@@ -10,4 +9,3 @@ export { TrendingBeats } from "./trending-beats";
 export { PlatformStatsService } from "./services/platformStats.service";
 export type { PlatformStats } from "./services/platformStats.service";
 export { ServiceSection } from "./services";
-export { TestimonialSection } from "./testimonials";
