@@ -24,8 +24,6 @@ export const NAV_ITEMS: NavbarNavItem[] = [
     { label: "Artists", href: "/artists", icon: User },
     { label: "Beat Marketplace", href: "/marketplace", icon: ShoppingBag },
     { label: "Services", href: "/services", icon: Wrench },
-    { label: "Bookings", href: "/bookings", icon: CalendarCheck },
     { label: "Sponsored", href: "/sponsored", icon: Megaphone },
-    { label: "Reviews", href: "/reviews", icon: Star },
     { label: "Help Center", href: "/help", icon: CircleHelp },
 ];

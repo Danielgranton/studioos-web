@@ -9,12 +9,13 @@ import {
     Heart,
     Pause,
     Play,
+    Star,
     TrendingUp,
 } from "lucide-react";
 import { useState } from "react";
 
 interface BeatCardProps {
-    id: number;
+    id: number | string;
     slug: string;
     title: string;
     producer: string;
@@ -29,6 +30,8 @@ interface BeatCardProps {
     exclusive: boolean;
     verified: boolean;
     loading?: "eager" | "lazy";
+    averageRating?: number;
+    reviewCount?: number;
 }
 
 export function BeatCard({
@@ -46,6 +49,8 @@ export function BeatCard({
     exclusive,
     verified,
     loading = "lazy",
+    averageRating = 0,
+    reviewCount = 0,
 }: BeatCardProps) {
     const [playing, setPlaying] = useState(false);
     const [liked, setLiked] = useState(false);
@@ -345,6 +350,13 @@ export function BeatCard({
                     >
                         <Heart size={10} className="text-red-400" />
                         {(likes + (liked ? 1 : 0)).toLocaleString()}
+                    </span>
+                    <span
+                        className="inline-flex items-center gap-1 rounded-md border border-[#2a2825] bg-[#1c1a17] px-2 py-0.5 font-mono text-[9px] font-medium text-[#b5b2a8]"
+                    >
+                        <Star size={10} className="fill-[#e8a33d] text-[#e8a33d]" />
+                        {averageRating > 0 ? averageRating.toFixed(1) : "New"}
+                        {reviewCount > 0 && <span className="text-[#6b685f]">({reviewCount})</span>}
                     </span>
                 </div>
 
