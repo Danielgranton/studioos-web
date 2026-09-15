@@ -24,6 +24,7 @@ class BeatServiceClient {
     }
 
     async completeUpload(beatId: string) { return (await api.post<{ beatId: string; status: string }>(`/beats/${beatId}/upload-complete`)).data; }
+    async archiveBeat(beatId: string): Promise<void> { await api.delete(`/beats/${beatId}`); }
 }
 
 export const BeatService = new BeatServiceClient();
