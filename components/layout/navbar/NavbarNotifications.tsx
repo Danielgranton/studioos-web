@@ -6,20 +6,19 @@ import Link from "next/link";
 import { Bell, CheckCheck } from "lucide-react";
 
 import { useClickOutside } from "@/features/search";
-
-import { NOTIFICATION_ICONS, NOTIFICATIONS } from "./notifications";
+import { formatNotificationTime, getNotificationVisual, useNotifications } from "@/features/notifications";
+import { useSession } from "@/features/auth";
 
 export function NavbarNotifications() {
 
     const [open, setOpen] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
+    const { isAuthenticated } = useSession();
 
     useClickOutside(containerRef, () => setOpen(false));
 
-    const unread = NOTIFICATIONS.filter((n) => !n.read).length;
-
-    const unreadLabel = unread > 9 ? "9+" : unread;
+    const { notifications, unreadCount, loading, markAsRead, markAllAsRead } = useNotifications(true, isAuthenticated);
 
     return (
 
@@ -43,7 +42,7 @@ export function NavbarNotifications() {
                     size={22}
                 />
 
-                {unread > 0 && (
+                {unreadCount > 0 && (
 
                     <span
                         className="
@@ -63,7 +62,7 @@ export function NavbarNotifications() {
                             text-white
                         "
                     >
-                        {unreadLabel}
+                        {unreadCount > 9 ? "9+" : unreadCount}
                     </span>
 
                 )}
@@ -105,7 +104,7 @@ export function NavbarNotifications() {
                             Notifications
                         </h3>
 
-                        {unread > 0 && (
+                        {unreadCount > 0 && (
 
                             <button
                                 className="
@@ -118,6 +117,7 @@ export function NavbarNotifications() {
                                     transition
                                     hover:text-white
                                 "
+                                onClick={() => void markAllAsRead()}
                             >
                                 <CheckCheck size={15} />
                                 Mark all read
@@ -127,7 +127,13 @@ export function NavbarNotifications() {
 
                     </div>
 
-                    {NOTIFICATIONS.length === 0 ? (
+                    {loading ? (
+                        <div className="space-y-3 px-5 py-8">
+                            <div className="h-3 w-1/2 animate-pulse rounded bg-[#2a2a2a]" />
+                            <div className="h-3 w-4/5 animate-pulse rounded bg-[#232323]" />
+                            <div className="h-3 w-2/3 animate-pulse rounded bg-[#232323]" />
+                        </div>
+                    ) : notifications.length === 0 ? (
 
                         <div className="px-5 py-12 text-center">
 
@@ -143,10 +149,11 @@ export function NavbarNotifications() {
 
                         <div className="max-h-[420px] overflow-y-auto no-scrollbar">
 
-                            {NOTIFICATIONS.map((notification) => (
+                            {notifications.slice(0, 6).map((notification) => (
 
                                 <button
                                     key={notification.id}
+                                    onClick={() => void markAsRead(notification.id)}
                                     className={`
                                         flex
                                         w-full
@@ -156,13 +163,13 @@ export function NavbarNotifications() {
                                         text-left
                                         transition
                                         hover:bg-[#272727]
-                                        ${!notification.read ? "bg-[#272727]/40" : ""}
+                                        ${!notification.isRead ? "bg-[#272727]/40" : ""}
                                     `}
                                 >
 
                                     <div className="mt-0.5 text-[#3ea6ff]">
                                         {(() => {
-                                            const Icon = NOTIFICATION_ICONS[notification.type];
+                                            const Icon = getNotificationVisual(notification).icon;
 
                                             return <Icon size={18} />;
                                         })()}
@@ -175,16 +182,16 @@ export function NavbarNotifications() {
                                         </p>
 
                                         <p className="mt-0.5 line-clamp-2 text-xs text-[#aaaaaa]">
-                                            {notification.description}
+                                            {notification.message}
                                         </p>
 
                                         <p className="mt-1.5 text-[11px] text-[#717171]">
-                                            {notification.time}
+                                            {formatNotificationTime(notification.createdAt)}
                                         </p>
 
                                     </div>
 
-                                    {!notification.read && (
+                                    {!notification.isRead && (
                                         <div className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[#3ea6ff]" />
                                     )}
 
@@ -197,7 +204,7 @@ export function NavbarNotifications() {
                     )}
 
                     <Link
-                        href="/dashboard/settings#notifications"
+                        href="/dashboard/notifications"
                         onClick={() => setOpen(false)}
                         className="
                             block
@@ -212,7 +219,7 @@ export function NavbarNotifications() {
                             hover:bg-[#272727]
                         "
                     >
-                        Manage notifications
+                        View all notifications
                     </Link>
 
                 </div>

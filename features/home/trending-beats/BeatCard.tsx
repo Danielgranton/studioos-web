@@ -28,6 +28,7 @@ interface BeatCardProps {
     duration: string;
     exclusive: boolean;
     verified: boolean;
+    loading?: "eager" | "lazy";
 }
 
 export function BeatCard({
@@ -44,6 +45,7 @@ export function BeatCard({
     duration,
     exclusive,
     verified,
+    loading = "lazy",
 }: BeatCardProps) {
     const [playing, setPlaying] = useState(false);
     const [liked, setLiked] = useState(false);
@@ -118,6 +120,7 @@ export function BeatCard({
                     src={thumbnail}
                     alt={title}
                     fill
+                    loading={loading}
                     sizes="(min-width: 1000px) 20vw, (min-width: 700px) 30vw, 40vw"
                     className="
                         object-cover

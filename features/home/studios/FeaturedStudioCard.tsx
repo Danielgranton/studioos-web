@@ -25,6 +25,7 @@ interface FeaturedStudioCardProps {
     services: string[];
     genres: string[];
     image: string;
+    loading?: "eager" | "lazy";
 }
 
 export function FeaturedStudioCard({
@@ -41,6 +42,7 @@ export function FeaturedStudioCard({
     services,
     genres,
     image,
+    loading = "lazy",
 }: FeaturedStudioCardProps) {
     return (
         <Link
@@ -111,6 +113,7 @@ export function FeaturedStudioCard({
                     src={image}
                     alt={`${name} studio`}
                     fill
+                    loading={loading}
                     sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
                     unoptimized
                     className="

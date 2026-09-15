@@ -253,10 +253,11 @@ export function TrendingBeats() {
                         lg:grid-cols-5
                     "
                 >
-                    {trendingBeats.map((beat) => (
+                    {trendingBeats.map((beat, index) => (
                         <BeatCard
                             key={beat.id}
                             {...beat}
+                            loading={index === 0 ? "eager" : "lazy"}
                         />
                     ))}
                 </div>

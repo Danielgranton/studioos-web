@@ -12,6 +12,7 @@ const pageLabels: Record<string, string> = {
     "/dashboard/sessions": "Sessions",
     "/dashboard/settings": "Settings",
     "/dashboard/services": "Services",
+    "/dashboard/notifications": "Notifications",
 };
 
 const pageDescriptions: Record<string, string> = {
@@ -20,6 +21,7 @@ const pageDescriptions: Record<string, string> = {
     "/dashboard/sessions": "Review your signed-in sessions",
     "/dashboard/settings": "Manage your account preferences",
     "/dashboard/services": "Publish services and manage requests",
+    "/dashboard/notifications": "Stay on top of your StudioOS activity",
 };
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
