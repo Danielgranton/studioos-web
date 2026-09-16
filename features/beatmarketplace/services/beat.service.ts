@@ -15,6 +15,7 @@ class BeatServiceClient {
     async getGenres(): Promise<BeatGenre[]> { return (await api.get<BeatGenre[]>("/beats/genres")).data; }
     async getReviews(beatId: string): Promise<BeatReview[]> { return (await api.get<BeatReview[]>(`/beats/${beatId}/reviews`)).data; }
     async getLicenses(beatId: string): Promise<BeatLicense[]> { return (await api.get<BeatLicense[]>(`/beats/${beatId}/licenses`)).data; }
+    async getPreviewUrl(beatId: string): Promise<string> { return (await api.get<{ previewUrl: string }>(`/beats/${beatId}/preview`)).data.previewUrl; }
     async createLicense(beatId: string, type: string, price: number): Promise<BeatLicense[]> {
         return (await api.post<BeatLicense[]>(`/beats/${beatId}/licenses`, { licenses: [{ type, price }] })).data;
     }
@@ -24,7 +25,9 @@ class BeatServiceClient {
     }
 
     async completeUpload(beatId: string) { return (await api.post<{ beatId: string; status: string }>(`/beats/${beatId}/upload-complete`)).data; }
+    async cancelUpload(beatId: string): Promise<void> { await api.delete(`/beats/${beatId}/upload`); }
     async archiveBeat(beatId: string): Promise<void> { await api.delete(`/beats/${beatId}`); }
+    async deleteArchivedBeat(beatId: string): Promise<void> { await api.delete(`/beats/${beatId}/permanent`); }
 }
 
 export const BeatService = new BeatServiceClient();
