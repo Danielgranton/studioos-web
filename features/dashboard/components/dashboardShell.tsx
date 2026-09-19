@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 
 import BackButton from "@/constants/BackButton";
+import { ProducerPlaybackProvider } from "@/features/beatmarketplace";
 
 import { DashboardSidebar } from "./dashboardSidebar";
 
@@ -38,7 +39,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             <div className="mx-auto flex h-full min-h-0 w-full max-w-[1600px] flex-col lg:flex-row">
                 <DashboardSidebar />
 
-                <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+                <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
+                <ProducerPlaybackProvider>
                     <div className="flex min-h-16 shrink-0 items-center justify-between gap-4 border-b border-[#252525] bg-[#111111] px-4 sm:px-6">
                         <div className="flex min-w-0 items-center gap-3">
                             <BackButton />
@@ -57,6 +59,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                         </div>
                     </div>
                     <main id="dashboard-main" tabIndex={-1} className="dashboard-scrollbar min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain outline-none">{children}</main>
+                </ProducerPlaybackProvider>
                 </div>
             </div>
         </div>

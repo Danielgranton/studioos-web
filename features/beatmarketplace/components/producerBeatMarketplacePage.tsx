@@ -8,6 +8,7 @@ import { AlertTriangle, BadgeCheck, BarChart3, CheckCircle2, ChevronDown, Clock3
 
 import { DashboardErrorState, useDashboardSession } from "@/features/dashboard";
 import { StudioService } from "@/features/studio";
+import { useProducerPlayback } from "./producerPlaybackProvider";
 
 import { BeatService } from "../services/beat.service";
 import type { BeatGenre, BeatLicense, BeatReview, BeatSale, BeatSummary } from "../types/beat";
@@ -178,6 +179,7 @@ function ProducerBeatRow({ beat, genres, sales, onUpdated, onArchived }: { beat:
     const [fullAudioUrl, setFullAudioUrl] = useState<string | null>(null);
     const [fullAudioLoading, setFullAudioLoading] = useState(false);
     const [playbackError, setPlaybackError] = useState(false);
+    const playback = useProducerPlayback();
     const [editing, setEditing] = useState(false);
     const [savingEdit, setSavingEdit] = useState(false);
     const [editForm, setEditForm] = useState({ title: beat.title, description: beat.description || "", genreId: beat.genreId || "", bpm: beat.bpm ? String(beat.bpm) : "", keySignature: beat.keySignature || "", mood: beat.mood || "", visibility: beat.visibility || "PUBLIC" });
@@ -188,14 +190,14 @@ function ProducerBeatRow({ beat, genres, sales, onUpdated, onArchived }: { beat:
     async function updateLicense(licenseId: string, type: string, price: number) { const updated = await BeatService.updateLicense(beat.id, licenseId, { type, price }); setLicenses((current) => (current || []).map((license) => license.id === updated.id ? updated : license)); onUpdated(); toast.success("License updated"); }
     async function archive() { setArchiving(true); try { await BeatService.archiveBeat(beat.id); onArchived(); setArchiveOpen(false); toast.success("Beat archived", { description: "The beat is no longer available in the public marketplace." }); } catch (error) { toast.error("Could not archive beat", { description: getErrorMessage(error) }); } finally { setArchiving(false); } }
     async function deleteArchived() { setDeleting(true); try { await BeatService.deleteArchivedBeat(beat.id); onArchived(); setDeleteOpen(false); toast.success("Archived beat deleted"); } catch (error) { toast.error("Could not delete archived beat", { description: getErrorMessage(error) }); } finally { setDeleting(false); } }
-    async function loadFullAudio() { if (fullAudioUrl || fullAudioLoading) return; setFullAudioLoading(true); setPlaybackError(false); try { setFullAudioUrl(await BeatService.getOwnerAudioUrl(beat.id)); } catch { setPlaybackError(true); } finally { setFullAudioLoading(false); } }
+    async function loadFullAudio() { if (fullAudioLoading) return; if (fullAudioUrl) { playback.setTrack({ id: beat.id, title: beat.title, thumbnailUrl: beat.thumbnailUrl, audioUrl: fullAudioUrl }); return; } setFullAudioLoading(true); setPlaybackError(false); try { const audioUrl = await BeatService.getOwnerAudioUrl(beat.id); setFullAudioUrl(audioUrl); playback.setTrack({ id: beat.id, title: beat.title, thumbnailUrl: beat.thumbnailUrl, audioUrl }); } catch { setPlaybackError(true); } finally { setFullAudioLoading(false); } }
     function editField(key: keyof typeof editForm, value: string) { setEditForm((current) => ({ ...current, [key]: value })); }
     async function saveEdit() { if (!editForm.title.trim() || !editForm.genreId) { toast.error("Complete the beat details", { description: "A title and genre are required." }); return; } setSavingEdit(true); try { await BeatService.updateBeat(beat.id, { ...editForm, bpm: editForm.bpm ? Number(editForm.bpm) : undefined }); setEditing(false); onUpdated(); toast.success("Beat details updated"); } catch (error) { toast.error("Could not update beat", { description: getErrorMessage(error) }); } finally { setSavingEdit(false); } }
     const archived = beat.status === "ARCHIVED";
     return <>
         <article className="overflow-hidden rounded-[1.75rem] border border-[#2b2b2b] bg-[#151515] shadow-[0_16px_45px_rgba(0,0,0,0.12)] transition-colors hover:border-[#454545]">
             <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_220px]">
-                <button type="button" onClick={() => void toggle()} className="group flex min-w-0 items-center gap-4 p-4 text-left transition hover:bg-[#1a1a1a] sm:gap-5 sm:p-5">
+                <button type="button" aria-expanded={open} onClick={() => void toggle()} className="group flex min-w-0 items-center gap-4 p-4 text-left transition hover:bg-[#1a1a1a] sm:gap-5 sm:p-5">
                     <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[#24211d] shadow-lg sm:h-24 sm:w-24">
                         {beat.thumbnailUrl ? <Image src={beat.thumbnailUrl} alt="" fill sizes="96px" className="object-cover transition duration-500 group-hover:scale-105" unoptimized /> : <Music2 size={28} className="absolute inset-0 m-auto text-[#e8a33d]" />}
                         <span className="absolute bottom-2 left-2 rounded-md bg-black/70 px-1.5 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-white backdrop-blur">{beat.status === "ARCHIVED" ? "Archived" : "Live"}</span>
@@ -213,49 +215,39 @@ function ProducerBeatRow({ beat, genres, sales, onUpdated, onArchived }: { beat:
                     <Metric label="Rating" value={beat.averageRating ? `${beat.averageRating.toFixed(1)} (${beat.reviewCount || 0})` : "New"} />
                 </div>
             </div>
-            {open && <div className="border-t border-[#2b2b2b] bg-[#101010] p-4 sm:p-5">
+            <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+                <div className="min-h-0 overflow-hidden border-t border-[#2b2b2b] bg-[#101010]">
+                <div className="p-4 sm:p-5">
                 <div className="grid gap-3 sm:grid-cols-3"><Metric label="Status" value={beat.status || "Unknown"} icon={<Clock3 size={13} />} /><Metric label="Visibility" value={beat.visibility || "Unknown"} icon={<Play size={13} />} /><Metric label="Likes / plays" value={`${beat.likeCount || 0} / ${(beat.playCount || 0).toLocaleString()}`} icon={<Heart size={13} />} /></div>
                 <div className="mt-5 grid gap-5 lg:grid-cols-2"><ReviewPreview reviews={reviews} error={reviewsError} onRetry={() => void loadDetails()} /><LicensePreview licenses={licenses} onCreate={addLicense} onUpdate={updateLicense} /></div>
                 {editing && <EditBeatPanel form={editForm} genres={genres} busy={savingEdit} onChange={editField} onCancel={() => setEditing(false)} onSave={() => void saveEdit()} />}
-                <ProducerBeatPlayer title={beat.title} thumbnailUrl={beat.thumbnailUrl} audioUrl={fullAudioUrl} loading={fullAudioLoading} available={Boolean(beat.previewAvailable)} error={playbackError} onLoad={() => void loadFullAudio()} onError={() => { setPlaybackError(true); setFullAudioUrl(null); }} />
+                <ProducerBeatPlayer trackId={beat.id} title={beat.title} thumbnailUrl={beat.thumbnailUrl} audioUrl={fullAudioUrl} loading={fullAudioLoading} available={Boolean(beat.previewAvailable)} error={playbackError} onLoad={() => void loadFullAudio()} />
                 <div className="mt-5 flex flex-wrap justify-end gap-2 border-t border-[#252525] pt-4"><button type="button" onClick={() => setEditing((value) => !value)} className="rounded-xl border border-[#3b3b3b] px-3.5 py-2.5 text-xs font-medium text-[#ccc] transition hover:border-[#e8a33d]/60 hover:text-white">{editing ? "Close editor" : "Edit details"}</button>{archived ? <button type="button" onClick={() => setDeleteOpen(true)} className="rounded-xl border border-red-400/30 px-3.5 py-2.5 text-xs font-medium text-red-300 transition hover:border-red-300/60 hover:bg-red-400/10">Delete permanently</button> : <button type="button" onClick={() => setArchiveOpen(true)} className="rounded-xl border border-red-400/30 px-3.5 py-2.5 text-xs font-medium text-red-300 transition hover:border-red-300/60 hover:bg-red-400/10">Archive beat</button>}</div>
-            </div>}
+                </div>
+                </div>
+            </div>
         </article>
         {archiveOpen && <ArchiveConfirmationDialog beatTitle={beat.title} busy={archiving} onCancel={() => setArchiveOpen(false)} onConfirm={() => void archive()} />}
         {deleteOpen && <ArchiveConfirmationDialog beatTitle={beat.title} busy={deleting} deleteMode onCancel={() => setDeleteOpen(false)} onConfirm={() => void deleteArchived()} />}
     </>;
 }
 
-function ProducerBeatPlayer({ title, thumbnailUrl, audioUrl, loading, available, error, onLoad, onError }: { title: string; thumbnailUrl?: string | null; audioUrl: string | null; loading: boolean; available: boolean; error: boolean; onLoad: () => void; onError: () => void }) {
-    const audioRef = useRef<HTMLAudioElement>(null);
-    const [playing, setPlaying] = useState(false);
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [bufferedTime, setBufferedTime] = useState(0);
-
-    useEffect(() => {
-        setPlaying(false);
-        setCurrentTime(0);
-        setDuration(0);
-        setBufferedTime(0);
-    }, [audioUrl]);
+function ProducerBeatPlayer({ trackId, title, thumbnailUrl, audioUrl, loading, available, error, onLoad }: { trackId: string; title: string; thumbnailUrl?: string | null; audioUrl: string | null; loading: boolean; available: boolean; error: boolean; onLoad: () => void }) {
+    const playback = useProducerPlayback();
+    const isActive = playback.track?.id === trackId;
+    const playing = isActive && playback.playing;
+    const currentTime = isActive ? playback.currentTime : 0;
+    const duration = isActive ? playback.duration : 0;
+    const bufferedTime = isActive ? playback.bufferedTime : 0;
 
     function togglePlayback() {
-        if (!audioRef.current || !audioUrl) return;
-        if (playing) audioRef.current.pause();
-        else void audioRef.current.play().catch(onError);
-        setPlaying((value) => !value);
+        if (!isActive || !audioUrl) return;
+        playback.toggle();
     }
 
     function seek(value: string) {
         const nextTime = Number(value);
-        if (audioRef.current) audioRef.current.currentTime = nextTime;
-        setCurrentTime(nextTime);
-    }
-
-    function updateBuffered(event: React.SyntheticEvent<HTMLAudioElement>) {
-        const media = event.currentTarget;
-        if (media.buffered.length) setBufferedTime(media.buffered.end(media.buffered.length - 1));
+        if (isActive) playback.seek(nextTime);
     }
 
     function formatTime(value: number) {
@@ -267,10 +259,9 @@ function ProducerBeatPlayer({ title, thumbnailUrl, audioUrl, loading, available,
     const bufferedPercent = duration ? Math.max(playedPercent, Math.min(100, (bufferedTime / duration) * 100)) : 0;
 
     return <div className="mt-5 rounded-xl border border-[#292929] bg-[#181818] px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.18)] sm:px-5">
-        <audio ref={audioRef} preload="metadata" src={audioUrl || undefined} onLoadedMetadata={(event) => setDuration(event.currentTarget.duration)} onProgress={updateBuffered} onTimeUpdate={(event) => { setCurrentTime(event.currentTarget.currentTime); updateBuffered(event); }} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onEnded={() => { setPlaying(false); setCurrentTime(0); }} onError={onError} />
         {!audioUrl ? <div className="flex flex-wrap items-center justify-between gap-3"><div className="flex min-w-0 items-center gap-3"><div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md bg-[#282828]">{thumbnailUrl ? <Image src={thumbnailUrl} alt="" fill sizes="48px" className="object-cover" unoptimized /> : <Music2 size={18} className="absolute inset-0 m-auto text-[#a7a7a7]" />}</div><div className="min-w-0"><p className="truncate text-sm font-medium text-white">{title}</p><p className="mt-1 text-xs text-[#a7a7a7]">{error ? "Playback unavailable" : available ? "Ready to play full master" : "Processing audio"}</p></div></div><button type="button" disabled={loading || !available} onClick={onLoad} className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#1ed760] px-4 py-2 text-xs font-bold text-black transition hover:bg-[#1fdf66] disabled:cursor-not-allowed disabled:opacity-50">{loading ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} fill="currentColor" />}{loading ? "Loading" : error ? "Retry" : "Play full beat"}</button></div> : <div className="grid items-center gap-x-5 gap-y-3 lg:grid-cols-[minmax(170px,0.8fr)_minmax(320px,1.5fr)_minmax(80px,0.5fr)]">
             <div className="flex min-w-0 items-center gap-3"><div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md bg-[#282828]">{thumbnailUrl ? <Image src={thumbnailUrl} alt="" fill sizes="48px" className="object-cover" unoptimized /> : <Music2 size={18} className="absolute inset-0 m-auto text-[#a7a7a7]" />}</div><div className="min-w-0"><p className="truncate text-sm font-medium text-white">{title}</p><p className="mt-1 truncate text-xs text-[#a7a7a7]">Producer preview</p></div></div>
-            <div className="min-w-0"><div className="flex items-center justify-center gap-5 text-[#b3b3b3]"><button type="button" aria-label="Restart beat" onClick={() => { if (audioRef.current) audioRef.current.currentTime = 0; setCurrentTime(0); }} className="transition hover:text-white"><SkipBack size={16} fill="currentColor" /></button><button type="button" onClick={togglePlayback} aria-label={playing ? "Pause beat" : "Play beat"} className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-black transition hover:scale-105">{playing ? <Pause size={15} fill="currentColor" /> : <Play size={15} fill="currentColor" className="ml-0.5" />}</button><button type="button" aria-label="Skip forward 10 seconds" onClick={() => { if (audioRef.current) audioRef.current.currentTime = Math.min((audioRef.current.currentTime || 0) + 10, duration); }} className="transition hover:text-white"><SkipForward size={16} fill="currentColor" /></button></div><div className="mt-2 flex items-center gap-2"><span className="w-8 text-right font-mono text-[10px] text-[#a7a7a7]">{formatTime(currentTime)}</span><input aria-label="Beat playback position" type="range" min="0" max={duration || 0} step="0.01" value={Math.min(currentTime, duration || 0)} onChange={(event) => seek(event.target.value)} style={{ background: `linear-gradient(to right, #fff 0%, #fff ${playedPercent}%, #6b6b6b ${playedPercent}%, #6b6b6b ${bufferedPercent}%, #404040 ${bufferedPercent}%, #404040 100%)` }} className="h-1 w-full cursor-pointer appearance-none rounded-full accent-white" /><span className="w-8 font-mono text-[10px] text-[#a7a7a7]">{formatTime(duration)}</span></div></div>
+            <div className="min-w-0"><div className="flex items-center justify-center gap-5 text-[#b3b3b3]"><button type="button" aria-label="Restart beat" onClick={playback.restart} className="transition hover:text-white"><SkipBack size={16} fill="currentColor" /></button><button type="button" onClick={togglePlayback} aria-label={playing ? "Pause beat" : "Play beat"} className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-black transition hover:scale-105">{playing ? <Pause size={15} fill="currentColor" /> : <Play size={15} fill="currentColor" className="ml-0.5" />}</button><button type="button" aria-label="Skip forward 10 seconds" onClick={playback.skipForward} className="transition hover:text-white"><SkipForward size={16} fill="currentColor" /></button></div><div className="mt-2 flex items-center gap-2"><span className="w-8 text-right font-mono text-[10px] text-[#a7a7a7]">{formatTime(currentTime)}</span><input aria-label="Beat playback position" type="range" min="0" max={duration || 0} step="0.01" value={Math.min(currentTime, duration || 0)} onChange={(event) => seek(event.target.value)} style={{ background: `linear-gradient(to right, #fff 0%, #fff ${playedPercent}%, #6b6b6b ${playedPercent}%, #6b6b6b ${bufferedPercent}%, #404040 ${bufferedPercent}%, #404040 100%)` }} className="h-1 w-full cursor-pointer appearance-none rounded-full accent-white" /><span className="w-8 font-mono text-[10px] text-[#a7a7a7]">{formatTime(duration)}</span></div></div>
             <div className="hidden items-center justify-end gap-2 text-[#a7a7a7] lg:flex"><Volume2 size={15} /><span className="text-[10px] uppercase tracking-[0.12em]">Private</span></div>
         </div>}
     </div>;
