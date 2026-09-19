@@ -21,6 +21,7 @@ export type BeatSummary = {
     description?: string | null;
     mood?: string | null;
     studioId?: string | null;
+    genreId?: string | null;
     status?: string | null;
     visibility?: string | null;
 };
