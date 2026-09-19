@@ -7,12 +7,15 @@ import {
     BadgeCheck,
     Clock3,
     Heart,
+    Loader2,
     Pause,
     Play,
+    SkipBack,
+    SkipForward,
     Star,
-    TrendingUp,
 } from "lucide-react";
-import { useState } from "react";
+import { BeatService } from "@/features/beatmarketplace";
+import { useEffect, useRef, useState } from "react";
 
 interface BeatCardProps {
     id: number | string;
@@ -27,6 +30,7 @@ interface BeatCardProps {
     plays: number;
     likes: number;
     duration: string;
+    durationSeconds?: number;
     exclusive: boolean;
     verified: boolean;
     loading?: "eager" | "lazy";
@@ -35,6 +39,7 @@ interface BeatCardProps {
 }
 
 export function BeatCard({
+    id,
     slug,
     title,
     producer,
@@ -46,6 +51,7 @@ export function BeatCard({
     plays,
     likes,
     duration,
+    durationSeconds = 0,
     exclusive,
     verified,
     loading = "lazy",
@@ -54,17 +60,91 @@ export function BeatCard({
 }: BeatCardProps) {
     const [playing, setPlaying] = useState(false);
     const [liked, setLiked] = useState(false);
+    const [likeCount, setLikeCount] = useState(likes);
+    const [likeLoading, setLikeLoading] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [previewLoading, setPreviewLoading] = useState(false);
+    const [previewError, setPreviewError] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0);
+    const parsedDuration = Number(duration.split(":")[0]) * 60 + Number(duration.split(":")[1]);
+    const [trackDuration, setTrackDuration] = useState(durationSeconds > 0 ? durationSeconds : parsedDuration > 0 ? parsedDuration : 70);
+    const [autoplayPreview, setAutoplayPreview] = useState(false);
+    const audioRef = useRef<HTMLAudioElement>(null);
 
-    const handlePlayClick = (e: React.MouseEvent) => {
+    useEffect(() => {
+        let active = true;
+        setLikeCount(likes);
+        setLiked(false);
+        void BeatService.getLikeState(String(id))
+            .then((state) => {
+                if (!active) return;
+                setLiked(state.liked);
+                setLikeCount(state.likeCount);
+            })
+            .catch(() => {
+                // Anonymous visitors may not have a like state yet.
+            });
+        return () => { active = false; };
+    }, [id, likes]);
+
+    useEffect(() => {
+        if (!previewUrl || !autoplayPreview || !audioRef.current) return;
+        setAutoplayPreview(false);
+        void audioRef.current.play().catch(() => { setPreviewError(true); setPlaying(false); });
+    }, [previewUrl, autoplayPreview]);
+
+    const handlePlayClick = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        setPlaying((p) => !p);
+        if (previewLoading) return;
+        setPreviewError(false);
+        if (!previewUrl) {
+            setPreviewLoading(true);
+            setAutoplayPreview(true);
+            try {
+                setPreviewUrl(await BeatService.getPreviewUrl(String(id)));
+            } catch {
+                setPreviewError(true);
+                setAutoplayPreview(false);
+            } finally {
+                setPreviewLoading(false);
+            }
+            return;
+        }
+        if (playing) audioRef.current?.pause();
+        else void audioRef.current?.play().catch(() => setPreviewError(true));
     };
 
-    const handleLikeClick = (e: React.MouseEvent) => {
+    const handleSeek = (value: string) => {
+        const nextTime = Math.min(Number(value), trackDuration);
+        if (audioRef.current) audioRef.current.currentTime = nextTime;
+        setCurrentTime(nextTime);
+    };
+
+    const seekBy = (seconds: number) => handleSeek(String(Math.max(0, Math.min(currentTime + seconds, trackDuration))));
+
+    const formatTime = (value: number) => `${Math.floor(value / 60)}:${Math.floor(value % 60).toString().padStart(2, "0")}`;
+    const displayDuration = durationSeconds > 0 ? formatTime(durationSeconds) : duration;
+    const accessibleDuration = Math.min(70, trackDuration);
+    const playedPercent = trackDuration ? (currentTime / trackDuration) * 100 : 0;
+    const accessiblePercent = trackDuration ? (accessibleDuration / trackDuration) * 100 : 100;
+
+    const handleLikeClick = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        setLiked((l) => !l);
+        if (likeLoading) return;
+        setLikeLoading(true);
+        try {
+            const state = liked
+                ? await BeatService.unlikeBeat(String(id))
+                : await BeatService.likeBeat(String(id));
+            setLiked(state.liked);
+            setLikeCount(state.likeCount);
+        } catch {
+            // Keep the current visual state when the API rejects the action.
+        } finally {
+            setLikeLoading(false);
+        }
     };
 
     return (
@@ -119,6 +199,7 @@ export function BeatCard({
                     overflow-hidden
                     rounded-xl
                     bg-[#0e0d0c]
+                    sm:aspect-[16/11]
                 "
             >
                 <Image
@@ -141,27 +222,16 @@ export function BeatCard({
                     className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"
                 />
 
-                {/* Exclusive — status flag, kept emerald to match "Available" on the studio card */}
-                <div className="absolute left-2 top-2">
-                    {exclusive && (
-                        <span
-                            className="
-                                inline-flex
-                                items-center
-                                gap-1
-                                rounded-full
-                                bg-emerald-500/90
-                                px-1.5
-                                py-0.5
-                                text-[9px]
-                                font-semibold
-                                text-white
-                                backdrop-blur-md
-                            "
-                        >
-                            Exclusive
-                        </span>
-                    )}
+                {/* License and rating — stacked so the purchase signal comes first */}
+                <div className="absolute left-2 top-2 flex flex-col items-start gap-1">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/90 px-1.5 py-0.5 text-[9px] font-semibold text-white backdrop-blur-md">
+                        {exclusive ? "Exclusive" : "Standard license"}
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-black/65 px-1.5 py-0.5 font-mono text-[9px] font-semibold text-white backdrop-blur-md">
+                        <Star size={9} className="fill-[#e8a33d] text-[#e8a33d]" />
+                        {averageRating > 0 ? averageRating.toFixed(1) : "New"}
+                        {reviewCount > 0 && <span className="text-[#c3bfb5]">({reviewCount})</span>}
+                    </span>
                 </div>
 
                 {/* BPM chip — mono readout, same slot as rating on the studio card */}
@@ -196,40 +266,6 @@ export function BeatCard({
                     </div>
                 </div>
 
-                {/* Play — floating center, unique to beats, gets the strongest accent */}
-                <button
-                    onClick={handlePlayClick}
-                    aria-label={playing ? "Pause preview" : "Play preview"}
-                    className="
-                        absolute
-                        left-1/2
-                        top-1/2
-                        z-10
-                        flex
-                        h-9
-                        w-9
-                        -translate-x-1/2
-                        -translate-y-1/2
-                        items-center
-                        justify-center
-                        rounded-full
-                        bg-[#e8a33d]
-                        text-[#161513]
-                        opacity-0
-                        shadow-xl
-                        transition-all
-                        duration-300
-                        group-hover:opacity-100
-                        hover:bg-[#f0b458]
-                    "
-                >
-                    {playing ? (
-                        <Pause size={14} className="fill-current" />
-                    ) : (
-                        <Play size={14} className="ml-0.5 fill-current" />
-                    )}
-                </button>
-
                 {/* Like — stays red when active, that convention overrides the brand accent */}
                 <button
                     onClick={handleLikeClick}
@@ -256,13 +292,13 @@ export function BeatCard({
                 >
                     <Heart
                         size={12}
-                        className={liked ? "fill-red-500 text-red-500" : "text-white"}
+                        className={likeLoading ? "animate-pulse text-white/60" : liked ? "fill-red-500 text-red-500" : "text-white"}
                     />
                 </button>
             </div>
 
             {/* Content — mirrors FeaturedStudioCard's structure exactly */}
-            <div className="flex flex-1 flex-col p-3">
+            <div className="flex min-w-0 flex-1 flex-col p-2.5">
 
                 {/* Header — title + verified badge, badge pill on the right */}
                 <div className="flex items-start justify-between gap-2">
@@ -294,74 +330,26 @@ export function BeatCard({
                 </div>
 
                 {/* Producer + duration — same slot as location + bookings */}
-                <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] text-[#9a978f]">
+                <div className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[10px] text-[#9a978f]">
                     <span className="min-w-0 truncate">
                         by {producer}
                     </span>
-
                     <span className="flex items-center gap-1">
                         <Clock3 size={11} />
-                        {duration}
+                        {displayDuration}
                     </span>
                 </div>
 
-                {/* Stats tags — patch-cable labels, mono numbers */}
-                <div className="mt-2 flex flex-wrap gap-1">
-                    <span
-                        className="
-                            inline-flex
-                            items-center
-                            gap-1
-                            rounded-md
-                            border
-                            border-[#2a2825]
-                            bg-[#1c1a17]
-                            px-2
-                            py-0.5
-                            font-mono
-                            text-[9px]
-                            font-medium
-                            text-[#b5b2a8]
-                            transition-colors
-                            group-hover:border-[#3a3630]
-                        "
-                    >
-                        <TrendingUp size={10} className="text-[#e8a33d]" />
-                        {plays.toLocaleString()} plays
-                    </span>
-                    <span
-                        className="
-                            inline-flex
-                            items-center
-                            gap-1
-                            rounded-md
-                            border
-                            border-[#2a2825]
-                            bg-[#1c1a17]
-                            px-2
-                            py-0.5
-                            font-mono
-                            text-[9px]
-                            font-medium
-                            text-[#b5b2a8]
-                            transition-colors
-                            group-hover:border-[#3a3630]
-                        "
-                    >
-                        <Heart size={10} className="text-red-400" />
-                        {(likes + (liked ? 1 : 0)).toLocaleString()}
-                    </span>
-                    <span
-                        className="inline-flex items-center gap-1 rounded-md border border-[#2a2825] bg-[#1c1a17] px-2 py-0.5 font-mono text-[9px] font-medium text-[#b5b2a8]"
-                    >
-                        <Star size={10} className="fill-[#e8a33d] text-[#e8a33d]" />
-                        {averageRating > 0 ? averageRating.toFixed(1) : "New"}
-                        {reviewCount > 0 && <span className="text-[#6b685f]">({reviewCount})</span>}
-                    </span>
+                <audio ref={audioRef} preload="metadata" src={previewUrl || undefined} onLoadedMetadata={(event) => { const duration = event.currentTarget.duration || 0; setTrackDuration((current) => Math.max(current, duration)); }} onTimeUpdate={(event) => { const media = event.currentTarget; const nextTime = Math.min(media.currentTime, accessibleDuration); if (media.currentTime >= accessibleDuration) { media.pause(); media.currentTime = accessibleDuration; setPlaying(false); } setCurrentTime(nextTime); }} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onEnded={() => { setPlaying(false); setCurrentTime(0); }} onError={() => { setPreviewError(true); setPlaying(false); }} className="hidden" />
+
+                {/* Spotify-style inline transport with a visible private remainder */}
+                <div className="mt-2" onClick={(event) => { event.preventDefault(); event.stopPropagation(); }}>
+                    <div className="flex items-center justify-center gap-3"><span className="mr-1 flex items-center gap-1 font-mono text-[9px] text-[#777]"><span className="text-[#e8a33d]">{plays.toLocaleString()}</span><span className="hidden sm:inline">plays</span></span><button type="button" onClick={(event) => { event.preventDefault(); event.stopPropagation(); seekBy(-10); }} aria-label="Skip back 10 seconds" className="text-[#999] transition hover:text-white"><SkipBack size={13} fill="currentColor" /></button><button type="button" onClick={handlePlayClick} aria-label={playing ? "Pause preview" : "Play preview"} title={previewError ? "Preview unavailable" : "Play preview"} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1ed760] text-[#071b0d] transition hover:scale-105 hover:bg-[#1fdf66]">{previewLoading ? <Loader2 size={12} className="animate-spin" /> : playing ? <Pause size={12} fill="currentColor" /> : <Play size={12} fill="currentColor" className="ml-0.5" />}</button><button type="button" onClick={(event) => { event.preventDefault(); event.stopPropagation(); seekBy(10); }} aria-label="Skip forward 10 seconds" className="text-[#999] transition hover:text-white"><SkipForward size={13} fill="currentColor" /></button><span className="ml-1 flex items-center gap-1 font-mono text-[9px] text-[#777]"><Heart size={10} className="text-red-400" />{likeCount.toLocaleString()}</span></div>
+                    <div className="mt-2 flex items-center gap-2"><span className="w-7 text-right font-mono text-[9px] text-[#777]">{formatTime(currentTime)}</span><div className="relative min-w-0 flex-1"><input aria-label="Preview position" type="range" min="0" max={trackDuration} step="0.01" value={Math.min(currentTime, trackDuration)} onChange={(event) => handleSeek(event.target.value)} style={{ background: `linear-gradient(to right, #fff 0%, #fff ${playedPercent}%, #777 ${playedPercent}%, #777 ${accessiblePercent}%, #ef4444 ${accessiblePercent}%, #ef4444 100%)` }} className="relative z-10 h-1 w-full cursor-pointer appearance-none rounded-full accent-white" />{accessiblePercent < 100 && <span aria-hidden="true" className="pointer-events-none absolute top-1/2 z-20 h-2.5 w-px -translate-y-1/2 bg-red-400" style={{ left: `${accessiblePercent}%` }} />}</div><span className="w-7 font-mono text-[9px] text-[#777]">{formatTime(trackDuration)}</span></div>
                 </div>
 
                 {/* Footer — identical structure to FeaturedStudioCard's */}
-                <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-[#2a2825] pt-2.5">
+                <div className="mt-2 flex items-center justify-between gap-2 border-t border-[#2a2825] pt-2">
                     <span className="truncate font-mono text-[10px] text-[#6b685f]">
                         {musicalKey}
                     </span>
@@ -385,7 +373,7 @@ export function BeatCard({
                             group-hover:bg-[#f0b458]
                         "
                     >
-                        Buy
+                        View Beat
                         <ArrowRight
                             size={12}
                             className="transition-transform duration-300 group-hover:translate-x-0.5"

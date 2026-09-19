@@ -86,7 +86,7 @@ export function MarketplacePage() {
 }
 
 function toCardBeat(beat: BeatSummary) {
-    return { id: beat.id, slug: beat.id, title: beat.title, producer: beat.producerName || "StudioOS producer", thumbnail: beat.thumbnailUrl || beat.coverUrl || "/images/beats.png", genre: beat.genreName || "Unclassified", bpm: beat.bpm ?? 0, musicalKey: beat.keySignature || "Key unset", price: beat.startingPrice == null ? "Price on request" : `KSh ${beat.startingPrice.toLocaleString()}`, plays: beat.playCount ?? 0, likes: beat.likeCount ?? 0, duration: formatDuration(beat.duration), exclusive: beat.exclusive, verified: beat.verified, averageRating: beat.averageRating ?? 0, reviewCount: beat.reviewCount ?? 0 };
+    return { id: beat.id, slug: beat.id, title: beat.title, producer: beat.producerName || "StudioOS producer", thumbnail: beat.thumbnailUrl || beat.coverUrl || "/images/beats.png", genre: beat.genreName || "Unclassified", bpm: beat.bpm ?? 0, musicalKey: beat.keySignature || "Key unset", price: beat.startingPrice == null ? "Price on request" : `KSh ${beat.startingPrice.toLocaleString()}`, plays: beat.playCount ?? 0, likes: beat.likeCount ?? 0, duration: formatDuration(beat.duration), durationSeconds: beat.duration ?? 0, exclusive: beat.exclusive, verified: beat.verified, averageRating: beat.averageRating ?? 0, reviewCount: beat.reviewCount ?? 0 };
 }
 
 function formatDuration(seconds?: number | null) {

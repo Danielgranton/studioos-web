@@ -85,7 +85,8 @@ export function ProducerBeatMarketplacePage() {
         try {
             setUploadStage("preparing");
             setUploadProgress(0);
-            draft = await BeatService.createUpload({ ...form, bpm: form.bpm ? Number(form.bpm) : undefined });
+            const duration = await readAudioDuration(audio);
+            draft = await BeatService.createUpload({ ...form, bpm: form.bpm ? Number(form.bpm) : undefined, duration });
             setUploadStage("files");
             let audioRatio = 0;
             let coverRatio = 0;
@@ -125,6 +126,29 @@ export function ProducerBeatMarketplacePage() {
             <SalesPanel sales={paidSales} />
         </>}
     </div>;
+}
+
+function readAudioDuration(file: File): Promise<number> {
+    return new Promise((resolve, reject) => {
+        const objectUrl = URL.createObjectURL(file);
+        const audio = document.createElement("audio");
+        const cleanup = () => {
+            URL.revokeObjectURL(objectUrl);
+            audio.remove();
+        };
+        audio.preload = "metadata";
+        audio.onloadedmetadata = () => {
+            const duration = Math.round(audio.duration);
+            cleanup();
+            if (Number.isFinite(duration) && duration > 0) resolve(duration);
+            else reject(new Error("The selected audio duration could not be read."));
+        };
+        audio.onerror = () => {
+            cleanup();
+            reject(new Error("The selected audio duration could not be read."));
+        };
+        audio.src = objectUrl;
+    });
 }
 
 function BeatProcessingCard({ beat, onRetried }: { beat: BeatSummary; onRetried: () => void }) {
@@ -179,6 +203,7 @@ function ProducerBeatRow({ beat, genres, sales, onUpdated, onArchived }: { beat:
     const [fullAudioUrl, setFullAudioUrl] = useState<string | null>(null);
     const [fullAudioLoading, setFullAudioLoading] = useState(false);
     const [playbackError, setPlaybackError] = useState(false);
+    const [repairingDuration, setRepairingDuration] = useState(false);
     const playback = useProducerPlayback();
     const [editing, setEditing] = useState(false);
     const [savingEdit, setSavingEdit] = useState(false);
@@ -191,28 +216,33 @@ function ProducerBeatRow({ beat, genres, sales, onUpdated, onArchived }: { beat:
     async function archive() { setArchiving(true); try { await BeatService.archiveBeat(beat.id); onArchived(); setArchiveOpen(false); toast.success("Beat archived", { description: "The beat is no longer available in the public marketplace." }); } catch (error) { toast.error("Could not archive beat", { description: getErrorMessage(error) }); } finally { setArchiving(false); } }
     async function deleteArchived() { setDeleting(true); try { await BeatService.deleteArchivedBeat(beat.id); onArchived(); setDeleteOpen(false); toast.success("Archived beat deleted"); } catch (error) { toast.error("Could not delete archived beat", { description: getErrorMessage(error) }); } finally { setDeleting(false); } }
     async function loadFullAudio() { if (fullAudioLoading) return; if (fullAudioUrl) { playback.setTrack({ id: beat.id, title: beat.title, thumbnailUrl: beat.thumbnailUrl, audioUrl: fullAudioUrl }); return; } setFullAudioLoading(true); setPlaybackError(false); try { const audioUrl = await BeatService.getOwnerAudioUrl(beat.id); setFullAudioUrl(audioUrl); playback.setTrack({ id: beat.id, title: beat.title, thumbnailUrl: beat.thumbnailUrl, audioUrl }); } catch { setPlaybackError(true); } finally { setFullAudioLoading(false); } }
+    async function repairDuration() { setRepairingDuration(true); try { await BeatService.retryProcessing(beat.id); toast.success("Duration repair started", { description: "The beat will return to the catalog when processing completes." }); onUpdated(); } catch (error) { toast.error("Could not repair duration", { description: getErrorMessage(error) }); } finally { setRepairingDuration(false); } }
     function editField(key: keyof typeof editForm, value: string) { setEditForm((current) => ({ ...current, [key]: value })); }
     async function saveEdit() { if (!editForm.title.trim() || !editForm.genreId) { toast.error("Complete the beat details", { description: "A title and genre are required." }); return; } setSavingEdit(true); try { await BeatService.updateBeat(beat.id, { ...editForm, bpm: editForm.bpm ? Number(editForm.bpm) : undefined }); setEditing(false); onUpdated(); toast.success("Beat details updated"); } catch (error) { toast.error("Could not update beat", { description: getErrorMessage(error) }); } finally { setSavingEdit(false); } }
     const archived = beat.status === "ARCHIVED";
     return <>
-        <article className="overflow-hidden rounded-[1.75rem] border border-[#2b2b2b] bg-[#151515] shadow-[0_16px_45px_rgba(0,0,0,0.12)] transition-colors hover:border-[#454545]">
+        <article className="group/beat relative overflow-hidden rounded-[1.75rem] border border-[#2b2b2b] bg-gradient-to-br from-[#191919] via-[#151515] to-[#111111] shadow-[0_16px_45px_rgba(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#4a4032] hover:shadow-[0_20px_55px_rgba(0,0,0,0.2)]">
+            <div aria-hidden="true" className="pointer-events-none absolute inset-y-5 left-0 w-px bg-gradient-to-b from-transparent via-[#e8a33d]/70 to-transparent opacity-50 transition-opacity group-hover/beat:opacity-100" />
             <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_220px]">
-                <button type="button" aria-expanded={open} onClick={() => void toggle()} className="group flex min-w-0 items-center gap-4 p-4 text-left transition hover:bg-[#1a1a1a] sm:gap-5 sm:p-5">
+                <button type="button" aria-expanded={open} onClick={() => void toggle()} className="group relative flex min-w-0 items-center gap-4 p-4 text-left transition-colors hover:bg-white/[0.025] sm:gap-5 sm:p-5">
                     <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[#24211d] shadow-lg sm:h-24 sm:w-24">
                         {beat.thumbnailUrl ? <Image src={beat.thumbnailUrl} alt="" fill sizes="96px" className="object-cover transition duration-500 group-hover:scale-105" unoptimized /> : <Music2 size={28} className="absolute inset-0 m-auto text-[#e8a33d]" />}
-                        <span className="absolute bottom-2 left-2 rounded-md bg-black/70 px-1.5 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-white backdrop-blur">{beat.status === "ARCHIVED" ? "Archived" : "Live"}</span>
+                        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+                        <span className="absolute bottom-2 left-2 rounded-md border border-white/10 bg-black/70 px-1.5 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-white backdrop-blur">{beat.status === "ARCHIVED" ? "Archived" : "Live"}</span>
                     </div>
                     <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2"><h3 className="truncate text-base font-semibold tracking-tight text-white sm:text-lg">{beat.title}</h3>{beat.verified && <BadgeCheck size={16} className="text-[#5eead4]" />}</div>
-                        <p className="mt-1 truncate text-xs text-[#888]">{beat.genreName || "Unclassified"} <span className="px-1 text-[#444]">·</span> {beat.bpm || "--"} BPM <span className="px-1 text-[#444]">·</span> {beat.keySignature || "Key unset"}</p>
-                        <div className="mt-3 flex flex-wrap gap-2"><span className="rounded-full border border-[#343434] px-2.5 py-1 text-[10px] font-medium text-[#aaa]">{beat.visibility || "PRIVATE"}</span><span className="rounded-full border border-[#343434] px-2.5 py-1 text-[10px] font-medium text-[#aaa]">{beat.mood || "No mood"}</span></div>
+                        <div className="flex flex-wrap items-center gap-2"><h3 className="truncate text-base font-semibold tracking-tight text-white sm:text-lg">{beat.title}</h3>{beat.verified && <BadgeCheck size={16} className="text-[#5eead4]" />}<span className="rounded-full bg-[#e8a33d]/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#e8a33d]">{beat.genreName || "Unclassified"}</span></div>
+                        <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px] text-[#888]"><span>{beat.bpm || "--"} BPM</span><span className="text-[#444]">/</span><span>{beat.keySignature || "Key unset"}</span><span className="text-[#444]">/</span><span>{formatBeatDuration(beat.duration)}</span></p>
+                        <div className="mt-3 flex flex-wrap gap-2"><span className="rounded-full border border-[#343434] px-2.5 py-1 text-[10px] font-medium text-[#aaa]">{beat.visibility || "PRIVATE"}</span><span className="rounded-full border border-[#343434] px-2.5 py-1 text-[10px] font-medium text-[#aaa]">{beat.mood || "No mood"}</span><span className="text-[10px] text-[#666] sm:ml-1 sm:self-center">Open to manage</span></div>
                     </div>
-                    <ChevronDown size={18} className={`hidden shrink-0 text-[#666] transition sm:block ${open ? "rotate-180 text-[#e8a33d]" : ""}`} />
+                    <span className={`hidden h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#343434] text-[#777] transition-all group-hover:border-[#e8a33d]/50 group-hover:text-[#e8a33d] sm:flex ${open ? "rotate-180 border-[#e8a33d]/50 text-[#e8a33d]" : ""}`}><ChevronDown size={16} /></span>
                 </button>
-                <div className="grid grid-cols-3 border-t border-[#292929] bg-[#111111] px-4 py-3 lg:grid-cols-1 lg:border-l lg:border-t-0 lg:px-5 lg:py-4">
+                <div className="grid grid-cols-2 gap-y-3 border-t border-[#292929] bg-[#111111] px-4 py-3 sm:grid-cols-3 lg:grid-cols-2 lg:border-l lg:border-t-0 lg:px-5 lg:py-4">
                     <Metric label="Price" value={beat.startingPrice ? `KSh ${beat.startingPrice.toLocaleString()}` : "Unset"} />
                     <Metric label="Sales" value={String(paid.length)} />
                     <Metric label="Rating" value={beat.averageRating ? `${beat.averageRating.toFixed(1)} (${beat.reviewCount || 0})` : "New"} />
+                    <Metric label="Plays" value={(beat.playCount || 0).toLocaleString()} icon={<BarChart3 size={13} />} />
+                    <Metric label="Likes" value={(beat.likeCount || 0).toLocaleString()} icon={<Heart size={13} />} />
                 </div>
             </div>
             <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
@@ -222,7 +252,7 @@ function ProducerBeatRow({ beat, genres, sales, onUpdated, onArchived }: { beat:
                 <div className="mt-5 grid gap-5 lg:grid-cols-2"><ReviewPreview reviews={reviews} error={reviewsError} onRetry={() => void loadDetails()} /><LicensePreview licenses={licenses} onCreate={addLicense} onUpdate={updateLicense} /></div>
                 {editing && <EditBeatPanel form={editForm} genres={genres} busy={savingEdit} onChange={editField} onCancel={() => setEditing(false)} onSave={() => void saveEdit()} />}
                 <ProducerBeatPlayer trackId={beat.id} title={beat.title} thumbnailUrl={beat.thumbnailUrl} audioUrl={fullAudioUrl} loading={fullAudioLoading} available={Boolean(beat.previewAvailable)} error={playbackError} onLoad={() => void loadFullAudio()} />
-                <div className="mt-5 flex flex-wrap justify-end gap-2 border-t border-[#252525] pt-4"><button type="button" onClick={() => setEditing((value) => !value)} className="rounded-xl border border-[#3b3b3b] px-3.5 py-2.5 text-xs font-medium text-[#ccc] transition hover:border-[#e8a33d]/60 hover:text-white">{editing ? "Close editor" : "Edit details"}</button>{archived ? <button type="button" onClick={() => setDeleteOpen(true)} className="rounded-xl border border-red-400/30 px-3.5 py-2.5 text-xs font-medium text-red-300 transition hover:border-red-300/60 hover:bg-red-400/10">Delete permanently</button> : <button type="button" onClick={() => setArchiveOpen(true)} className="rounded-xl border border-red-400/30 px-3.5 py-2.5 text-xs font-medium text-red-300 transition hover:border-red-300/60 hover:bg-red-400/10">Archive beat</button>}</div>
+                <div className="mt-5 flex flex-wrap justify-end gap-2 border-t border-[#252525] pt-4">{!beat.duration && !archived && <button type="button" disabled={repairingDuration} onClick={() => void repairDuration()} className="inline-flex items-center gap-2 rounded-xl border border-[#4a4032] px-3.5 py-2.5 text-xs font-medium text-[#e8a33d] transition hover:bg-[#24211d] disabled:opacity-50">{repairingDuration && <Loader2 size={14} className="animate-spin" />}{repairingDuration ? "Repairing" : "Repair duration"}</button>}<button type="button" onClick={() => setEditing((value) => !value)} className="rounded-xl border border-[#3b3b3b] px-3.5 py-2.5 text-xs font-medium text-[#ccc] transition hover:border-[#e8a33d]/60 hover:text-white">{editing ? "Close editor" : "Edit details"}</button>{archived ? <button type="button" onClick={() => setDeleteOpen(true)} className="rounded-xl border border-red-400/30 px-3.5 py-2.5 text-xs font-medium text-red-300 transition hover:border-red-300/60 hover:bg-red-400/10">Delete permanently</button> : <button type="button" onClick={() => setArchiveOpen(true)} className="rounded-xl border border-red-400/30 px-3.5 py-2.5 text-xs font-medium text-red-300 transition hover:border-red-300/60 hover:bg-red-400/10">Archive beat</button>}</div>
                 </div>
                 </div>
             </div>
@@ -350,6 +380,11 @@ function LicensePreview({ licenses, onCreate, onUpdate }: { licenses: BeatLicens
 function SalesPanel({ sales }: { sales: BeatSale[] }) { return <section className="mt-9"><div className="flex items-center gap-2"><BarChart3 size={16} className="text-[#e8a33d]" /><h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-[#777]">Recent sales</h2></div>{sales.length === 0 ? <div className="mt-3 rounded-2xl border border-dashed border-[#303030] px-5 py-8 text-center text-sm text-[#666]">Your paid beat sales will appear here.</div> : <div className="mt-3 overflow-hidden rounded-2xl border border-[#2b2b2b] bg-[#151515]">{sales.slice(0, 8).map((sale) => <div key={sale.id} className="flex items-center justify-between gap-4 border-b border-[#292929] px-4 py-3.5 last:border-0"><div className="min-w-0"><p className="truncate text-sm font-medium text-[#ddd]">{sale.beatTitle}</p><p className="mt-1 text-xs text-[#666]">{new Date(sale.purchasedAt).toLocaleDateString()}</p></div><span className="font-mono text-sm text-emerald-300">+ KSh {sale.amount.toLocaleString()}</span></div>)}</div>}</section>; }
 function Kpi({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) { return <div className="rounded-2xl border border-[#2b2b2b] bg-[#151515] p-4"><span className="text-[#777]">{icon}</span><p className="mt-3 text-xl font-semibold text-white">{value}</p><p className="mt-1 text-[10px] uppercase tracking-[0.14em] text-[#666]">{label}</p></div>; }
 function Metric({ label, value, icon }: { label: string; value: string; icon?: React.ReactNode }) { return <div><p className="text-[9px] uppercase tracking-[0.14em] text-[#666]">{label}</p><p className="mt-1 flex items-center gap-1 text-xs font-medium text-[#ccc]">{icon}{value}</p></div>; }
+
+function formatBeatDuration(value?: number | null) {
+    if (!value || value < 1) return "Duration unset";
+    return `${Math.floor(value / 60)}:${String(value % 60).padStart(2, "0")}`;
+}
 function Input({ label, value, onChange, type = "text", placeholder, required }: { label: string; value: string; onChange: (value: string) => void; type?: string; placeholder?: string; required?: boolean }) { return <label><span className="mb-1.5 block text-xs font-medium text-[#aaa]">{label}</span><input required={required} type={type} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} className="w-full rounded-xl border border-[#36312a] bg-[#11100e] px-3 py-2.5 text-sm text-white outline-none placeholder:text-[#555] focus:border-[#e8a33d]" /></label>; }
 function Select({ label, value, options, onChange, disabled }: { label: string; value: string; options: string[][]; onChange: (value: string) => void; disabled?: boolean }) { return <label><span className="mb-1.5 block text-xs font-medium text-[#aaa]">{label}</span><select required disabled={disabled} value={value} onChange={(event) => onChange(event.target.value)} className="w-full rounded-xl border border-[#36312a] bg-[#11100e] px-3 py-2.5 text-sm text-white outline-none focus:border-[#e8a33d] disabled:cursor-not-allowed disabled:opacity-50"><option value="">{disabled ? `${label} unavailable` : `Select ${label.toLowerCase()}`}</option>{options.map(([id, name]) => <option key={id} value={id}>{name}</option>)}</select></label>; }
 function FilePicker({ label, accept, file, onChange, icon }: { label: string; accept: string; file: File | null; onChange: (file: File | null) => void; icon: React.ReactNode }) { return <label className="relative flex min-h-14 cursor-pointer items-center gap-3 overflow-hidden rounded-xl border border-dashed border-[#4a4032] bg-[#151311] px-4 py-3 text-sm text-[#aaa] transition hover:border-[#e8a33d]/60 focus-within:border-[#e8a33d] focus-within:ring-2 focus-within:ring-[#e8a33d]/20"><input type="file" required accept={accept} className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0" onChange={(event) => onChange(event.target.files?.[0] || null)} />{icon}<span className="pointer-events-none min-w-0 truncate">{file?.name || label}</span></label>; }

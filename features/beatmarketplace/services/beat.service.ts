@@ -2,6 +2,11 @@ import { api } from "@/lib/api";
 
 import type { BeatGenre, BeatLicense, BeatPage, BeatReview, BeatSale, BeatSummary } from "../types/beat";
 
+export interface BeatLikeState {
+    liked: boolean;
+    likeCount: number;
+}
+
 class BeatServiceClient {
     async browse(params: { page?: number; size?: number; sortBy?: string } = {}): Promise<BeatPage> {
         const response = await api.get<BeatPage>("/beats", {
@@ -16,6 +21,9 @@ class BeatServiceClient {
     async getReviews(beatId: string): Promise<BeatReview[]> { return (await api.get<BeatReview[]>(`/beats/${beatId}/reviews`)).data; }
     async getLicenses(beatId: string): Promise<BeatLicense[]> { return (await api.get<BeatLicense[]>(`/beats/${beatId}/licenses`)).data; }
     async getPreviewUrl(beatId: string): Promise<string> { return (await api.get<{ previewUrl: string }>(`/beats/${beatId}/preview`)).data.previewUrl; }
+    async getLikeState(beatId: string): Promise<BeatLikeState> { return (await api.get<BeatLikeState>(`/beats/${beatId}/like`)).data; }
+    async likeBeat(beatId: string): Promise<BeatLikeState> { return (await api.post<BeatLikeState>(`/beats/${beatId}/like`)).data; }
+    async unlikeBeat(beatId: string): Promise<BeatLikeState> { return (await api.delete<BeatLikeState>(`/beats/${beatId}/like`)).data; }
     async getOwnerAudioUrl(beatId: string): Promise<string> { return (await api.get<{ previewUrl: string }>(`/beats/${beatId}/owner-audio`)).data.previewUrl; }
     async updateBeat(beatId: string, request: { title: string; description?: string; genreId: string; bpm?: number; keySignature?: string; mood?: string; visibility: string }): Promise<void> {
         await api.put(`/beats/${beatId}`, request);
@@ -27,7 +35,7 @@ class BeatServiceClient {
         return (await api.put<BeatLicense>(`/beats/${beatId}/licenses/${licenseId}`, request)).data;
     }
 
-    async createUpload(request: { title: string; description?: string; genreId: string; bpm?: number; keySignature?: string; mood?: string; visibility: string; studioId: string }) {
+    async createUpload(request: { title: string; description?: string; genreId: string; bpm?: number; keySignature?: string; mood?: string; duration: number; visibility: string; studioId: string }) {
         return (await api.post<{ beatId: string; beatUploadUrl: string; coverUploadUrl: string }>("/beats", request)).data;
     }
 
