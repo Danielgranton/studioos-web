@@ -31,6 +31,7 @@ export type Studio = {
     media?: StudioMedia[];
     averageRating?: number;
     totalRatings?: number;
+    likeCount?: number;
     createdAt?: string;
 };
 

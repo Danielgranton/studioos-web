@@ -15,6 +15,7 @@ export type FeaturedStudio = {
     location: string;
     rating: number;
     reviews: number;
+    likes: number;
     bookings: number;
     verified: boolean;
     badge: string;
@@ -521,6 +522,7 @@ function toFeaturedStudio(studio: Studio): FeaturedStudio {
         location: studio.location,
         rating: studio.averageRating ?? 0,
         reviews: studio.totalRatings ?? 0,
+        likes: studio.likeCount ?? 0,
         bookings: studio.bookings,
         verified: studio.verified,
         badge: studio.badge || "Standard listing",

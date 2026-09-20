@@ -5,10 +5,14 @@ import Link from "next/link";
 import {
     ArrowRight,
     BadgeCheck,
+    Heart,
     MapPin,
     Star,
     Users,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import { StudioService } from "@/features/studio";
 
 interface FeaturedStudioCardProps {
     id: number | string;
@@ -17,6 +21,7 @@ interface FeaturedStudioCardProps {
     location: string;
     rating: number;
     reviews: number;
+    likes: number;
     bookings: number;
     verified: boolean;
     badge: string;
@@ -29,11 +34,13 @@ interface FeaturedStudioCardProps {
 }
 
 export function FeaturedStudioCard({
+    id,
     slug,
     name,
     location,
     rating,
     reviews,
+    likes,
     bookings,
     verified,
     badge,
@@ -44,6 +51,36 @@ export function FeaturedStudioCard({
     image,
     loading = "lazy",
 }: FeaturedStudioCardProps) {
+    const [liked, setLiked] = useState(false);
+    const [likeCount, setLikeCount] = useState(likes);
+    const [likeLoading, setLikeLoading] = useState(false);
+
+    useEffect(() => {
+        setLikeCount(likes);
+        void StudioService.getLikeState(String(id))
+            .then((state) => {
+                setLiked(state.liked);
+                setLikeCount(state.likeCount);
+            })
+            .catch(() => undefined);
+    }, [id, likes]);
+
+    async function toggleLike(event: React.MouseEvent<HTMLButtonElement>) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (likeLoading) return;
+        setLikeLoading(true);
+        try {
+            const state = liked
+                ? await StudioService.unlikeStudio(String(id))
+                : await StudioService.likeStudio(String(id));
+            setLiked(state.liked);
+            setLikeCount(state.likeCount);
+        } finally {
+            setLikeLoading(false);
+        }
+    }
+
     return (
         <Link
             href={`/studios/${slug}`}
@@ -209,8 +246,8 @@ export function FeaturedStudioCard({
                     {reviews > 0 && <span className="hidden text-[#a19d92] sm:inline">({reviews})</span>}
                 </div>
 
-                {/* Price */}
-                <div className="absolute bottom-1.5 left-1.5 sm:bottom-3 sm:left-3 lg:bottom-2.5 lg:left-2.5">
+                {/* Price and like action */}
+                <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-end justify-between gap-2 sm:bottom-3 sm:left-3 sm:right-3 lg:bottom-2.5 lg:left-2.5 lg:right-2.5">
                     <div className="rounded-lg bg-black/60 px-2 py-1 backdrop-blur-md sm:rounded-xl sm:px-3 sm:py-1.5 lg:rounded-lg lg:px-2.5 lg:py-1">
                         <p className="hidden font-mono text-[9px] uppercase tracking-wide text-[#c4c0b6] sm:block lg:text-[8px]">
                             From
@@ -219,6 +256,16 @@ export function FeaturedStudioCard({
                             {priceLabel}
                         </p>
                     </div>
+                    <button
+                        type="button"
+                        aria-label={liked ? "Unlike studio" : "Like studio"}
+                        aria-pressed={liked}
+                        disabled={likeLoading}
+                        onClick={toggleLike}
+                        className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border backdrop-blur-md transition hover:scale-105 disabled:opacity-60 sm:h-9 sm:w-9 ${liked ? "border-red-300/40 bg-red-400/20 text-red-200" : "border-white/15 bg-black/60 text-white hover:border-white/30"}`}
+                    >
+                        <Heart size={15} className={liked ? "fill-current" : ""} />
+                    </button>
                 </div>
             </div>
 
@@ -261,7 +308,7 @@ export function FeaturedStudioCard({
                     </span>
                 </div>
 
-                {/* Location + bookings */}
+                {/* Location + review and like counts */}
                 <div
                     className="
                         mt-1.5
@@ -285,8 +332,16 @@ export function FeaturedStudioCard({
                         <span className="truncate">{location}</span>
                     </span>
 
+                    <span className="flex items-center gap-1.5">
+                        <Star size={12} className="text-[#e8a33d]" />
+                        {reviews.toLocaleString()}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                        <Heart size={12} className={liked ? "fill-current text-red-300" : "text-[#9a978f]"} />
+                        {likeCount.toLocaleString()}
+                    </span>
                     {bookings > 0 && (
-                        <span className="hidden items-center gap-1.5 sm:flex">
+                        <span className="hidden items-center gap-1.5 lg:flex">
                             <Users size={13} />
                             {bookings.toLocaleString()} bookings
                         </span>

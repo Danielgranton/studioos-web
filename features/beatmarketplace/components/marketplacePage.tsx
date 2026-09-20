@@ -9,7 +9,7 @@ import { BeatCard } from "@/features/home/trending-beats";
 import { BeatService } from "../services/beat.service";
 import type { BeatSummary } from "../types/beat";
 
-const filters = ["All", "Hip-Hop", "Afrobeat", "Trap", "Exclusive"];
+const filters = ["All", "Top rated", "Basic", "Premium", "Exclusive"];
 
 export function MarketplacePage() {
     const [beats, setBeats] = useState<BeatSummary[] | null>(null);
@@ -33,16 +33,29 @@ export function MarketplacePage() {
 
     const visibleBeats = useMemo(() => {
         const query = searchTerm.trim().toLowerCase();
-        return (beats ?? []).filter((beat) => {
+        const filtered = (beats ?? []).filter((beat) => {
             const genre = beat.genreName?.toLowerCase() ?? "";
             const matchesSearch = !query || [beat.title, beat.producerName ?? "", genre].some((value) => value.toLowerCase().includes(query));
             const matchesFilter = activeFilter === "All"
-                || (activeFilter === "Exclusive" && beat.exclusive)
-                || genre.includes(activeFilter.toLowerCase().replace("-", " "))
-                || (activeFilter === "Afrobeat" && genre.includes("afro"));
+                || (activeFilter === "Top rated")
+                || beat.licenseType === activeFilter.toUpperCase();
             return matchesSearch && matchesFilter;
         });
+
+        return [...filtered].sort((first, second) => {
+            if (activeFilter !== "Top rated") return 0;
+            return (second.averageRating ?? 0) - (first.averageRating ?? 0)
+                || (second.reviewCount ?? 0) - (first.reviewCount ?? 0)
+                || (second.likeCount ?? 0) - (first.likeCount ?? 0)
+                || (second.playCount ?? 0) - (first.playCount ?? 0);
+        });
     }, [activeFilter, beats, searchTerm]);
+
+    const marketplaceStats = [
+        { value: beats ? visibleBeats.length.toLocaleString() : "--", label: "beats in view" },
+        { value: beats && visibleBeats.length ? `${(visibleBeats.reduce((sum, beat) => sum + (beat.averageRating ?? 0), 0) / visibleBeats.length).toFixed(1)}★` : "--", label: "avg rating" },
+        { value: beats ? visibleBeats.reduce((sum, beat) => sum + (beat.reviewCount ?? 0), 0).toLocaleString() : "--", label: "listener reviews" },
+    ];
 
     return (
         <main className="min-h-screen bg-[#0f0f0f] py-8 text-[#f5f4f1] sm:py-12">
@@ -56,7 +69,14 @@ export function MarketplacePage() {
                                 <h1 className="whitespace-nowrap font-black leading-[1.05] tracking-tight" style={{ fontSize: "clamp(1.1rem, 4.2vw, 2rem)" }}>Find the sound for your <span className="relative inline-block"><span className="text-blue-600">next record</span><svg aria-hidden="true" viewBox="0 0 200 16" preserveAspectRatio="none" className="absolute -bottom-1 left-0 h-[0.15em] w-full text-blue-600"><path d="M2 8 H198" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="14 8" className="beats-marketplace-underline" /></svg></span>.</h1>
                             </div>
                             <p className="mt-3 max-w-xl text-sm leading-7 text-[#9a978f] sm:text-base">Browse original instrumentals from StudioOS producers. Preview the energy, find your pocket, and license the right beat.</p>
-                            <div className="mt-5 flex flex-wrap items-baseline gap-x-6 gap-y-2"><span className="flex items-baseline gap-2"><span className="font-mono text-base font-bold">{beats?.length ?? "--"}</span><span className="text-xs text-[#6b685f]">beats in view</span></span><span className="flex items-baseline gap-2"><span className="font-mono text-base font-bold">{visibleBeats.filter((beat) => beat.exclusive).length || "--"}</span><span className="text-xs text-[#6b685f]">exclusive drops</span></span></div>
+                            <div className="mt-5 flex flex-wrap items-baseline gap-x-5 gap-y-2 sm:mt-6 sm:gap-x-6">
+                                {marketplaceStats.map((stat) => (
+                                    <div key={stat.label} className="flex items-baseline gap-1.5">
+                                        <span className="font-mono text-sm font-bold text-[#f5f4f1] sm:text-base">{stat.value}</span>
+                                        <span className="text-[11px] text-[#6b685f] sm:text-xs">{stat.label}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                         <div className="flex w-full flex-col items-start gap-3 lg:w-auto lg:items-end">
                             <label className="flex w-full items-center gap-2 rounded-full border border-[#2a2825] bg-[#161513] px-4 py-2.5 text-sm text-[#9a978f] sm:min-w-[300px]"><Search size={15} className="text-[#e8a33d]" /><span className="sr-only">Search beats</span><input value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search beats or producers" className="w-full bg-transparent text-sm text-[#f5f4f1] outline-none placeholder:text-[#6b685f]" /></label>

@@ -9,6 +9,8 @@ import type {
     UpdateStudioRequest,
 } from "../types/studio";
 
+export type StudioLikeState = { liked: boolean; likeCount: number };
+
 class StudioServiceClient {
     async getMyStudios(): Promise<Studio[]> {
         const response = await api.get<ApiResponse<Studio[]>>("/studios/my");
@@ -45,6 +47,21 @@ class StudioServiceClient {
     async getStudio(studioId: string): Promise<Studio> {
         const response = await api.get<ApiResponse<Studio>>(`/studios/${studioId}`);
         return response.data.data as Studio;
+    }
+
+    async getLikeState(studioId: string): Promise<StudioLikeState> {
+        const response = await api.get<ApiResponse<StudioLikeState>>(`/studios/${studioId}/like`);
+        return response.data.data as StudioLikeState;
+    }
+
+    async likeStudio(studioId: string): Promise<StudioLikeState> {
+        const response = await api.post<ApiResponse<StudioLikeState>>(`/studios/${studioId}/like`);
+        return response.data.data as StudioLikeState;
+    }
+
+    async unlikeStudio(studioId: string): Promise<StudioLikeState> {
+        const response = await api.delete<ApiResponse<StudioLikeState>>(`/studios/${studioId}/like`);
+        return response.data.data as StudioLikeState;
     }
 
     async createStudio(request: CreateStudioRequest): Promise<Studio> {

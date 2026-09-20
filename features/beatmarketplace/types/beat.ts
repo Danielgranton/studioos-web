@@ -7,6 +7,7 @@ export type BeatSummary = {
     bpm?: number | null;
     keySignature?: string | null;
     startingPrice?: number | null;
+    licenseType?: "BASIC" | "PREMIUM" | "EXCLUSIVE" | null;
     likeCount?: number | null;
     playCount?: number | null;
     producerId: string;

@@ -4,7 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
-import { BadgeCheck, Building2, Check, Film, ImagePlus, Loader2, MapPin, Pencil, Plus, Sparkles, Star } from "lucide-react";
+import { BadgeCheck, Building2, Check, Film, Heart, ImagePlus, Loader2, MapPin, Pencil, Plus, Sparkles, Star, Trash2 } from "lucide-react";
 
 import { DashboardErrorState, useDashboardSession } from "@/features/dashboard";
 import { VerificationGuide } from "@/features/verification";
@@ -144,9 +144,9 @@ function StudioManagementRow({ studio, onEdit, onRefresh }: { studio: Studio; on
         </div>
         <VerificationGuide subject="studio" status={studio.verificationStatus ?? (studio.verified ? "VERIFIED" : "UNVERIFIED")} items={[{ label: "Add a clear studio profile image", complete: Boolean(studio.profileImage || studio.profileImageMedium || studio.profileImageThumbnail) }, { label: "Write a detailed listing description", complete: Boolean(studio.description?.trim()) }, { label: "Set your location and hourly pricing", complete: Boolean(studio.location?.trim() && studio.pricing > 0) }, { label: "List your services and genres", complete: studio.services.length > 0 && studio.genres.length > 0 }, { label: "Add gallery photos of the space", complete: (studio.media?.filter((item) => item.type === "IMAGE").length || 0) > 0 }]} />
         <StudioMediaManager studio={studio} onRefresh={onRefresh} />
-        <div className="grid gap-6 border-t border-[#2b2b2b] px-5 py-6 sm:px-7 lg:grid-cols-[1.2fr_1fr]">
+            <div className="grid gap-6 border-t border-[#2b2b2b] px-5 py-6 sm:px-7 lg:grid-cols-[1.2fr_1fr]">
             <div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#666]">Listing overview</p><p className="mt-3 max-w-2xl text-sm leading-7 text-[#999]">{studio.description || "Add a description to help artists understand the space and its capabilities."}</p><div className="mt-5 flex flex-wrap gap-2">{studio.services.length > 0 ? studio.services.map((service) => <span key={service} className="rounded-full border border-[#303030] bg-[#101010] px-3 py-1.5 text-xs text-[#aaa]">{service}</span>) : <span className="text-xs text-[#666]">No services added yet.</span>}</div></div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2"><Metric label="From / hour" value={`KSh ${studio.pricing.toLocaleString()}`} /><Metric label="Next available" value={studio.nextAvailable || studio.availability} /><Metric label="Rating" value={studio.averageRating ? studio.averageRating.toFixed(1) : "New"} icon={<Star size={13} className="fill-[#e8a33d] text-[#e8a33d]" />} /><Metric label="Reviews" value={String(studio.totalRatings || 0)} /></div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2"><Metric label="From / hour" value={`KSh ${studio.pricing.toLocaleString()}`} /><Metric label="Next available" value={studio.nextAvailable || studio.availability} /><Metric label="Rating" value={studio.averageRating ? studio.averageRating.toFixed(1) : "New"} icon={<Star size={13} className="fill-[#e8a33d] text-[#e8a33d]" />} /><Metric label="Reviews" value={String(studio.totalRatings || 0)} /><Metric label="Likes" value={String(studio.likeCount || 0)} icon={<Heart size={13} className="text-red-300" />} /></div>
         </div>
     </article>;
 }
@@ -158,8 +158,8 @@ function StudioGallery({ studio, gallery }: { studio: Studio; gallery: StudioMed
     const selectedSource = selected?.largeUrl || selected?.url || fallback;
 
     return <div className="grid gap-2 bg-[#0d0d0d] p-2 lg:grid-cols-[92px_minmax(0,1fr)]">
-        <div className="order-2 flex gap-2 overflow-x-auto lg:order-1 lg:flex-col">{gallery.map((item) => <button key={item.id} type="button" onClick={() => setSelectedId(item.id)} className={`relative h-16 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition lg:h-[76px] lg:w-[76px] ${selected?.id === item.id ? "border-[#3ea6ff] opacity-100" : "border-transparent opacity-55 hover:opacity-100"}`} aria-label={`Show studio image ${gallery.indexOf(item) + 1}`}><Image src={item.thumbnailUrl || item.mediumUrl || item.url} alt="" fill sizes="80px" unoptimized className="object-cover" /></button>)}{gallery.length === 0 && <div className="flex h-16 w-20 shrink-0 items-center justify-center rounded-xl border border-dashed border-[#363636] text-[#555] lg:h-[76px] lg:w-[76px]"><Building2 size={20} /></div>}</div>
-        <div className="relative order-1 min-h-[280px] overflow-hidden rounded-2xl bg-[#1b1b1b] sm:min-h-[360px] lg:order-2">{selectedSource ? <Image key={selected?.id || selectedSource} src={selectedSource} alt={`${studio.studioName} studio`} fill sizes="(min-width: 1024px) 75vw, 100vw" unoptimized className="object-cover transition duration-500" /> : <div className="flex h-full min-h-[280px] items-center justify-center"><Building2 size={42} className="text-[#4a4a4a]" /></div>}<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" /><div className="absolute bottom-4 left-4 rounded-full border border-white/10 bg-black/35 px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-white/75 backdrop-blur-md">{gallery.length > 0 ? `${(gallery.findIndex((item) => item.id === selected?.id) + 1) || 1} / ${gallery.length}` : "Add gallery photos"}</div></div>
+        <div className="order-2 flex gap-2 overflow-x-auto lg:order-1 lg:flex-col">{gallery.map((item) => <button key={item.id} type="button" onClick={() => setSelectedId(item.id)} className={`relative h-16 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition lg:h-[76px] lg:w-[76px] ${selected?.id === item.id ? "border-[#3ea6ff] opacity-100" : "border-transparent opacity-55 hover:opacity-100"}`} aria-label={`Show studio ${item.type.toLowerCase()} ${gallery.indexOf(item) + 1}`}>{item.type === "IMAGE" ? <Image src={item.thumbnailUrl || item.mediumUrl || item.url} alt="" fill sizes="80px" unoptimized className="object-cover" /> : item.thumbnailUrl ? <Image src={item.thumbnailUrl} alt="" fill sizes="80px" unoptimized className="object-cover brightness-75" /> : <video src={item.url} muted playsInline className="h-full w-full object-cover" />}</button>)}{gallery.length === 0 && <div className="flex h-16 w-20 shrink-0 items-center justify-center rounded-xl border border-dashed border-[#363636] text-[#555] lg:h-[76px] lg:w-[76px]"><Building2 size={20} /></div>}</div>
+        <div className="relative order-1 min-h-[280px] overflow-hidden rounded-2xl bg-[#1b1b1b] sm:min-h-[360px] lg:order-2">{selected ? selected.type === "VIDEO" ? <video key={selected.id} src={selected.url} poster={selected.thumbnailUrl || undefined} controls playsInline className="h-full min-h-[280px] w-full object-contain sm:min-h-[360px]" /> : <Image key={selected.id} src={selectedSource || "/images/beats.png"} alt={`${studio.studioName} studio`} fill sizes="(min-width: 1024px) 75vw, 100vw" unoptimized className="object-cover transition duration-500" /> : <div className="flex h-full min-h-[280px] items-center justify-center"><Building2 size={42} className="text-[#4a4a4a]" /></div>}<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" /><div className="absolute bottom-4 left-4 rounded-full border border-white/10 bg-black/35 px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-white/75 backdrop-blur-md">{gallery.length > 0 ? `${(gallery.findIndex((item) => item.id === selected?.id) + 1) || 1} / ${gallery.length}` : "Add gallery photos"}</div></div>
     </div>;
 }
 
@@ -174,7 +174,7 @@ function getStudioGallery(studio: Studio): StudioMedia[] {
         thumbnailUrl: studio.profileImageThumbnail || profileImage,
         displayOrder: -1,
     }] : [];
-    return [...profileMedia, ...(studio.media?.filter((item) => item.type === "IMAGE") || [])];
+    return [...profileMedia, ...(studio.media || [])];
 }
 
 function Metric({ label, value, icon }: { label: string; value: string; icon?: React.ReactNode }) {
@@ -185,16 +185,42 @@ function StudioMediaManager({ studio, onRefresh }: { studio: Studio; onRefresh: 
     const [media, setMedia] = useState<StudioMedia[]>(getStudioGallery(studio));
     const [busy, setBusy] = useState(false);
     const [uploading, setUploading] = useState<"image" | "video" | null>(null);
+    const [pendingImage, setPendingImage] = useState<File | null>(null);
+    const [pendingVideo, setPendingVideo] = useState<File | null>(null);
 
-    async function addImage(file: File) {
+    useEffect(() => {
+        setMedia(getStudioGallery(studio));
+    }, [studio]);
+
+    async function removeMedia(item: StudioMedia) {
+        if (item.id === "profile-image") return;
+        setBusy(true);
+        try {
+            await StudioService.deleteStudioMedia(studio.id, item.id);
+            setMedia((current) => current.filter((entry) => entry.id !== item.id));
+            await onRefresh();
+            toast.success(item.type === "VIDEO" ? "Studio video removed" : "Gallery photo removed");
+        } catch (error) {
+            toast.error("Could not remove gallery media", { description: getErrorMessage(error) });
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    function selectImage(file: File) {
         if (!isSupportedImage(file)) {
             toast.error("Invalid gallery image", { description: "Use a JPEG, PNG, or WebP image smaller than 5 MB." });
             return;
         }
-        if (media.filter((item) => item.type === "IMAGE").length >= 5) {
+        if (media.filter((item) => item.type === "IMAGE" && item.id !== "profile-image").length >= 5) {
             toast.error("Gallery limit reached", { description: "A studio can have up to 5 gallery images." });
             return;
         }
+        setPendingImage(file);
+        setPendingVideo(null);
+    }
+
+    async function uploadImage(file: File) {
         setBusy(true);
         setUploading("image");
         try {
@@ -202,6 +228,7 @@ function StudioMediaManager({ studio, onRefresh }: { studio: Studio; onRefresh: 
             setMedia((current) => [...current, uploaded]);
             await onRefresh();
             toast.success("Gallery image added");
+            setPendingImage(null);
         } catch (error) {
             toast.error("Could not upload gallery image", { description: getErrorMessage(error) });
         } finally {
@@ -210,7 +237,7 @@ function StudioMediaManager({ studio, onRefresh }: { studio: Studio; onRefresh: 
         }
     }
 
-    async function addVideo(file: File) {
+    function selectVideo(file: File) {
         if (!file.size || file.size > 100 * 1024 * 1024 || !["video/mp4", "video/webm", "video/quicktime"].includes(file.type)) {
             toast.error("Invalid studio video", { description: "Use an MP4, WebM, or MOV video smaller than 100 MB." });
             return;
@@ -219,6 +246,11 @@ function StudioMediaManager({ studio, onRefresh }: { studio: Studio; onRefresh: 
             toast.error("Video limit reached", { description: "A studio can have only 1 gallery video." });
             return;
         }
+        setPendingVideo(file);
+        setPendingImage(null);
+    }
+
+    async function uploadVideo(file: File) {
         setBusy(true);
         setUploading("video");
         try {
@@ -226,6 +258,7 @@ function StudioMediaManager({ studio, onRefresh }: { studio: Studio; onRefresh: 
             setMedia((current) => [...current, uploaded]);
             await onRefresh();
             toast.success("Studio video added");
+            setPendingVideo(null);
         } catch (error) {
             toast.error("Could not upload studio video", { description: getErrorMessage(error) });
         } finally {
@@ -234,7 +267,33 @@ function StudioMediaManager({ studio, onRefresh }: { studio: Studio; onRefresh: 
         }
     }
 
-    return <div className="border-t border-[#2b2b2b] bg-[#111111] px-5 py-5 sm:px-7"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#3ea6ff]">Music studio gallery</p><p className="mt-1 text-sm font-medium text-[#e5e5e5]">Manage the media shown in your studio showcase</p><p className="mt-1 text-xs text-[#666]">{media.filter((item) => item.type === "IMAGE").length}/5 photos · {media.some((item) => item.type === "VIDEO") ? "1/1 video" : "0/1 video"}</p></div><div className="flex flex-wrap items-center gap-2"><span aria-live="polite" className={`mr-1 inline-flex items-center gap-2 text-xs ${uploading ? "text-[#3ea6ff]" : "text-[#666]"}`}>{uploading && <Loader2 size={14} className="animate-spin" />}{uploading === "image" ? "Uploading and processing photo..." : uploading === "video" ? "Uploading video..." : ""}</span><label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-[#363636] bg-[#181818] px-3 py-2 text-xs font-medium text-[#aaa] transition hover:border-[#3ea6ff]/50 hover:text-white"><input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" disabled={busy} onChange={(event) => { const file = event.target.files?.[0]; if (file) void addImage(file); event.target.value = ""; }} /><ImagePlus size={14} /> Add photo</label><label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-[#363636] bg-[#181818] px-3 py-2 text-xs font-medium text-[#aaa] transition hover:border-[#3ea6ff]/50 hover:text-white"><input type="file" accept="video/mp4,video/webm,video/quicktime" className="sr-only" disabled={busy} onChange={(event) => { const file = event.target.files?.[0]; if (file) void addVideo(file); event.target.value = ""; }} /><Film size={14} /> Add video</label></div></div></div>;
+    return <>
+    <div className="border-t border-[#2b2b2b] bg-[#111111] px-5 py-5 sm:px-7">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#3ea6ff]">Music studio gallery</p>
+                <p className="mt-1 text-sm font-medium text-[#e5e5e5]">Manage the media shown in your studio showcase</p>
+                <p className="mt-1 text-xs text-[#666]">{media.filter((item) => item.type === "IMAGE" && item.id !== "profile-image").length}/5 photos · {media.some((item) => item.type === "VIDEO") ? "1/1 video" : "0/1 video"}</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-[#363636] bg-[#181818] px-3 py-2 text-xs font-medium text-[#aaa] transition hover:border-[#3ea6ff]/50 hover:text-white">
+                    <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" disabled={busy} onChange={(event) => { const file = event.target.files?.[0]; if (file) selectImage(file); event.target.value = ""; }} />
+                    <ImagePlus size={14} /> Choose photo
+                </label>
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-[#363636] bg-[#181818] px-3 py-2 text-xs font-medium text-[#aaa] transition hover:border-[#3ea6ff]/50 hover:text-white">
+                    <input type="file" accept="video/mp4,video/webm,video/quicktime" className="sr-only" disabled={busy} onChange={(event) => { const file = event.target.files?.[0]; if (file) selectVideo(file); event.target.value = ""; }} />
+                    <Film size={14} /> Choose video
+                </label>
+            </div>
+        </div>
+        {(pendingImage || pendingVideo || uploading) && <div className="mt-3 flex min-w-0 items-center gap-2 text-xs">
+            <span className="min-w-0 truncate text-[#9aa6b2]">{(pendingImage || pendingVideo)?.name || (uploading === "image" ? "Uploading photo..." : "Uploading video...")}</span>
+            {!uploading && <><button type="button" onClick={() => { setPendingImage(null); setPendingVideo(null); }} className="shrink-0 text-[#777] hover:text-white">Cancel</button><button type="button" onClick={() => pendingImage ? void uploadImage(pendingImage) : pendingVideo ? void uploadVideo(pendingVideo) : undefined} className="shrink-0 font-semibold text-[#3ea6ff] hover:text-[#65b8ff]">Upload</button></>}
+            {uploading && <span className="inline-flex shrink-0 items-center gap-1 text-[#3ea6ff]"><Loader2 size={13} className="animate-spin" /> Processing</span>}
+        </div>}
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">{media.filter((item) => item.id !== "profile-image").map((item) => <div key={item.id} className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-[#2b2b2b] bg-[#181818]">{item.type === "IMAGE" ? <Image src={item.thumbnailUrl || item.mediumUrl || item.url} alt="" fill sizes="160px" unoptimized className="object-cover" /> : item.thumbnailUrl ? <Image src={item.thumbnailUrl} alt="" fill sizes="160px" unoptimized className="object-cover brightness-75" /> : <video src={item.url} muted playsInline className="h-full w-full object-cover" />}<span className="absolute left-2 top-2 rounded-md bg-black/60 px-1.5 py-1 text-[9px] uppercase tracking-wide text-white">{item.type === "VIDEO" ? "Video" : "Photo"}</span><button type="button" disabled={busy} onClick={() => void removeMedia(item)} aria-label={`Remove ${item.type.toLowerCase()}`} className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/65 text-red-200 opacity-100 transition hover:bg-red-400/25 disabled:opacity-50 sm:opacity-0 sm:group-hover:opacity-100"><Trash2 size={13} /></button></div>)}</div>
+    </div>
+    </>;
 }
 
 function getErrorMessage(error: unknown) {

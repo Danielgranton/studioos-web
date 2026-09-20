@@ -10,6 +10,7 @@ import {
     CalendarCheck,
     CheckCircle2,
     Clock3,
+    Heart,
     MapPin,
     Play,
     Star,
@@ -276,6 +277,10 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
                             <Users size={15} className="text-[#e8a33d]" />
                             {studio.bookings.toLocaleString()} bookings completed
                         </p>
+                        <p className="mt-3 flex items-center gap-2 text-xs text-[#aaa69d]">
+                            <Heart size={15} className="text-red-300" />
+                            {studio.likeCount?.toLocaleString() ?? "0"} likes
+                        </p>
                         <button type="button" disabled className="mt-5 inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-[#e8a33d]/50 px-3 py-2.5 text-xs font-semibold text-[#17130d]/70">
                             <CalendarCheck size={16} />
                             Booking flow coming soon
@@ -301,8 +306,9 @@ function toGallery(studio: Studio): GalleryItem[] {
         }
     }
 
-    const video = media.find((item) => item.type === "VIDEO");
-    if (video) items.push(toGalleryItem(video, items[0]?.url));
+    media.filter((item) => item.type === "VIDEO").forEach((video) => {
+        items.push(toGalleryItem(video, items[0]?.url));
+    });
 
     return items;
 }

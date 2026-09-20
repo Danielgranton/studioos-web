@@ -1,16 +1,46 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { ArrowRight, RefreshCw } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 import { BeatCard } from "./BeatCard";
-import { trendingBeats } from "./beatData";
+import { BeatService } from "@/features/beatmarketplace";
+import type { BeatSummary } from "@/features/beatmarketplace";
 
-const filters = ["All", "Hip-Hop", "Afrobeat", "Trap", "Exclusive"];
+const filters = ["Top rated", "Basic", "Premium", "Exclusive"];
 
 export function TrendingBeats() {
-    const [activeFilter, setActiveFilter] = useState("All");
+    const [activeFilter, setActiveFilter] = useState("Top rated");
+    const [beats, setBeats] = useState<BeatSummary[] | null>(null);
+    const [error, setError] = useState(false);
+
+    async function loadBeats() {
+        setError(false);
+        try {
+            const response = await BeatService.browse({ page: 0, size: 50, sortBy: "TRENDING" });
+            setBeats(response.content ?? []);
+        } catch {
+            setError(true);
+        }
+    }
+
+    useEffect(() => { void loadBeats(); }, []);
+
+    const visibleBeats = useMemo(() => {
+        const filtered = (beats ?? []).filter((beat) => {
+            if (activeFilter === "Basic") return beat.licenseType === "BASIC";
+            if (activeFilter === "Premium") return beat.licenseType === "PREMIUM";
+            if (activeFilter === "Exclusive") return beat.licenseType === "EXCLUSIVE";
+            return true;
+        });
+        return [...filtered]
+            .sort((first, second) => (second.averageRating ?? 0) - (first.averageRating ?? 0)
+                || (second.reviewCount ?? 0) - (first.reviewCount ?? 0)
+                || (second.likeCount ?? 0) - (first.likeCount ?? 0)
+                || (second.playCount ?? 0) - (first.playCount ?? 0))
+        .slice(0, 10);
+    }, [activeFilter, beats]);
 
     return (
         <section
@@ -80,7 +110,7 @@ export function TrendingBeats() {
                                     />
                                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#e8a33d]" />
                                 </span>
-                                Trending Beats
+                                Top Rated Beats
                             </span>
 
                             <span className="h-px flex-1 bg-gradient-to-r from-[#e8a33d]/30 to-transparent lg:hidden" />
@@ -158,10 +188,22 @@ export function TrendingBeats() {
                                 sm:leading-7
                             "
                         >
-                            Browse exclusive instrumentals from top
-                            producers. Preview, purchase and start
-                            recording instantly.
+                            Discover the highest-rated instrumentals from StudioOS producers. Preview, compare, and license your next record.
                         </p>
+
+                        {/* Trust signal strip — mirrors the producer section's live stats */}
+                        <div className="mt-5 flex flex-wrap items-baseline gap-x-5 gap-y-2 sm:mt-6 sm:gap-x-6">
+                            {[
+                                { value: beats ? visibleBeats.length.toLocaleString() : "--", label: "beats in view" },
+                                { value: beats && visibleBeats.length ? `${(visibleBeats.reduce((sum, beat) => sum + (beat.averageRating ?? 0), 0) / visibleBeats.length).toFixed(1)}★` : "--", label: "avg rating" },
+                                { value: beats ? visibleBeats.reduce((sum, beat) => sum + (beat.reviewCount ?? 0), 0).toLocaleString() : "--", label: "listener reviews" },
+                            ].map((stat) => (
+                                <div key={stat.label} className="flex items-baseline gap-1.5">
+                                    <span className="font-mono text-sm font-bold text-[#f5f4f1] sm:text-base">{stat.value}</span>
+                                    <span className="text-[11px] text-[#6b685f] sm:text-xs">{stat.label}</span>
+                                </div>
+                            ))}
+                        </div>
 
                     </div>
 
@@ -242,25 +284,7 @@ export function TrendingBeats() {
 
                 </div>
 
-                {/* Beat Grid — 2 mobile, 3 tablet, 4 desktop */}
-                <div
-                    className="
-                        grid
-                        grid-cols-2
-                        gap-3
-                        sm:gap-4
-                        md:grid-cols-3
-                        lg:grid-cols-5
-                    "
-                >
-                    {trendingBeats.map((beat, index) => (
-                        <BeatCard
-                            key={beat.id}
-                            {...beat}
-                            loading={index === 0 ? "eager" : "lazy"}
-                        />
-                    ))}
-                </div>
+                {error ? <BeatErrorState onRetry={() => void loadBeats()} /> : !beats ? <BeatGridLoading /> : visibleBeats.length === 0 ? <BeatEmptyState filter={activeFilter} /> : <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-5">{visibleBeats.map((beat, index) => <BeatCard key={beat.id} {...toCardBeat(beat)} loading={index === 0 ? "eager" : "lazy"} />)}</div>}
 
             </div>
 
@@ -281,4 +305,43 @@ export function TrendingBeats() {
             `}</style>
         </section>
     );
+}
+
+function toCardBeat(beat: BeatSummary) {
+    return {
+        id: beat.id,
+        slug: beat.id,
+        title: beat.title,
+        producer: beat.producerName || "StudioOS producer",
+        thumbnail: beat.thumbnailUrl || beat.coverUrl || "/images/beats.png",
+        genre: beat.genreName || "Unclassified",
+        bpm: beat.bpm ?? 0,
+        musicalKey: beat.keySignature || "Key unset",
+        price: beat.startingPrice == null ? "Price on request" : `KSh ${beat.startingPrice.toLocaleString()}`,
+        plays: beat.playCount ?? 0,
+        likes: beat.likeCount ?? 0,
+        duration: formatDuration(beat.duration),
+        durationSeconds: beat.duration ?? 0,
+        exclusive: beat.exclusive,
+        verified: beat.verified,
+        averageRating: beat.averageRating ?? 0,
+        reviewCount: beat.reviewCount ?? 0,
+    };
+}
+
+function formatDuration(seconds?: number | null) {
+    if (!seconds || seconds < 1) return "--:--";
+    return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+function BeatGridLoading() {
+    return <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-5" aria-label="Loading top-rated beats">{Array.from({ length: 10 }).map((_, index) => <div key={index} className="overflow-hidden rounded-2xl border border-[#2a2825] bg-[#161513] p-2.5"><div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-[#24211d]"><div className="absolute inset-0 animate-pulse bg-white/[0.04]" /></div><div className="mt-3 h-4 w-2/3 animate-pulse rounded bg-[#24211d]" /><div className="mt-2 h-3 w-1/2 animate-pulse rounded bg-[#24211d]" /><div className="mt-3 h-7 w-full animate-pulse rounded bg-[#1e1d1a]" /></div>)}</div>;
+}
+
+function BeatErrorState({ onRetry }: { onRetry: () => void }) {
+    return <div className="relative flex min-h-52 flex-col items-center justify-center overflow-hidden rounded-3xl border border-[#4a4032] bg-[linear-gradient(135deg,#1b1813,#151311)] px-6 text-center"><div aria-hidden="true" className="absolute left-1/2 top-0 h-28 w-64 -translate-x-1/2 rounded-full bg-[#e8a33d]/10 blur-3xl" /><div className="relative"><div className="mx-auto flex h-9 items-end justify-center gap-1">{[12, 24, 16, 30, 19, 26, 10].map((height, index) => <span key={index} className="w-1 rounded-full bg-[#e8a33d]/70" style={{ height }} />)}</div><p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e8a33d]">Signal interrupted</p><h3 className="mt-2 text-lg font-semibold text-[#f5f4f1]">The beat shelf is taking a moment</h3><p className="mt-1 text-xs text-[#888]">The latest top-rated catalog could not be reached.</p><button type="button" onClick={onRetry} className="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#4a4032] px-3 py-2 text-xs font-semibold text-[#e8a33d] transition hover:bg-[#24211d]"><RefreshCw size={13} /> Reconnect</button></div></div>;
+}
+
+function BeatEmptyState({ filter }: { filter: string }) {
+    return <div className="relative flex min-h-52 flex-col items-center justify-center overflow-hidden rounded-3xl border border-dashed border-[#3a3027] bg-[#151311] px-6 text-center"><div aria-hidden="true" className="absolute left-1/2 top-0 h-24 w-56 -translate-x-1/2 rounded-full bg-[#e8a33d]/[0.06] blur-3xl" /><div className="relative"><div className="mx-auto flex h-10 w-16 items-end justify-center gap-1 opacity-70">{[10, 18, 28, 15, 23, 12].map((height, index) => <span key={index} className="w-1 rounded-full bg-[#5a5144]" style={{ height }} />)}</div><p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#777]">Quiet lane</p><h3 className="mt-2 text-lg font-semibold text-[#f5f4f1]">No {filter.toLowerCase()} beats yet</h3><p className="mt-1 max-w-sm text-xs leading-5 text-[#888]">New instrumentals will appear here as producers publish and listeners rate them.</p></div></div>;
 }
