@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { RefreshCw, Search, SlidersHorizontal } from "lucide-react";
+import { RefreshCw, Search, SlidersHorizontal, ArrowLeft} from "lucide-react";
 
 import BackButton from "@/constants/BackButton";
 import { BeatCard } from "@/features/home/trending-beats";
 
 import { BeatService } from "../services/beat.service";
 import type { BeatSummary } from "../types/beat";
-
+import Link from "next/link";
 const filters = ["All", "Top rated", "Basic", "Premium", "Exclusive"];
 
 export function MarketplacePage() {
@@ -61,7 +61,12 @@ export function MarketplacePage() {
         <main className="min-h-screen bg-[#0f0f0f] py-8 text-[#f5f4f1] sm:py-12">
             <section className="relative overflow-hidden scroll-mt-28">
                 <div className="mx-auto max-w-[1600px] px-6">
-                    <div className="mb-5"><BackButton /></div>
+                    <div className="mb-5 gap-3 items-center">
+                        <BackButton />
+                         <Link href="/" className="inline-flex
+                        items-center gap-2 text-xs font-semibold text-                            [#918d84] transition hover:text-white">
+                         <ArrowLeft size={14} /> Back to home</Link>
+                    </div>
                     <div className="mb-8 flex flex-col gap-6 lg:mb-10 lg:flex-row lg:items-end lg:justify-between">
                         <div className="max-w-2xl">
                             <div className="mt-3 flex items-center gap-3 sm:mt-5 sm:gap-4">

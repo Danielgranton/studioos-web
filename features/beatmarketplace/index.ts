@@ -1,4 +1,5 @@
 export { MarketplacePage } from "./components/marketplacePage";
+export { BeatDetailsPage } from "./components/beatDetailsPage";
 export { ProducerBeatMarketplacePage } from "./components/producerBeatMarketplacePage";
 export { ProducerPlaybackProvider, useProducerPlayback } from "./components/producerPlaybackProvider";
 export { BeatService } from "./services/beat.service";

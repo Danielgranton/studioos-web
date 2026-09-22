@@ -30,7 +30,20 @@ export type BeatSummary = {
 export type BeatGenre = { id: string; name: string };
 export type BeatSale = { id: string; beatId: string; beatTitle: string; amount: number; status: string; exclusive: boolean; purchasedAt: string };
 export type BeatReview = { id: string; beatId: string; userId: number; purchaseId?: string; rating: number; comment?: string; createdAt: string };
-export type BeatLicense = { id: string; beatId: string; type: string; price: number; exclusive: boolean; active: boolean };
+export type BeatLicense = {
+    id: string;
+    beatId: string;
+    type: string;
+    price: number;
+    commercialUse?: boolean;
+    maxStreams?: number | null;
+    allowMusicVideo?: boolean;
+    allowRadio?: boolean;
+    allowTV?: boolean;
+    allowModification?: boolean;
+    exclusive: boolean;
+    active: boolean;
+};
 
 export type BeatPage = {
     content: BeatSummary[];

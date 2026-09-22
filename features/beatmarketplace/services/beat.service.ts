@@ -15,6 +15,8 @@ class BeatServiceClient {
         return response.data;
     }
 
+    async getPublicBeat(beatId: string): Promise<BeatSummary> { return (await api.get<BeatSummary>(`/beats/${beatId}`)).data; }
+
     async getMyBeats(): Promise<BeatSummary[]> { return (await api.get<BeatSummary[]>("/beats/my")).data; }
     async getMySales(): Promise<BeatSale[]> { return (await api.get<BeatSale[]>("/beats/my/sales")).data; }
     async getGenres(): Promise<BeatGenre[]> { return (await api.get<BeatGenre[]>("/beats/genres")).data; }
