@@ -6,20 +6,23 @@ import { Check, Clock3, DollarSign, Inbox, MoreHorizontal, PackageCheck, Pencil,
 import { toast } from "sonner";
 
 import { useDashboardSession } from "@/features/dashboard";
+import { ServiceCatalogService } from "@/features/services";
+import type { ServiceCatalogItem } from "@/features/services";
 
 import { ArtistService as ArtistApiService } from "../services/artist.service";
 import type { ArtistService, ArtistServiceRequest } from "../types/artist";
 
-type ServiceForm = { name: string; description: string; price: string; currency: string; active: boolean };
+type ServiceForm = { name: string; catalogServiceId: string; description: string; price: string; currency: string; active: boolean };
 type RequestFilter = "PENDING" | "PAID" | "DELIVERED";
 
-const EMPTY_FORM: ServiceForm = { name: "", description: "", price: "", currency: "KES", active: true };
+const EMPTY_FORM: ServiceForm = { name: "", catalogServiceId: "", description: "", price: "", currency: "KES", active: true };
 
 export function ArtistServicesPage() {
     const session = useDashboardSession();
     const router = useRouter();
     const [services, setServices] = useState<ArtistService[] | null>(null);
     const [requests, setRequests] = useState<ArtistServiceRequest[] | null>(null);
+    const [catalog, setCatalog] = useState<ServiceCatalogItem[]>([]);
     const [editing, setEditing] = useState<ArtistService | null>(null);
     const [form, setForm] = useState<ServiceForm>(EMPTY_FORM);
     const [saving, setSaving] = useState(false);
@@ -32,7 +35,7 @@ export function ArtistServicesPage() {
 
     useEffect(() => {
         if (session?.role !== "ARTIST") return;
-        void Promise.all([ArtistApiService.getMyServices(), ArtistApiService.getMyServiceRequests()]).then(([myServices, myRequests]) => { setServices(myServices); setRequests(myRequests); }).catch(() => { setServices([]); setRequests([]); toast.error("Could not load your services workspace"); });
+        void Promise.all([ArtistApiService.getMyServices(), ArtistApiService.getMyServiceRequests(), ServiceCatalogService.getCatalog()]).then(([myServices, myRequests, serviceCatalog]) => { setServices(myServices); setRequests(myRequests); setCatalog(serviceCatalog.filter((service) => service.artistAllowed)); }).catch(() => { setServices([]); setRequests([]); toast.error("Could not load your services workspace"); });
     }, [session]);
 
     if (session?.role !== "ARTIST") return null;
@@ -45,13 +48,21 @@ export function ArtistServicesPage() {
 
     function openEdit(service: ArtistService) {
         setEditing(service);
-        setForm({ name: service.name, description: service.description || "", price: String(service.price), currency: service.currency, active: service.active });
+        setForm({ name: service.name, catalogServiceId: service.catalogServiceId || "", description: service.description || "", price: String(service.price), currency: service.currency, active: service.active });
         setShowForm(true);
     }
 
     async function save(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        const request = { name: form.name.trim(), description: form.description.trim() || undefined, price: Number(form.price), currency: form.currency.trim().toUpperCase() || "KES", active: form.active };
+        let catalogServiceId = form.catalogServiceId || undefined;
+        if (!catalogServiceId) {
+            try {
+                const customService = await ServiceCatalogService.addCustomService({ name: form.name.trim(), category: "Custom" });
+                catalogServiceId = customService.id;
+                setCatalog((current) => current.some((item) => item.id === customService.id) ? current : [customService, ...current]);
+            } catch { toast.error("Could not add this service to the StudioOS catalog"); return; }
+        }
+        const request = { name: form.name.trim(), catalogServiceId, description: form.description.trim() || undefined, price: Number(form.price), currency: form.currency.trim().toUpperCase() || "KES", active: form.active };
         if (!request.name || !Number.isFinite(request.price) || request.price < 0) { toast.error("Add a service name and valid price"); return; }
         setSaving(true);
         try {
@@ -72,14 +83,14 @@ export function ArtistServicesPage() {
     return <div className="mx-auto w-full max-w-6xl p-5 text-[#f1f1f1] sm:p-8 lg:p-10">
         <header className="flex flex-col gap-5 border-b border-[#2b2b2b] pb-7 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#3ea6ff]">Artist workspace</p><h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Services</h1><p className="mt-2 max-w-xl text-sm leading-6 text-[#888]">Package your creative work with clear prices, then manage every request from one place.</p></div><button type="button" onClick={openCreate} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#3ea6ff] px-4 py-2.5 text-sm font-semibold text-[#0f0f0f] transition hover:bg-[#65b8ff]"><Plus size={16} /> Add service</button></header>
         <section className="mt-6 grid gap-3 sm:grid-cols-3"><SummaryTile icon={<Inbox size={17} />} label="Published services" value={services?.filter((service) => service.active).length ?? 0} /><SummaryTile icon={<Clock3 size={17} />} label="Pending requests" value={requests?.filter((request) => request.status === "PENDING").length ?? 0} /><SummaryTile icon={<DollarSign size={17} />} label="Paid requests" value={requests?.filter((request) => request.status === "PAID").length ?? 0} /></section>
-        {showForm && <ServiceForm form={form} editing={Boolean(editing)} saving={saving} onChange={setForm} onCancel={() => setShowForm(false)} onSubmit={save} />}
+        {showForm && <ServiceForm form={form} catalog={catalog} editing={Boolean(editing)} saving={saving} onChange={setForm} onCancel={() => setShowForm(false)} onSubmit={save} />}
         <section className="mt-8"><div className="flex items-end justify-between gap-3"><div><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#3ea6ff]">Your catalogue</p><h2 className="mt-2 text-lg font-semibold">Services and pricing</h2></div><span className="text-xs text-[#666]">{services?.length ?? 0} total</span></div>{services === null ? <LoadingRows /> : services.length === 0 ? <EmptyState title="Your catalogue is empty" description="Add your first service so artists and collaborators know exactly what you offer." action={openCreate} /> : <div className="mt-4 grid gap-3 md:grid-cols-2">{services.map((service) => <ServiceCard key={service.id} service={service} onEdit={() => openEdit(service)} onDelete={() => void remove(service)} />)}</div>}</section>
         <section className="mt-10"><div className="flex flex-col gap-4 border-b border-[#2b2b2b] pb-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#3ea6ff]">Work queue</p><h2 className="mt-2 text-lg font-semibold">Service requests</h2><p className="mt-1 text-sm text-[#777]">Review requests, confirm payment, and deliver completed work.</p></div><div className="flex rounded-xl border border-[#303030] bg-[#151515] p-1">{(["PENDING", "PAID", "DELIVERED"] as RequestFilter[]).map((filter) => <button key={filter} type="button" onClick={() => setRequestFilter(filter)} className={`rounded-lg px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] transition ${requestFilter === filter ? "bg-[#3ea6ff] text-[#0f0f0f]" : "text-[#777] hover:text-[#ddd]"}`}>{filter === "PENDING" ? "Pending" : filter === "PAID" ? "Paid" : "Delivered"}</button>)}</div></div>{requests === null ? <LoadingRows /> : requests.filter((request) => request.status === requestFilter).length > 0 ? <div className="mt-5 grid gap-3 md:grid-cols-2">{requests.filter((request) => request.status === requestFilter).map((request) => <RequestCard key={request.id} request={request} onUpdate={async (status) => { const updated = await ArtistApiService.updateServiceRequest(request.id, status); setRequests((current) => (current || []).map((item) => item.id === updated.id ? updated : item)); }} />)}</div> : <RequestEmptyState filter={requestFilter} />}</section>
     </div>;
 }
 
-function ServiceForm({ form, editing, saving, onChange, onCancel, onSubmit }: { form: ServiceForm; editing: boolean; saving: boolean; onChange: (form: ServiceForm) => void; onCancel: () => void; onSubmit: (event: FormEvent<HTMLFormElement>) => void }) {
-    return <form onSubmit={onSubmit} className="mt-6 rounded-2xl border border-[#3ea6ff]/30 bg-[#15181c] p-5 sm:p-6"><div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#3ea6ff]">{editing ? "Edit service" : "New service"}</p><h2 className="mt-2 text-lg font-semibold">Define the offer</h2></div><button type="button" onClick={onCancel} className="text-xs text-[#777] hover:text-[#ddd]">Cancel</button></div><div className="mt-5 grid gap-4 sm:grid-cols-2"><Field label="Service name" value={form.name} placeholder="Vocal recording, songwriting..." onChange={(name) => onChange({ ...form, name })} /><div className="grid grid-cols-[1fr_90px] gap-3"><Field label="Price" type="number" value={form.price} placeholder="0" onChange={(price) => onChange({ ...form, price })} /><Field label="Currency" value={form.currency} placeholder="KES" onChange={(currency) => onChange({ ...form, currency })} /></div><label className="sm:col-span-2"><span className="text-xs font-medium text-[#aaa]">Description</span><textarea rows={3} value={form.description} placeholder="What does the client receive?" onChange={(event) => onChange({ ...form, description: event.target.value })} className="mt-1.5 w-full rounded-xl border border-[#3f3f3f] bg-[#101010] px-3.5 py-2.5 text-sm text-[#f1f1f1] outline-none placeholder:text-[#666] focus:border-[#3ea6ff]/70" /></label><label className="flex items-center gap-3 text-xs text-[#aaa]"><input type="checkbox" checked={form.active} onChange={(event) => onChange({ ...form, active: event.target.checked })} className="h-4 w-4 accent-[#3ea6ff]" /> Publish this service</label></div><div className="mt-5 flex justify-end"><button type="submit" disabled={saving} className="rounded-xl bg-[#3ea6ff] px-5 py-2.5 text-sm font-semibold text-[#0f0f0f] disabled:opacity-60">{saving ? "Saving..." : editing ? "Save changes" : "Publish service"}</button></div></form>;
+function ServiceForm({ form, catalog, editing, saving, onChange, onCancel, onSubmit }: { form: ServiceForm; catalog: ServiceCatalogItem[]; editing: boolean; saving: boolean; onChange: (form: ServiceForm) => void; onCancel: () => void; onSubmit: (event: FormEvent<HTMLFormElement>) => void }) {
+    return <form onSubmit={onSubmit} className="mt-6 rounded-2xl border border-[#3ea6ff]/30 bg-[#15181c] p-5 sm:p-6"><div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#3ea6ff]">{editing ? "Edit service" : "New service"}</p><h2 className="mt-2 text-lg font-semibold">Choose what you deliver</h2><p className="mt-1 text-xs text-[#777]">Select a StudioOS service, or type a new one and we will add it to the catalog.</p></div><button type="button" onClick={onCancel} className="text-xs text-[#777] hover:text-[#ddd]">Cancel</button></div><div className="mt-5 grid gap-4 sm:grid-cols-2"><label className="sm:col-span-2"><span className="text-xs font-medium text-[#aaa]">StudioOS service</span><select value={form.catalogServiceId} onChange={(event) => { const selected = catalog.find((item) => item.id === event.target.value); onChange({ ...form, catalogServiceId: event.target.value, name: selected?.name || form.name }); }} className="mt-1.5 w-full rounded-xl border border-[#3f3f3f] bg-[#101010] px-3.5 py-2.5 text-sm text-[#f1f1f1] outline-none focus:border-[#3ea6ff]/70"><option value="">Add a new service instead...</option>{catalog.map((service) => <option key={service.id} value={service.id}>{service.category} · {service.name}</option>)}</select></label>{!form.catalogServiceId && <Field label="New service name" value={form.name} placeholder="Vocal coaching, live guitar..." onChange={(name) => onChange({ ...form, name })} />}<div className={form.catalogServiceId ? "sm:col-span-2" : ""}><div className="grid grid-cols-[1fr_90px] gap-3"><Field label="Price" type="number" value={form.price} placeholder="0" onChange={(price) => onChange({ ...form, price })} /><Field label="Currency" value={form.currency} placeholder="KES" onChange={(currency) => onChange({ ...form, currency })} /></div></div><label className="sm:col-span-2"><span className="text-xs font-medium text-[#aaa]">Description</span><textarea rows={3} value={form.description} placeholder="What does the client receive?" onChange={(event) => onChange({ ...form, description: event.target.value })} className="mt-1.5 w-full rounded-xl border border-[#3f3f3f] bg-[#101010] px-3.5 py-2.5 text-sm text-[#f1f1f1] outline-none placeholder:text-[#666] focus:border-[#3ea6ff]/70" /></label><label className="flex items-center gap-3 text-xs text-[#aaa]"><input type="checkbox" checked={form.active} onChange={(event) => onChange({ ...form, active: event.target.checked })} className="h-4 w-4 accent-[#3ea6ff]" /> Publish this service</label></div><div className="mt-5 flex justify-end"><button type="submit" disabled={saving} className="rounded-xl bg-[#3ea6ff] px-5 py-2.5 text-sm font-semibold text-[#0f0f0f] disabled:opacity-60">{saving ? "Saving..." : editing ? "Save changes" : "Publish service"}</button></div></form>;
 }
 
 function ServiceCard({ service, onEdit, onDelete }: { service: ArtistService; onEdit: () => void; onDelete: () => void }) {

@@ -119,7 +119,6 @@ const accentStyles = {
 };
 
 export function ServiceCategoryCard({
-    id,
     title,
     description,
     icon: Icon,
@@ -132,7 +131,7 @@ export function ServiceCategoryCard({
 
     return (
         <Link
-            href={`/services/${id}`}
+            href="/services"
             className={`
                 group
                 relative

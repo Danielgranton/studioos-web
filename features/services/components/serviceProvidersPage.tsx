@@ -1,0 +1,23 @@
+"use client";
+
+import Link from "next/link";
+import { ArrowLeft, CheckCircle2, MapPin, Music2 } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import { ServiceCatalogService } from "../services/service-catalog.service";
+import type { ServiceCatalogItem } from "../types/service";
+import type { ServiceProvider } from "../services/service-catalog.service";
+
+export function ServiceProvidersPage({ slug }: { slug: string }) {
+    const [service, setService] = useState<ServiceCatalogItem | null>(null);
+    const [providers, setProviders] = useState<ServiceProvider[] | null>(null);
+    const [error, setError] = useState(false);
+
+    useEffect(() => { void Promise.all([ServiceCatalogService.getCatalog(), ServiceCatalogService.getProviders(slug)]).then(([catalog, matches]) => { setService(catalog.find((item) => item.slug === slug) ?? null); setProviders(matches); }).catch(() => setError(true)); }, [slug]);
+    if (error) return <State title="Service unavailable" text="We could not load providers for this service." />;
+    if (providers === null) return <Loading />;
+    return <main className="min-h-screen bg-[#0f0f0f] px-5 py-8 text-[#f5f4f1] sm:px-8 sm:py-12"><div className="mx-auto max-w-[1180px]"><Link href="/services" className="inline-flex items-center gap-2 text-xs text-[#99938a] hover:text-white"><ArrowLeft size={14} /> All services</Link><div className="mt-8 border-b border-[#292722] pb-8"><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">{service?.category || "StudioOS service"}</p><h1 className="mt-3 text-3xl font-black sm:text-5xl">{service?.name || slug.replaceAll("-", " ")}</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-[#aaa49a]">{service?.description || "Professionals offering this service on StudioOS."}</p><p className="mt-5 text-xs text-[#777169]">{providers.length} provider{providers.length === 1 ? "" : "s"} available</p></div>{providers.length === 0 ? <State title="No providers yet" text="This service is in the catalog. Check back as more professionals publish their offers." /> : <div className="mt-7 grid gap-3 md:grid-cols-2">{providers.map((provider) => <article key={`${provider.providerType}-${provider.providerId}`} className="rounded-2xl border border-[#2b2925] bg-[#161513] p-4 sm:p-5"><div className="flex items-start gap-3"><div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#211d18] text-[#e8a33d]">{provider.profileImage ? <img src={provider.profileImage} alt="" className="h-full w-full object-cover" /> : <Music2 size={19} />}</div><div className="min-w-0 flex-1"><div className="flex items-center gap-2"><h2 className="truncate text-sm font-bold">{provider.providerName}</h2>{provider.verified && <CheckCircle2 size={14} className="shrink-0 text-[#5eead4]" />}</div><p className="mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#c5a66c]">{provider.providerType === "STUDIO" ? "Studio" : "Artist"}</p>{provider.location && <p className="mt-2 flex items-center gap-1 text-xs text-[#777169]"><MapPin size={12} /> {provider.location}</p>}</div></div><p className="mt-4 text-xs leading-5 text-[#99938a]">{provider.description || `Offers ${provider.serviceName}.`}</p><div className="mt-5 flex items-center justify-between border-t border-[#2b2925] pt-3"><span className="text-sm font-bold text-[#f0bd65]">{provider.price == null ? "Contact for price" : `${provider.currency} ${provider.price.toLocaleString()}`}</span><Link href={provider.providerType === "STUDIO" ? `/studios/${provider.providerId}` : `/artists/${provider.providerId}`} className="rounded-xl bg-[#e8a33d] px-3 py-2 text-xs font-bold text-[#17130c] hover:bg-[#f0b458]">View profile</Link></div></article>)}</div>}</div></main>;
+}
+
+function Loading() { return <main className="min-h-screen bg-[#0f0f0f] px-5 py-12"><div className="mx-auto max-w-[1180px] animate-pulse"><div className="h-5 w-24 rounded bg-[#211f1b]" /><div className="mt-10 h-12 w-1/2 rounded bg-[#211f1b]" /><div className="mt-8 grid gap-3 md:grid-cols-2"><div className="h-48 rounded-2xl bg-[#161513]" /><div className="h-48 rounded-2xl bg-[#161513]" /></div></div></main>; }
+function State({ title, text }: { title: string; text: string }) { return <main className="flex min-h-screen items-center justify-center bg-[#0f0f0f] px-6 text-center text-white"><div><h1 className="text-2xl font-bold">{title}</h1><p className="mt-2 text-sm text-[#777169]">{text}</p><Link href="/services" className="mt-5 inline-flex rounded-xl bg-[#e8a33d] px-4 py-2.5 text-xs font-bold text-[#17130c]">Browse services</Link></div></main>; }

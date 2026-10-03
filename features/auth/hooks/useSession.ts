@@ -5,7 +5,49 @@ import { useEffect, useState } from "react";
 import { getStoredSession } from "../services/session.service";
 import { clearSession } from "../services/session.service";
 import { AuthService } from "../services/auth.service";
-import { AuthResponse } from "../types/auth";
+import type { AuthResponse, UserProfile } from "../types/auth";
+
+const PROFILE_CACHE_TTL = 30_000;
+const PROFILE_FAILURE_COOLDOWN = 5_000;
+let profileRequest: Promise<UserProfile> | null = null;
+let profileRequestKey: string | null = null;
+let cachedProfile: { key: string; value: UserProfile; expiresAt: number } | null = null;
+let profileFailure: { key: string; error: unknown; expiresAt: number } | null = null;
+
+function profileKey(session: AuthResponse) {
+    return session.accessToken || "cookie-session";
+}
+
+function getProfileOnce(session: AuthResponse): Promise<UserProfile> {
+    const key = profileKey(session);
+    const now = Date.now();
+    if (cachedProfile?.key === key && cachedProfile.expiresAt > now) return Promise.resolve(cachedProfile.value);
+    if (profileFailure?.key === key && profileFailure.expiresAt > now) return Promise.reject(profileFailure.error);
+    if (profileRequest && profileRequestKey === key) return profileRequest;
+
+    profileRequestKey = key;
+    profileRequest = AuthService.getMyProfile()
+        .then((profile) => {
+            cachedProfile = { key, value: profile, expiresAt: Date.now() + PROFILE_CACHE_TTL };
+            profileFailure = null;
+            return profile;
+        })
+        .catch((error) => {
+            profileFailure = { key, error, expiresAt: Date.now() + PROFILE_FAILURE_COOLDOWN };
+            throw error;
+        })
+        .finally(() => {
+            const request = profileRequest;
+            window.setTimeout(() => {
+                if (profileRequest === request) {
+                    profileRequest = null;
+                    profileRequestKey = null;
+                }
+            }, PROFILE_FAILURE_COOLDOWN);
+        });
+
+    return profileRequest;
+}
 
 export function useSession() {
     const [session, setSession] = useState<AuthResponse | null>(null);
@@ -37,7 +79,7 @@ export function useSession() {
                 if (showLoading) setIsLoading(true);
             }
             try {
-                const profile = await AuthService.getMyProfile();
+                const profile = await getProfileOnce(storedSession);
                 if (active) {
                     setSession({
                         ...storedSession,

@@ -8,6 +8,8 @@ import { BadgeCheck, Building2, Check, Film, Heart, ImagePlus, Loader2, MapPin, 
 
 import { DashboardErrorState, useDashboardSession } from "@/features/dashboard";
 import { VerificationGuide } from "@/features/verification";
+import { ServiceCatalogService } from "@/features/services";
+import type { ServiceCatalogItem } from "@/features/services";
 
 import { useMyStudios } from "../hooks/useMyStudios";
 import type { Studio, StudioFormValues, StudioMedia } from "../types/studio";
@@ -321,7 +323,7 @@ function StudioForm({ initialValues, editing, saving, onCancel, onSubmit }: { in
                 <Field label="Location" value={values.location} required onChange={(value) => updateField("location", value)} placeholder="e.g. Westlands, Nairobi" />
                 <Field label="Hourly price" type="number" value={values.pricing} required onChange={(value) => updateField("pricing", value)} placeholder="e.g. 2500" min="0" />
                 <Field label="Availability" value={values.availability} required onChange={(value) => updateField("availability", value)} placeholder="e.g. Mon-Sat, 8am-10pm" />
-                <div className="sm:col-span-2"><Field label="Services" value={values.services} onChange={(value) => updateField("services", value)} placeholder="Recording, Mixing, Mastering" hint="Separate services with commas." /></div>
+                <div className="sm:col-span-2"><StudioServiceSelector value={values.services} onChange={(value) => updateField("services", value)} /></div>
                 <Field label="Listing badge" value={values.badge} onChange={(value) => updateField("badge", value)} placeholder="e.g. Top Rated" />
                 <Field label="Genres" value={values.genres} onChange={(value) => updateField("genres", value)} placeholder="Afrobeats, Hip Hop, R&B" />
                 <div className="sm:col-span-2"><Field label="Equipment" value={values.equipment} onChange={(value) => updateField("equipment", value)} placeholder="Neumann U87, Apollo x8, Yamaha HS8" hint="Separate items with commas." /></div>
@@ -336,6 +338,38 @@ function StudioForm({ initialValues, editing, saving, onCancel, onSubmit }: { in
             <div className="mt-7 flex flex-col-reverse gap-3 border-t border-[#2b2b2b] pt-5 sm:flex-row sm:justify-end"><button type="button" onClick={onCancel} className="rounded-xl border border-[#363636] px-4 py-2.5 text-sm font-medium text-[#aaa] transition hover:bg-[#202020] hover:text-white">Cancel</button><button disabled={saving} type="submit" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#3ea6ff] px-5 py-2.5 text-sm font-semibold text-[#0f0f0f] transition hover:bg-[#65b8ff] disabled:cursor-not-allowed disabled:opacity-60">{saving ? "Saving..." : <><Check size={16} /> {editing ? "Save changes" : "Create studio"}</>}</button></div>
         </form>
     );
+}
+
+function StudioServiceSelector({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+    const [catalog, setCatalog] = useState<ServiceCatalogItem[]>([]);
+    const [custom, setCustom] = useState("");
+    const [adding, setAdding] = useState(false);
+    const selected = value.split(",").map((item) => item.trim()).filter(Boolean);
+
+    useEffect(() => { void ServiceCatalogService.getCatalog().then((items) => setCatalog(items.filter((item) => item.studioAllowed))).catch(() => undefined); }, []);
+
+    function toggle(name: string) {
+        const next = selected.includes(name) ? selected.filter((item) => item !== name) : [...selected, name];
+        onChange(next.join(", "));
+    }
+
+    async function addCustom() {
+        const name = custom.trim();
+        if (!name || selected.includes(name)) return;
+        setAdding(true);
+        try {
+            const created = await ServiceCatalogService.addCustomService({ name, category: "Custom" });
+            setCatalog((items) => items.some((item) => item.id === created.id) ? items : [created, ...items]);
+            onChange([...selected, created.name].join(", "));
+            setCustom("");
+        } catch {
+            toast.error("Could not add this service to StudioOS");
+        } finally {
+            setAdding(false);
+        }
+    }
+
+    return <div><div className="flex items-end justify-between gap-3"><div><span className="text-xs font-medium text-[#aaa]">Services you deliver</span><p className="mt-1 text-[11px] text-[#666]">Select your capabilities. These appear on your public studio profile.</p></div><span className="text-[10px] text-[#777]">{selected.length} selected</span></div><div className="mt-3 flex flex-wrap gap-2">{catalog.map((service) => <button key={service.id} type="button" onClick={() => toggle(service.name)} className={`rounded-full border px-3 py-1.5 text-xs transition ${selected.includes(service.name) ? "border-[#3ea6ff]/50 bg-[#3ea6ff]/10 text-[#8acbff]" : "border-[#363636] bg-[#101010] text-[#888] hover:border-[#3ea6ff]/40 hover:text-white"}`}>{service.name}</button>)}</div><div className="mt-3 flex gap-2"><input value={custom} onChange={(event) => setCustom(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); void addCustom(); } }} placeholder="Add another service" className="min-w-0 flex-1 rounded-xl border border-[#363636] bg-[#101010] px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-[#5f5f5f] focus:border-[#3ea6ff]/70" /><button type="button" disabled={adding || !custom.trim()} onClick={() => void addCustom()} className="rounded-xl border border-[#3f3f3f] px-3.5 py-2.5 text-xs font-semibold text-[#aaa] hover:border-[#3ea6ff]/50 hover:text-white disabled:opacity-50">{adding ? "Adding..." : "Add"}</button></div>{selected.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{selected.map((item) => <button type="button" key={item} onClick={() => toggle(item)} className="rounded-full bg-[#3ea6ff]/10 px-2.5 py-1 text-[11px] text-[#8acbff]">{item} ×</button>)}</div>}</div>;
 }
 
 function Field({ label, value, onChange, placeholder, required = false, type = "text", min, hint }: { label: string; value: string; onChange: (value: string) => void; placeholder: string; required?: boolean; type?: string; min?: string; hint?: string }) {

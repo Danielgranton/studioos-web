@@ -2,6 +2,7 @@ export type ArtistService = {
     id: string;
     artistId: number;
     name: string;
+    catalogServiceId?: string | null;
     description?: string;
     price: number;
     currency: string;
