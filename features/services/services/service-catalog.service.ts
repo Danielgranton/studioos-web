@@ -3,7 +3,7 @@ import { api } from "@/lib/api";
 import type { ServiceCatalogItem } from "../types/service";
 
 export type ServiceProvider = {
-    providerType: "ARTIST" | "STUDIO";
+    providerType: "ARTIST" | "PRODUCER";
     providerId: string;
     providerName: string;
     location?: string;

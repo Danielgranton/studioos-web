@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, BadgeCheck, Building2, Clock3, MapPin, Star } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export interface ProducerCardProps {
     id: number;
@@ -74,6 +75,11 @@ export function ProducerCard({
     servicesTitle,
 }: ProducerCardProps) {
     const workLabel = creatorLabel === "artist" ? "releases" : "produced";
+    const [avatarSrc, setAvatarSrc] = useState(avatar || "/images/avatar.png");
+
+    useEffect(() => {
+        setAvatarSrc(avatar || "/images/avatar.png");
+    }, [avatar]);
 
     return (
         <Link
@@ -85,11 +91,14 @@ export function ProducerCard({
             <div className="relative flex items-start gap-3">
                 <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/10">
                     <Image
-                        src={avatar}
+                        src={avatarSrc}
                         alt={name}
                         fill
                         sizes="56px"
                         unoptimized
+                        onError={() => {
+                            if (avatarSrc !== "/images/avatar.png") setAvatarSrc("/images/avatar.png");
+                        }}
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                 </div>
