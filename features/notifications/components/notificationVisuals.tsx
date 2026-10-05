@@ -21,6 +21,7 @@ const visualMap: Record<string, { icon: LucideIcon; color: string; tint: string 
     WALLET_TRANSACTION: { icon: CreditCard, color: "text-emerald-300", tint: "bg-emerald-300/10" },
     BEAT_SOLD: { icon: Music2, color: "text-violet-300", tint: "bg-violet-300/10" },
     BEAT_PURCHASED: { icon: Music2, color: "text-violet-300", tint: "bg-violet-300/10" },
+    BEAT_PURCHASE_FAILED: { icon: Music2, color: "text-rose-300", tint: "bg-rose-300/10" },
     REVIEW_COMMENT: { icon: MessageCircle, color: "text-blue-300", tint: "bg-blue-300/10" },
     REVIEW_REACTION: { icon: Heart, color: "text-pink-300", tint: "bg-pink-300/10" },
     FOLLOW: { icon: UserPlus, color: "text-cyan-300", tint: "bg-cyan-300/10" },

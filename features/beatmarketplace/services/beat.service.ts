@@ -26,7 +26,7 @@ class BeatServiceClient {
     async getLikeState(beatId: string): Promise<BeatLikeState> { return (await api.get<BeatLikeState>(`/beats/${beatId}/like`)).data; }
     async likeBeat(beatId: string): Promise<BeatLikeState> { return (await api.post<BeatLikeState>(`/beats/${beatId}/like`)).data; }
     async unlikeBeat(beatId: string): Promise<BeatLikeState> { return (await api.delete<BeatLikeState>(`/beats/${beatId}/like`)).data; }
-    async purchaseBeat(beatId: string, request: { licenseId: string; phoneNumber: string }): Promise<{ purchaseId: string; transactionId: string; status: string }> {
+    async purchaseBeat(beatId: string, request: { licenseId: string; phoneNumber: string }): Promise<{ purchaseId: string; transactionId: string; status: string; reusedExistingRequest: boolean }> {
         return (await api.post(`/beats/${beatId}/purchase`, request)).data;
     }
     async getOwnerAudioUrl(beatId: string): Promise<string> { return (await api.get<{ previewUrl: string }>(`/beats/${beatId}/owner-audio`)).data.previewUrl; }
@@ -47,6 +47,7 @@ class BeatServiceClient {
     async completeUpload(beatId: string) { return (await api.post<{ beatId: string; status: string }>(`/beats/${beatId}/upload-complete`)).data; }
     async cancelUpload(beatId: string): Promise<void> { await api.delete(`/beats/${beatId}/upload`); }
     async archiveBeat(beatId: string): Promise<void> { await api.delete(`/beats/${beatId}`); }
+    async restoreArchivedBeat(beatId: string): Promise<void> { await api.post(`/beats/${beatId}/restore`); }
     async deleteArchivedBeat(beatId: string): Promise<void> { await api.delete(`/beats/${beatId}/permanent`); }
     async retryProcessing(beatId: string): Promise<void> { await api.post(`/beats/${beatId}/processing/retry`); }
     async getProcessingStatus(beatId: string): Promise<{ operation: string; status: string; progressPercent: number; errorMessage?: string | null }[]> {

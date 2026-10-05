@@ -49,7 +49,7 @@ export function BeatDetailsPage({ beatId }: BeatDetailsPageProps) {
     const [selectedLicense, setSelectedLicense] = useState<string | null>(null);
     const [checkoutOpen, setCheckoutOpen] = useState(false);
     const [purchaseLoading, setPurchaseLoading] = useState(false);
-    const [purchaseComplete, setPurchaseComplete] = useState<{ purchaseId: string; transactionId: string } | null>(null);
+    const [purchaseComplete, setPurchaseComplete] = useState<{ purchaseId: string; transactionId: string; reusedExistingRequest: boolean } | null>(null);
 
     const loadBeat = useCallback(async () => {
         setLoading(true);
@@ -104,8 +104,12 @@ export function BeatDetailsPage({ beatId }: BeatDetailsPageProps) {
         setPurchaseLoading(true);
         try {
             const result = await BeatService.purchaseBeat(beatId, { licenseId: license.id, phoneNumber });
-            setPurchaseComplete({ purchaseId: result.purchaseId, transactionId: result.transactionId });
-            toast.success("M-Pesa prompt sent", { description: "Approve the payment on your phone to complete the beat purchase." });
+            setPurchaseComplete({ purchaseId: result.purchaseId, transactionId: result.transactionId, reusedExistingRequest: result.reusedExistingRequest });
+            if (result.reusedExistingRequest) {
+                toast.info("Payment request is still pending", { description: "No new prompt was sent. Complete the existing M-Pesa request or wait for its failure confirmation before retrying." });
+            } else {
+                toast.success("M-Pesa prompt sent", { description: "Approve the payment on your phone to complete the beat purchase." });
+            }
         } catch (cause) {
             const message = (cause as { response?: { data?: { message?: string } } })?.response?.data?.message;
             toast.error("Could not start purchase", { description: message || "Check the phone number and license availability, then try again." });
@@ -213,7 +217,7 @@ function BeatCheckoutDialog({ beat, license, initialPhone, submitting, result, o
     license: BeatLicense;
     initialPhone: string;
     submitting: boolean;
-    result: { purchaseId: string; transactionId: string } | null;
+    result: { purchaseId: string; transactionId: string; reusedExistingRequest: boolean } | null;
     onClose: () => void;
     onPurchase: (phoneNumber: string) => void;
 }) {
@@ -236,9 +240,9 @@ function BeatCheckoutDialog({ beat, license, initialPhone, submitting, result, o
         <section role="dialog" aria-modal="true" aria-labelledby="beat-checkout-title" className="max-h-full w-full max-w-md overflow-y-auto rounded-3xl border border-white/10 bg-[#171614] p-5 shadow-2xl sm:p-6">
             {result ? <>
                 <div className="grid h-12 w-12 place-items-center rounded-2xl border border-emerald-300/20 bg-emerald-300/10 text-emerald-300"><Check size={22} /></div>
-                <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">Payment request sent</p>
-                <h2 id="beat-checkout-title" className="mt-2 text-xl font-bold text-white">Check your phone</h2>
-                <p className="mt-2 text-sm leading-6 text-[#99958d]">Approve the M-Pesa prompt to finish buying <span className="text-white">{beat.title}</span>. Your license and download will be available after payment is confirmed.</p>
+                <p className={`mt-5 text-[10px] font-bold uppercase tracking-[0.2em] ${result.reusedExistingRequest ? "text-[#e8a33d]" : "text-emerald-300"}`}>{result.reusedExistingRequest ? "Payment still pending" : "Payment request sent"}</p>
+                <h2 id="beat-checkout-title" className="mt-2 text-xl font-bold text-white">{result.reusedExistingRequest ? "No new prompt was sent" : "Check your phone"}</h2>
+                <p className="mt-2 text-sm leading-6 text-[#99958d]">{result.reusedExistingRequest ? "This exclusive license already has an active payment request for your account. Complete that M-Pesa prompt, or wait for Safaricom to confirm it failed before trying again." : <>Approve the M-Pesa prompt to finish buying <span className="text-white">{beat.title}</span>. Your license and download will be available after payment is confirmed.</>}</p>
                 <div className="mt-5 rounded-xl border border-white/[0.08] bg-black/20 p-3 text-[10px] text-[#777169]">Purchase reference <span className="ml-1 font-mono text-[#c9c5bd]">{result.purchaseId}</span><span className="mt-1 block">Payment reference <span className="font-mono text-[#c9c5bd]">{result.transactionId}</span></span></div>
                 <button type="button" onClick={onClose} className="mt-5 w-full rounded-xl bg-[#e8a33d] px-4 py-3 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458]">Continue browsing</button>
             </> : <>
