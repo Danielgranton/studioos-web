@@ -36,6 +36,21 @@ export function useNotifications(unreadOnly = false, enabled = true) {
 
     useEffect(() => {
         void refresh();
+
+        const refreshOnReturn = () => {
+            if (document.visibilityState === "visible") void refresh();
+        };
+        const refreshAfterNotificationChange = () => void refresh();
+        const interval = window.setInterval(refreshOnReturn, 60_000);
+        window.addEventListener("focus", refreshOnReturn);
+        window.addEventListener("studioos:notifications-changed", refreshAfterNotificationChange);
+        document.addEventListener("visibilitychange", refreshOnReturn);
+        return () => {
+            window.clearInterval(interval);
+            window.removeEventListener("focus", refreshOnReturn);
+            window.removeEventListener("studioos:notifications-changed", refreshAfterNotificationChange);
+            document.removeEventListener("visibilitychange", refreshOnReturn);
+        };
     }, [refresh]);
 
     const markAsRead = useCallback(async (id: string) => {
@@ -47,6 +62,7 @@ export function useNotifications(unreadOnly = false, enabled = true) {
 
         try {
             await NotificationService.markAsRead(id);
+            window.dispatchEvent(new Event("studioos:notifications-changed"));
         } catch {
             setNotifications((items) => items.map((item) => item.id === id ? existing : item));
             setUnreadCount((count) => count + 1);
@@ -60,6 +76,7 @@ export function useNotifications(unreadOnly = false, enabled = true) {
 
         try {
             await NotificationService.markAllAsRead();
+            window.dispatchEvent(new Event("studioos:notifications-changed"));
         } catch {
             setNotifications(previous);
             setUnreadCount(previous.filter((item) => !item.isRead).length);
@@ -74,6 +91,7 @@ export function useNotifications(unreadOnly = false, enabled = true) {
 
         try {
             await NotificationService.delete(id);
+            window.dispatchEvent(new Event("studioos:notifications-changed"));
         } catch {
             setNotifications(previous);
             setUnreadCount(previous.filter((item) => !item.isRead).length);

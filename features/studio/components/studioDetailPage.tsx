@@ -10,17 +10,21 @@ import {
     CalendarCheck,
     CheckCircle2,
     Clock3,
+    LoaderCircle,
     Heart,
     MapPin,
     Play,
     Star,
     Users,
+    X,
 } from "lucide-react";
 
 import { StudioService } from "../services/studio.service";
 import type { Studio, StudioMedia } from "../types/studio";
 import BackButton from "@/constants/BackButton";
 import { ReviewList } from "@/features/reviews";
+import { useSession } from "@/features/auth";
+import { BookingService } from "@/features/booking";
 
 type GalleryItem = {
     id: string;
@@ -30,9 +34,11 @@ type GalleryItem = {
 };
 
 export function StudioDetailPage({ studioId }: { studioId: string }) {
+    const { session, isAuthenticated } = useSession();
     const [studio, setStudio] = useState<Studio | null>(null);
     const [loading, setLoading] = useState(true);
     const [selectedMediaId, setSelectedMediaId] = useState<string | null>(null);
+    const [bookingOpen, setBookingOpen] = useState(false);
 
     useEffect(() => {
         let active = true;
@@ -281,16 +287,76 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
                             <Heart size={15} className="text-red-300" />
                             {studio.likeCount?.toLocaleString() ?? "0"} likes
                         </p>
-                        <button type="button" disabled className="mt-5 inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-[#e8a33d]/50 px-3 py-2.5 text-xs font-semibold text-[#17130d]/70">
-                            <CalendarCheck size={16} />
-                            Booking flow coming soon
-                        </button>
+                        {!isAuthenticated ? <Link href={`/auth/signin?next=${encodeURIComponent(`/studios/${studioId}`)}`} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-3 py-2.5 text-xs font-semibold text-[#17130d] transition hover:bg-[#f0b458]"><CalendarCheck size={16} />Sign in to request a session</Link> : session?.role === "ARTIST" ? <button type="button" disabled={!studio.available} onClick={() => setBookingOpen(true)} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-3 py-2.5 text-xs font-semibold text-[#17130d] transition hover:bg-[#f0b458] disabled:cursor-not-allowed disabled:opacity-50"><CalendarCheck size={16} />{studio.available ? "Request a session" : "Studio unavailable"}</button> : <p className="mt-5 rounded-xl border border-white/[0.08] px-3 py-2.5 text-center text-[11px] text-[#888176]">Studio bookings are available to artist accounts.</p>}
                     </aside>
                 </div>
                 <div className="mt-7"><ReviewList target="STUDIO" targetId={studioId} /></div>
             </div>
+            {bookingOpen && <StudioBookingDialog studio={studio} onClose={() => setBookingOpen(false)} />}
         </main>
     );
+}
+
+function StudioBookingDialog({ studio, onClose }: { studio: Studio; onClose: () => void }) {
+    const [sessionDate, setSessionDate] = useState("");
+    const [durationHours, setDurationHours] = useState(2);
+    const [notes, setNotes] = useState("");
+    const [error, setError] = useState("");
+    const [sending, setSending] = useState(false);
+    const [created, setCreated] = useState(false);
+
+    async function submit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        setError("");
+        const requestedTime = new Date(sessionDate).getTime();
+        if (!sessionDate || !Number.isFinite(requestedTime) || requestedTime <= Date.now()) {
+            setError("Choose a future date and time for your session.");
+            return;
+        }
+
+        setSending(true);
+        try {
+            await BookingService.createBooking({
+                studioId: studio.id,
+                sessionDate: toLocalDateTime(sessionDate),
+                durationHours,
+                notes: notes.trim() || undefined,
+            });
+            setCreated(true);
+        } catch (cause) {
+            setError((cause as { response?: { data?: { message?: string } } })?.response?.data?.message || "We could not send the request. Check the time and try again.");
+        } finally {
+            setSending(false);
+        }
+    }
+
+    return <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 px-4 py-6 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+        <section role="dialog" aria-modal="true" aria-labelledby="studio-booking-title" className="max-h-full w-full max-w-lg overflow-y-auto rounded-3xl border border-white/10 bg-[#171614] p-5 shadow-2xl sm:p-7">
+            {created ? <div className="py-5 text-center"><span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-300/20 bg-emerald-300/[0.08] text-emerald-200"><CheckCircle2 size={22} /></span><p className="mt-5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">Request sent</p><h2 id="studio-booking-title" className="mt-2 text-2xl font-bold">The studio has your request</h2><p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-[#99958d]">The producer will review the time and confirm the total price. You can follow updates in your dashboard bookings.</p><div className="mt-6 flex justify-center gap-2"><Link href="/dashboard/bookings" onClick={onClose} className="rounded-xl bg-[#e8a33d] px-4 py-2.5 text-xs font-bold text-[#17130c]">View bookings</Link><button type="button" onClick={onClose} className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-semibold text-[#c9c5bd]">Close</button></div></div> : <>
+                <div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">Studio session request</p><h2 id="studio-booking-title" className="mt-2 text-2xl font-bold">Book {studio.studioName}</h2><p className="mt-2 text-xs text-[#888176]">KSh {studio.pricing.toLocaleString()} per hour · producer confirms final price</p></div><button type="button" onClick={onClose} aria-label="Close booking form" className="rounded-lg p-2 text-[#888] hover:bg-white/[0.06] hover:text-white"><X size={18} /></button></div>
+                <form onSubmit={(event) => void submit(event)} className="mt-6 space-y-4">
+                    <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">Session date and start time</span><input type="datetime-local" min={localDateTimeMinimum()} value={sessionDate} onChange={(event) => setSessionDate(event.target.value)} required className="mt-2 w-full rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm text-white outline-none focus:border-[#e8a33d]/50 [color-scheme:dark]" /></label>
+                    <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">Session length</span><div className="mt-2 flex items-center gap-3"><select value={durationHours} onChange={(event) => setDurationHours(Number(event.target.value))} className="w-full rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm text-white outline-none focus:border-[#e8a33d]/50">{Array.from({ length: 12 }, (_, index) => index + 1).map((hours) => <option key={hours} value={hours}>{hours} {hours === 1 ? "hour" : "hours"}</option>)}</select><span className="shrink-0 text-xs text-[#99958d]">Estimate <strong className="ml-1 text-[#f0bd65]">KSh {(studio.pricing * durationHours).toLocaleString()}</strong></span></div></label>
+                    <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">What are you working on? <span className="font-normal text-[#77746e]">Optional</span></span><textarea value={notes} onChange={(event) => setNotes(event.target.value)} maxLength={1000} rows={4} placeholder="Tell the producer about your session, setup needs, or project..." className="mt-2 w-full resize-y rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm leading-5 text-white outline-none placeholder:text-[#5f5c57] focus:border-[#e8a33d]/50" /></label>
+                    {error && <p role="alert" className="rounded-xl border border-red-300/20 bg-red-300/[0.06] px-3 py-2.5 text-xs leading-5 text-red-200">{error}</p>}
+                    <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] px-3.5 py-3 text-[11px] leading-5 text-[#88847c]">No payment is taken now. The producer reviews your request and sets the final total; you pay after approval.</div>
+                    <button type="submit" disabled={sending} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-4 py-3 text-sm font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:cursor-wait disabled:opacity-60">{sending && <LoaderCircle size={16} className="animate-spin" />}{sending ? "Sending request..." : "Send booking request"}</button>
+                </form>
+            </>}
+        </section>
+    </div>;
+}
+
+function localDateTimeMinimum() {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + 30);
+    return toLocalDateTime(now);
+}
+
+function toLocalDateTime(value: string | Date) {
+    const date = value instanceof Date ? value : new Date(value);
+    const pad = (part: number) => String(part).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
 }
 
 function toGallery(studio: Studio): GalleryItem[] {

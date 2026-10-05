@@ -14,6 +14,7 @@ const pageLabels: Record<string, string> = {
     "/dashboard/settings": "Settings",
     "/dashboard/services": "Services",
     "/dashboard/notifications": "Notifications",
+    "/dashboard/bookings": "Bookings",
     "/dashboard/beat-marketplace": "Beat marketplace",
 };
 
@@ -24,6 +25,7 @@ const pageDescriptions: Record<string, string> = {
     "/dashboard/settings": "Manage your account preferences",
     "/dashboard/services": "Publish services and manage requests",
     "/dashboard/notifications": "Stay on top of your StudioOS activity",
+    "/dashboard/bookings": "Review studio requests and manage session payments",
     "/dashboard/beat-marketplace": "Manage your beat catalog and sales",
 };
 

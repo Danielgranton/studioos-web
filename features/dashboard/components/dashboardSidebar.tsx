@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { AuthService } from "@/features/auth";
+import { useNotifications } from "@/features/notifications";
 import { useDashboardSession } from "./dashboardAuthGuard";
 import { filterDashboardItems, getDashboardNavigation, isDashboardRole } from "../config/navigation";
 
@@ -16,6 +17,17 @@ export function DashboardSidebar() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const role = isDashboardRole(session?.role) ? session.role : "USER";
     const groups = filterDashboardItems(getDashboardNavigation(role), role);
+    const { notifications, unreadCount } = useNotifications(true, Boolean(session));
+    const unreadByType = notifications.reduce<Record<string, number>>((counts, notification) => {
+        counts[notification.type] = (counts[notification.type] ?? 0) + 1;
+        return counts;
+    }, {});
+    const pageCounts: Record<string, number> = {
+        "/dashboard/bookings": sumTypes(unreadByType, ["BOOKING_REQUEST", "BOOKING_CONFIRMED", "BOOKING_CANCELLED", "BOOKING_EXPIRED"]),
+        "/dashboard/beat-marketplace": sumTypes(unreadByType, ["BEAT_SOLD", "BEAT_PURCHASED", "BEAT_PROCESSING_COMPLETED", "BEAT_PROCESSING_FAILED"]),
+        "/dashboard/wallet": sumTypes(unreadByType, ["PAYMENT_REQUEST", "WALLET_TRANSACTION", "ESCROW_ACTIVITY", "TOPUP_REQUEST"]),
+        "/dashboard/notifications": unreadCount,
+    };
 
     useEffect(() => {
         if (!mobileOpen) return;
@@ -37,7 +49,7 @@ export function DashboardSidebar() {
                 <div className="shrink-0 border-b border-[#2b2b2b] p-5">
                     <SidebarIdentity session={session} compact />
                 </div>
-                <SidebarNavigation groups={groups} pathname={pathname} onNavigate={() => undefined} />
+                <SidebarNavigation groups={groups} pathname={pathname} onNavigate={() => undefined} pageCounts={pageCounts} />
             </aside>
 
             <div className="border-b border-[#2b2b2b] bg-[#121212] px-4 py-3 lg:hidden sm:px-6">
@@ -83,7 +95,7 @@ export function DashboardSidebar() {
                                 <X size={18} />
                             </button>
                         </div>
-                        <SidebarNavigation groups={groups} pathname={pathname} onNavigate={() => setMobileOpen(false)} />
+                        <SidebarNavigation groups={groups} pathname={pathname} onNavigate={() => setMobileOpen(false)} pageCounts={pageCounts} />
                     </aside>
             </div>
         </>
@@ -118,7 +130,7 @@ function SidebarIdentity({ session, compact = false }: { session: ReturnType<typ
         <div className="relative h-14 w-14 shrink-0">
             <div className="absolute inset-0 overflow-hidden rounded-full border border-[#4a4a4a] bg-gradient-to-br from-[#303030] to-[#171717] shadow-[0_4px_18px_rgb(0_0_0_/_25%)]">
                 {avatarUrl ? (
-                    <Image src={avatarUrl} alt={`${name} profile`} fill sizes="56px" className="object-cover" />
+                    <Image src={avatarUrl} alt={`${name} profile`} fill sizes="56px" unoptimized onError={() => setAvatarUrl(undefined)} className="object-cover" />
                 ) : (
                     <div className="flex h-full w-full items-center justify-center text-xs font-bold tracking-[0.12em] text-[#f1f1f1]">{initials}</div>
                 )}
@@ -137,10 +149,12 @@ function SidebarNavigation({
     groups,
     pathname,
     onNavigate,
+    pageCounts,
 }: {
     groups: ReturnType<typeof filterDashboardItems>;
     pathname: string;
     onNavigate: () => void;
+    pageCounts: Record<string, number>;
 }) {
     return (
         <nav aria-label="Dashboard navigation" className="dashboard-scrollbar min-h-0 flex-1 space-y-7 overflow-y-auto p-4">
@@ -153,6 +167,7 @@ function SidebarNavigation({
                                 ? pathname === item.href
                                 : pathname.startsWith(item.href);
                             const Icon = item.icon;
+                            const unread = pageCounts[item.href] ?? 0;
 
                             if (item.comingSoon) {
                                 return (
@@ -175,7 +190,7 @@ function SidebarNavigation({
                                     {active && <span aria-hidden="true" className="absolute left-0 h-5 w-0.5 rounded-full bg-[#3ea6ff]" />}
                                     <Icon size={16} className={active ? "text-[#3ea6ff]" : "text-[#666] group-hover:text-[#aaa]"} />
                                     <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                                    {active && <ChevronRight size={14} className="text-[#3ea6ff]" />}
+                                    {unread > 0 ? <span aria-label={`${unread} unread ${item.label.toLowerCase()} updates`} className="inline-flex h-5 min-w-5 items-center justify-center rounded-full border border-[#3ea6ff]/20 bg-[#3ea6ff]/10 px-1.5 text-[9px] font-bold tabular-nums text-[#82caff]">{unread > 99 ? "99+" : unread}</span> : active && <ChevronRight size={14} className="text-[#3ea6ff]" />}
                                 </Link>
                             );
                         })}
@@ -184,4 +199,8 @@ function SidebarNavigation({
             ))}
         </nav>
     );
+}
+
+function sumTypes(counts: Record<string, number>, types: string[]) {
+    return types.reduce((total, type) => total + (counts[type] ?? 0), 0);
 }

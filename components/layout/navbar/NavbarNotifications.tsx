@@ -150,10 +150,13 @@ export function NavbarNotifications() {
                         <div className="max-h-[420px] overflow-y-auto no-scrollbar">
 
                             {notifications.slice(0, 6).map((notification) => (
-
-                                <button
+                                <Link
                                     key={notification.id}
-                                    onClick={() => void markAsRead(notification.id)}
+                                    href={getNotificationHref(notification.type, notification.relatedEntityId)}
+                                    onClick={() => {
+                                        void markAsRead(notification.id);
+                                        setOpen(false);
+                                    }}
                                     className={`
                                         flex
                                         w-full
@@ -195,7 +198,7 @@ export function NavbarNotifications() {
                                         <div className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[#3ea6ff]" />
                                     )}
 
-                                </button>
+                                </Link>
 
                             ))}
 
@@ -230,4 +233,11 @@ export function NavbarNotifications() {
 
     );
 
+}
+
+function getNotificationHref(type: string, relatedEntityId?: string | null) {
+    if (type.startsWith("BOOKING_") && relatedEntityId) {
+        return `/dashboard/bookings?bookingId=${encodeURIComponent(relatedEntityId)}#booking-${encodeURIComponent(relatedEntityId)}`;
+    }
+    return "/dashboard/notifications";
 }

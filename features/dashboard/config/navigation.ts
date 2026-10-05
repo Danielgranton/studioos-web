@@ -34,7 +34,7 @@ const sharedGroups: DashboardNavigationGroup[] = [
         items: [
             { label: "Overview", href: "/dashboard", description: "Your StudioOS activity at a glance.", icon: BarChart3 },
             { label: "Notifications", href: "/dashboard/notifications", description: "Catch up on your latest StudioOS updates.", icon: Bell },
-            { label: "Bookings", href: "/dashboard/bookings", description: "Track upcoming and past bookings.", icon: CalendarCheck, comingSoon: true },
+            { label: "Bookings", href: "/dashboard/bookings", description: "Track upcoming and past bookings.", icon: CalendarCheck },
             { label: "Projects", href: "/dashboard/projects", description: "Keep releases and collaborations moving.", icon: FolderKanban, comingSoon: true },
             { label: "My releases", href: "/dashboard/releases", description: "Organize your release pipeline.", icon: SlidersHorizontal, comingSoon: true, roles: ["ARTIST"] },
             { label: "Services", href: "/dashboard/services", description: "Publish services and manage client requests.", icon: WalletCards, roles: ["ARTIST"] },
