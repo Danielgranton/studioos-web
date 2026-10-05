@@ -9,6 +9,7 @@ export type Booking = {
     artistName?: string;
     sessionDate: string;
     durationHours: number;
+    attemptCount?: number;
     totalPrice?: number | null;
     status: BookingStatus;
     paymentStatus: BookingPaymentStatus;

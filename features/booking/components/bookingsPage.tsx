@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { AlertCircle, ArrowRight, CalendarDays, Check, Clock3, CreditCard, LoaderCircle, MapPin, RefreshCw, Sparkles, X } from "lucide-react";
+import { AlertCircle, ArrowRight, CalendarDays, Check, Clock3, CreditCard, LoaderCircle, MapPin, RefreshCw, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
 import { useSession } from "@/features/auth";
 import { StudioService } from "@/features/studio";
@@ -21,7 +22,7 @@ export function BookingsPage() {
     const [busyId, setBusyId] = useState<string | null>(null);
     const [priceDrafts, setPriceDrafts] = useState<Record<string, string>>({});
     const [phoneDrafts, setPhoneDrafts] = useState<Record<string, string>>({});
-    const [notice, setNotice] = useState("");
+    const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
     const [now, setNow] = useState(0);
     const [highlightedBooking, setHighlightedBooking] = useState<string | null>(null);
     const handledTarget = useRef<string | null>(null);
@@ -78,7 +79,7 @@ export function BookingsPage() {
             setBookings((current) => current.some((item) => item.id === booking.id) ? current : [booking, ...current]);
             setHighlightedBooking(bookingId);
         }).catch(() => {
-            setNotice("That booking may have been removed or is no longer available to your account.");
+            toast.error("Booking unavailable", { description: "That booking may have been removed or is no longer available to your account." });
         });
     }, [bookings, loading, session]);
 
@@ -112,36 +113,35 @@ export function BookingsPage() {
     async function confirm(booking: Booking) {
         const totalPrice = Number(priceDrafts[booking.id]);
         if (!Number.isInteger(totalPrice) || totalPrice < 1) {
-            setNotice("Enter a total price in KSh before confirming.");
+            toast.error("Enter a valid booking price", { description: "Enter a total price in KSh before approving." });
             return;
         }
         setBusyId(booking.id);
-        setNotice("");
         try {
             await BookingService.confirmBooking(booking.id, totalPrice);
-            setNotice("Booking approved. The artist can now complete payment.");
+            toast.success("Booking approved", { description: "The artist can now complete payment." });
             await loadBookings();
         } catch (cause) {
-            setNotice(errorMessage(cause, "Could not approve this booking."));
+            toast.error("Could not approve booking", { description: errorMessage(cause, "Please try again.") });
         } finally {
             setBusyId(null);
         }
     }
 
     async function pay(booking: Booking) {
-        const phoneNumber = (phoneDrafts[booking.id] ?? session?.phone ?? "").trim();
+        const rawPhoneNumber = phoneDrafts[booking.id] ?? session?.phone ?? "";
+        const phoneNumber = normalizeKenyanPhone(rawPhoneNumber);
         if (!phoneNumber) {
-            setNotice("Enter the M-Pesa phone number that should receive the payment prompt.");
+            toast.error("Check the M-Pesa phone number", { description: "Use a Kenyan mobile number such as +254 7XX XXX XXX or 07XX XXX XXX." });
             return;
         }
         setBusyId(booking.id);
-        setNotice("");
         try {
             await BookingService.initiatePayment(booking.id, phoneNumber);
-            setNotice("Payment prompt sent. Complete it on your phone, then refresh booking status here.");
+            toast.success("M-Pesa prompt sent", { description: "Complete payment on your phone. Refresh this page to check the booking status." });
             await loadBookings();
         } catch (cause) {
-            setNotice(errorMessage(cause, "Could not start the M-Pesa payment."));
+            toast.error("Could not start M-Pesa payment", { description: errorMessage(cause, "Please try again.") });
         } finally {
             setBusyId(null);
         }
@@ -149,13 +149,36 @@ export function BookingsPage() {
 
     async function cancel(booking: Booking) {
         setBusyId(booking.id);
-        setNotice("");
         try {
             await BookingService.cancelBooking(booking.id);
-            setNotice("Booking cancelled.");
+            toast.success("Booking cancelled");
             await loadBookings();
         } catch (cause) {
-            setNotice(errorMessage(cause, "Could not cancel this booking."));
+            toast.error("Could not cancel booking", { description: errorMessage(cause, "Please try again.") });
+        } finally {
+            setBusyId(null);
+        }
+    }
+
+    async function saveBookingEdit(values: { sessionDate: string; durationHours: number; notes: string }) {
+        if (!editingBooking) return;
+        const booking = editingBooking;
+        setBusyId(booking.id);
+        try {
+            await BookingService.updateBooking(booking.id, {
+                ...values,
+                sessionDate: toApiLocalDateTime(values.sessionDate),
+                notes: values.notes.trim() || undefined,
+            });
+            setEditingBooking(null);
+            toast.success(booking.status === "EXPIRED" ? "Final booking request sent" : "Booking details updated", {
+                description: booking.status === "EXPIRED"
+                    ? "The producer must approve your request before you can pay."
+                    : "Your changes have been saved.",
+            });
+            await loadBookings();
+        } catch (cause) {
+            toast.error("Could not update booking", { description: errorMessage(cause, "Please try again.") });
         } finally {
             setBusyId(null);
         }
@@ -169,6 +192,7 @@ export function BookingsPage() {
     ];
 
     return (
+        <>
         <div className="mx-auto max-w-6xl px-4 py-7 text-[#f1f1f1] sm:px-6 sm:py-9">
             <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
                 <div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">StudioOS booking desk</p><h1 className="mt-2 text-3xl font-black tracking-[-0.04em]">Bookings</h1><p className="mt-2 max-w-xl text-sm leading-6 text-[#92908a]">{isProducer ? "Review studio requests, set the session price, and keep your schedule clear." : "Track studio requests, confirm your session, and manage payment."}</p></div>
@@ -179,7 +203,6 @@ export function BookingsPage() {
                 {tabs.map((tab) => <button key={tab.id} type="button" onClick={() => setFilter(tab.id)} className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition ${filter === tab.id ? "bg-white/[0.09] text-white" : "text-[#77746e] hover:bg-white/[0.04] hover:text-[#ddd]"}`}>{tab.label}{tab.count !== undefined && <span className={`rounded-md px-1.5 py-0.5 font-mono text-[9px] ${filter === tab.id ? "bg-[#e8a33d]/15 text-[#e8a33d]" : "bg-white/[0.05] text-[#77746e]"}`}>{tab.count}</span>}</button>)}
             </div>
 
-            {notice && <div role="status" className="mt-4 flex items-start justify-between gap-3 rounded-xl border border-[#e8a33d]/20 bg-[#e8a33d]/[0.07] px-4 py-3 text-xs leading-5 text-[#e6c891]">{notice}<button type="button" aria-label="Dismiss message" onClick={() => setNotice("")}><X size={14} /></button></div>}
             {error && <BookingsError message={error} onRetry={() => void loadBookings()} />}
             {!sessionLoading && session && !canAccessBookings ? <BookingsAccessState /> : loading || sessionLoading ? <BookingsLoading /> : !error && visible.length === 0 ? <EmptyBookings producer={isProducer} filter={filter} hasBookings={bookings.length > 0} /> : <div className="mt-5 space-y-3">{visible.map((booking) => <article id={`booking-${booking.id}`} key={booking.id} className={`scroll-mt-8 rounded-2xl border p-4 transition-colors duration-700 sm:p-5 ${highlightedBooking === booking.id ? "border-[#e8a33d]/70 bg-[#211d15] shadow-[0_0_35px_rgba(232,163,61,0.12)]" : "border-white/[0.08] bg-[#151514]"}`}>
                 <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
@@ -191,14 +214,44 @@ export function BookingsPage() {
                     </div>
                     <div className="w-full lg:max-w-[310px]">
                         {isProducer && booking.status === "PENDING" && <div className="rounded-xl border border-white/[0.08] bg-black/15 p-3"><label className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-[#77746e]">Set total price · KSh</label><input inputMode="numeric" min="1" value={priceDrafts[booking.id] ?? ""} onChange={(event) => setPriceDrafts((current) => ({ ...current, [booking.id]: event.target.value }))} placeholder="Enter amount" className="mt-2 w-full rounded-lg border border-white/[0.1] bg-[#10100f] px-3 py-2.5 text-sm text-white outline-none focus:border-[#e8a33d]/50"/><button type="button" disabled={busyId === booking.id} onClick={() => void confirm(booking)} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#e8a33d] px-3 py-2.5 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:opacity-50">{busyId === booking.id ? <LoaderCircle size={14} className="animate-spin" /> : <Check size={14} />}Approve booking</button></div>}
-                        {!isProducer && booking.status === "APPROVED" && booking.paymentStatus !== "PAID" && <div className="rounded-xl border border-[#e8a33d]/20 bg-[#e8a33d]/[0.05] p-3"><p className="text-xs font-semibold text-[#e5d2ac]">Your session is approved</p><label className="mt-3 block text-[10px] font-semibold uppercase tracking-[0.14em] text-[#77746e]">M-Pesa phone</label><input type="tel" value={phoneDrafts[booking.id] ?? session?.phone ?? ""} onChange={(event) => setPhoneDrafts((current) => ({ ...current, [booking.id]: event.target.value }))} placeholder="07xx xxx xxx" className="mt-2 w-full rounded-lg border border-white/[0.1] bg-[#10100f] px-3 py-2.5 text-sm text-white outline-none focus:border-[#e8a33d]/50"/><button type="button" disabled={busyId === booking.id} onClick={() => void pay(booking)} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#e8a33d] px-3 py-2.5 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:opacity-50">{busyId === booking.id ? <LoaderCircle size={14} className="animate-spin" /> : <CreditCard size={14} />}Pay KSh {booking.totalPrice?.toLocaleString()}</button></div>}
+                        {!isProducer && booking.status === "APPROVED" && booking.paymentStatus !== "PAID" && <div className="rounded-xl border border-[#e8a33d]/20 bg-[#e8a33d]/[0.05] p-3"><p className="text-xs font-semibold text-[#e5d2ac]">Your session is approved</p><label className="mt-3 block text-[10px] font-semibold uppercase tracking-[0.14em] text-[#77746e]">M-Pesa phone</label><input type="tel" autoComplete="tel" value={phoneDrafts[booking.id] ?? session?.phone ?? ""} onChange={(event) => setPhoneDrafts((current) => ({ ...current, [booking.id]: event.target.value }))} placeholder="+254 7XX XXX XXX or 07XX XXX XXX" className="mt-2 w-full rounded-lg border border-white/[0.1] bg-[#10100f] px-3 py-2.5 text-sm text-white outline-none focus:border-[#e8a33d]/50"/><p className="mt-1.5 text-[10px] leading-4 text-[#77746e]">You can enter +254 or local format; we convert it for M-Pesa.</p><button type="button" disabled={busyId === booking.id} onClick={() => void pay(booking)} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#e8a33d] px-3 py-2.5 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:opacity-50">{busyId === booking.id ? <LoaderCircle size={14} className="animate-spin" /> : <CreditCard size={14} />}Pay KSh {booking.totalPrice?.toLocaleString()}</button></div>}
+                        {!isProducer && (booking.status === "PENDING" || booking.status === "EXPIRED" && (booking.attemptCount ?? 1) < 2) && <button type="button" disabled={busyId === booking.id} onClick={() => setEditingBooking(booking)} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#e8a33d]/25 bg-[#e8a33d]/[0.06] px-3 py-2.5 text-xs font-semibold text-[#e8bd7a] transition hover:bg-[#e8a33d]/[0.12] disabled:opacity-50">{booking.status === "EXPIRED" ? "Edit & request again" : "Edit booking details"}</button>}
+                        {!isProducer && booking.status === "EXPIRED" && (booking.attemptCount ?? 1) >= 2 && <p className="mt-2 rounded-lg border border-white/[0.06] px-3 py-2 text-[10px] leading-4 text-[#77746e]">Both request attempts have expired. This booking can’t be requested again.</p>}
                         {canCancel(booking.status) && <button type="button" disabled={busyId === booking.id} onClick={() => void cancel(booking)} className="mt-2 w-full rounded-lg border border-white/[0.08] px-3 py-2 text-xs font-semibold text-[#99958d] transition hover:border-red-300/20 hover:text-red-200 disabled:opacity-50">Cancel booking</button>}
                     </div>
                 </div>
             </article>)}</div>}
             {bookings.length > 0 && <p className="mt-5 inline-flex items-center gap-2 text-[10px] text-[#66635d]"><MapPin size={12} /> Studio sessions are confirmed by the studio producer before payment.</p>}
         </div>
+        {editingBooking && <BookingEditDialog booking={editingBooking} saving={busyId === editingBooking.id} onClose={() => setEditingBooking(null)} onSave={(values) => void saveBookingEdit(values)} />}
+        </>
     );
+}
+
+function BookingEditDialog({ booking, saving, onClose, onSave }: {
+    booking: Booking;
+    saving: boolean;
+    onClose: () => void;
+    onSave: (values: { sessionDate: string; durationHours: number; notes: string }) => void;
+}) {
+    const isRetry = booking.status === "EXPIRED";
+    const [sessionDate, setSessionDate] = useState(toLocalInput(booking.sessionDate));
+    const [durationHours, setDurationHours] = useState(booking.durationHours);
+    const [notes, setNotes] = useState(booking.notes ?? "");
+    return <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 px-4 py-6 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget && !saving) onClose(); }}>
+        <section role="dialog" aria-modal="true" aria-labelledby="booking-edit-title" className="max-h-full w-full max-w-lg overflow-y-auto rounded-3xl border border-white/10 bg-[#171614] p-5 shadow-2xl sm:p-7">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">{isRetry ? "Final request attempt" : "Update request"}</p>
+            <h2 id="booking-edit-title" className="mt-2 text-xl font-bold text-[#f1eee8]">{isRetry ? "Choose a new session time" : "Edit booking details"}</h2>
+            <p className="mt-2 text-sm leading-6 text-[#99958d]">{isRetry ? "Adjust the time, length, or notes, then send this request back to the producer. The 15-minute payment window starts only after approval." : "You can update the session while it is waiting for the producer to review it."}</p>
+            {isRetry && <p className="mt-4 rounded-xl border border-amber-200/15 bg-amber-200/[0.05] px-3.5 py-3 text-xs leading-5 text-amber-100/80">This is your one remaining request attempt. It will need producer approval again.</p>}
+            <form onSubmit={(event) => { event.preventDefault(); onSave({ sessionDate, durationHours, notes }); }} className="mt-5 space-y-4">
+                <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">Session date and start time</span><input type="datetime-local" min={localDateTimeMinimum()} required value={sessionDate} onChange={(event) => setSessionDate(event.target.value)} className="mt-2 w-full rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm text-white outline-none focus:border-[#e8a33d]/50 [color-scheme:dark]" /></label>
+                <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">Session length</span><select value={durationHours} onChange={(event) => setDurationHours(Number(event.target.value))} className="mt-2 w-full rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm text-white outline-none focus:border-[#e8a33d]/50">{Array.from({ length: 12 }, (_, index) => index + 1).map((hours) => <option key={hours} value={hours}>{hours} {hours === 1 ? "hour" : "hours"}</option>)}</select></label>
+                <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">Session notes</span><textarea value={notes} onChange={(event) => setNotes(event.target.value)} maxLength={1000} rows={4} className="mt-2 w-full resize-y rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm leading-5 text-white outline-none focus:border-[#e8a33d]/50" /></label>
+                <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end"><button type="button" disabled={saving} onClick={onClose} className="rounded-xl border border-white/10 px-4 py-3 text-xs font-semibold text-[#c9c5bd] transition hover:bg-white/[0.04] disabled:opacity-50">Keep as is</button><button type="submit" disabled={saving || !sessionDate} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-4 py-3 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:opacity-50">{saving && <LoaderCircle size={14} className="animate-spin" />}{isRetry ? "Update & send request" : "Save booking changes"}</button></div>
+            </form>
+        </section>
+    </div>;
 }
 
 function StatusBadge({ status, paymentStatus }: { status: BookingStatus; paymentStatus: Booking["paymentStatus"] }) {
@@ -260,3 +313,25 @@ function formatDate(value: string) { return new Intl.DateTimeFormat(undefined, {
 function formatTime(value: string) { return new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(new Date(value)); }
 function canCancel(status: BookingStatus) { return status === "PENDING" || status === "APPROVED"; }
 function errorMessage(error: unknown, fallback: string) { return (error as { response?: { data?: { message?: string } } })?.response?.data?.message || fallback; }
+
+function normalizeKenyanPhone(input: string) {
+    let phone = input.trim().replace(/[\s()-]/g, "");
+    if (phone.startsWith("+")) phone = phone.slice(1);
+    if (/^0[17]\d{8}$/.test(phone)) phone = `254${phone.slice(1)}`;
+    else if (/^[17]\d{8}$/.test(phone)) phone = `254${phone}`;
+    return /^254[17]\d{8}$/.test(phone) ? phone : "";
+}
+
+function localDateTimeMinimum() {
+    return toLocalInput(new Date());
+}
+
+function toLocalInput(value: string | Date) {
+    const date = value instanceof Date ? value : new Date(value);
+    const pad = (part: number) => String(part).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function toApiLocalDateTime(value: string) {
+    return value.length === 16 ? `${value}:00` : value;
+}
