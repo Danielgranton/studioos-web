@@ -90,7 +90,8 @@ export function ProducerBeatMarketplacePage() {
             setUploadStage("files");
             let audioRatio = 0;
             let coverRatio = 0;
-            const updateProgress = () => setUploadProgress(Math.round(((audioRatio + coverRatio) / 2) * 100));
+            const totalBytes = audio.size + cover.size;
+            const updateProgress = () => setUploadProgress(Math.round(((audioRatio * audio.size + coverRatio * cover.size) / totalBytes) * 100));
             await Promise.all([
                 putFile(draft.beatUploadUrl, audio, "audio/mpeg", (ratio) => { audioRatio = ratio; updateProgress(); }),
                 putFile(draft.coverUploadUrl, cover, "image/jpeg", (ratio) => { coverRatio = ratio; updateProgress(); }),
@@ -155,29 +156,61 @@ function BeatProcessingCard({ beat, onRetried }: { beat: BeatSummary; onRetried:
     const failed = beat.status === "FAILED";
     const [retrying, setRetrying] = useState(false);
     const [failureReason, setFailureReason] = useState<string | null>(null);
+    const [jobs, setJobs] = useState<{ operation: string; status: string; progressPercent: number; errorMessage?: string | null }[] | null>(null);
     const circumference = 2 * Math.PI * 30;
     useEffect(() => {
-        if (!failed) return;
-        void BeatService.getProcessingStatus(beat.id).then((jobs) => {
-            setFailureReason(jobs.find((job) => job.errorMessage)?.errorMessage || null);
-        }).catch(() => setFailureReason(null));
+        let active = true;
+        async function refreshStatus() {
+            try {
+                const status = await BeatService.getProcessingStatus(beat.id);
+                if (!active) return;
+                setJobs(status);
+                setFailureReason(status.find((job) => job.errorMessage)?.errorMessage || null);
+            } catch {
+                if (active && failed) setFailureReason(null);
+            }
+        }
+        void refreshStatus();
+        if (failed) return () => { active = false; };
+        const interval = window.setInterval(() => void refreshStatus(), 4000);
+        return () => { active = false; window.clearInterval(interval); };
     }, [beat.id, failed]);
+    const completedJobs = jobs?.filter((job) => job.status === "SUCCESS").length ?? 0;
+    const progress = jobs && jobs.length > 0
+        ? Math.round(jobs.reduce((total, job) => total + (job.status === "SUCCESS" ? 100 : Math.max(0, Math.min(100, job.progressPercent ?? 0))), 0) / jobs.length)
+        : null;
+    const activeJob = jobs?.find((job) => job.status === "RUNNING")
+        || jobs?.find((job) => job.status === "SUBMITTING")
+        || jobs?.find((job) => job.status === "QUEUED");
+    const operationLabel = activeJob ? processingOperationLabel(activeJob.operation) : null;
     async function retry() { setRetrying(true); try { await BeatService.retryProcessing(beat.id); toast.success("Processing restarted"); onRetried(); } catch (error) { toast.error("Could not restart processing", { description: getErrorMessage(error) }); } finally { setRetrying(false); } }
     return <article className="flex items-center gap-4 rounded-2xl border border-[#2b2b2b] bg-[#151515] p-4 sm:p-5">
         <div className="relative h-[72px] w-[72px] shrink-0">
-            <svg viewBox="0 0 72 72" className={`h-full w-full -rotate-90 ${failed ? "" : "animate-[spin_2.8s_linear_infinite]"}`} aria-hidden="true">
+            <svg viewBox="0 0 72 72" className="h-full w-full -rotate-90" aria-hidden="true">
                 <circle cx="36" cy="36" r="30" fill="none" stroke="currentColor" strokeWidth="5" className="text-[#302f2d]" />
-                <circle cx="36" cy="36" r="30" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeDasharray={`${circumference * 0.22} ${circumference * 0.78}`} className={failed ? "text-red-300" : "text-[#e8a33d]"} />
+                {progress !== null && <circle cx="36" cy="36" r="30" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={circumference * (1 - progress / 100)} className={`${failed ? "text-red-300" : "text-[#e8a33d]"} transition-[stroke-dashoffset] duration-700 ease-out`} />}
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center">{failed ? <AlertTriangle size={18} className="text-red-300" /> : <Loader2 size={18} className="animate-spin text-[#e8a33d]" />}</span>
+            <span className="absolute inset-0 flex items-center justify-center">{failed ? <AlertTriangle size={18} className="text-red-300" /> : progress === null ? <Loader2 size={18} className="animate-spin text-[#e8a33d]" /> : <span className="font-mono text-xs font-bold text-white">{progress}%</span>}</span>
         </div>
         <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2"><h3 className="truncate font-semibold text-white">{beat.title}</h3><span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${failed ? "bg-red-400/10 text-red-300" : "bg-[#24211d] text-[#d7a35d]"}`}>{failed ? "Needs attention" : "Processing"}</span></div>
             <p className="mt-1 truncate text-xs text-[#777]">{beat.genreName || "Unclassified"} · {beat.bpm || "--"} BPM · {beat.keySignature || "Key unset"}</p>
-            <p className="mt-2 text-xs leading-5 text-[#999]">{failed ? (failureReason || "Media processing could not finish. Retry the pipeline or remove this entry and upload the files again.") : "Fetching audio and artwork, then generating the preview, waveform, and marketplace images."}</p>
+            <p className="mt-2 text-xs leading-5 text-[#999]">{failed ? (failureReason || "Media processing could not finish. Retry the pipeline or remove this entry and upload the files again.") : progress === null ? "Checking media pipeline status…" : operationLabel ? `${operationLabel} · ${activeJob?.progressPercent ?? 0}% · ${completedJobs} of ${jobs?.length} steps complete` : progress === 100 ? "All media steps complete · finalizing your catalog entry" : `${completedJobs} of ${jobs?.length} media steps complete`}</p>
         </div>
         {failed && <button type="button" disabled={retrying} onClick={() => void retry()} className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-[#4a4032] px-3 py-2 text-xs font-semibold text-[#e8a33d] transition hover:bg-[#24211d] disabled:opacity-50">{retrying && <Loader2 size={14} className="animate-spin" />}{retrying ? "Retrying" : "Retry"}</button>}
     </article>;
+}
+
+function processingOperationLabel(operation: string) {
+    const labels: Record<string, string> = {
+        AUDIO_NORMALIZE: "Normalizing audio",
+        AUDIO_PREVIEW: "Creating preview",
+        AUDIO_WAVEFORM: "Building waveform",
+        COVER_RESIZE: "Resizing cover art",
+        COVER_THUMBNAIL: "Creating cover thumbnail",
+        COVER_WEBP: "Optimizing cover art",
+    };
+    return labels[operation] || operation.toLowerCase().replaceAll("_", " ");
 }
 
 function BeatUploadForm({ genres, studios, busy, stage, progress, onCancel, onSubmit }: { genres: BeatGenre[]; studios: { id: string; name: string }[]; busy: boolean; stage: "preparing" | "files" | "finalizing" | null; progress: number; onCancel: () => void; onSubmit: (form: BeatForm, audio: File, cover: File) => Promise<void> }) {

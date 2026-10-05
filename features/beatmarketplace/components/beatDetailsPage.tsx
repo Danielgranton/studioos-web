@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import {
     ArrowLeft,
     ArrowDownWideNarrow,
+    ArrowRight,
     BadgeCheck,
     Check,
     Clock3,
@@ -16,6 +18,7 @@ import {
     Play,
     Radio,
     RefreshCw,
+    Shield,
     ShoppingBag,
     Star,
     ShieldCheck,
@@ -24,6 +27,8 @@ import {
 } from "lucide-react";
 
 import BackButton from "@/constants/BackButton";
+import { useSession } from "@/features/auth";
+import { toast } from "sonner";
 
 import { BeatService } from "../services/beat.service";
 import type { BeatLicense, BeatReview, BeatSummary } from "../types/beat";
@@ -31,6 +36,8 @@ import type { BeatLicense, BeatReview, BeatSummary } from "../types/beat";
 type BeatDetailsPageProps = { beatId: string };
 
 export function BeatDetailsPage({ beatId }: BeatDetailsPageProps) {
+    const router = useRouter();
+    const { session, isLoading: sessionLoading } = useSession();
     const [beat, setBeat] = useState<BeatSummary | null>(null);
     const [licenses, setLicenses] = useState<BeatLicense[]>([]);
     const [reviews, setReviews] = useState<BeatReview[]>([]);
@@ -40,6 +47,9 @@ export function BeatDetailsPage({ beatId }: BeatDetailsPageProps) {
     const [likeCount, setLikeCount] = useState(0);
     const [likeLoading, setLikeLoading] = useState(false);
     const [selectedLicense, setSelectedLicense] = useState<string | null>(null);
+    const [checkoutOpen, setCheckoutOpen] = useState(false);
+    const [purchaseLoading, setPurchaseLoading] = useState(false);
+    const [purchaseComplete, setPurchaseComplete] = useState<{ purchaseId: string; transactionId: string } | null>(null);
 
     const loadBeat = useCallback(async () => {
         setLoading(true);
@@ -77,8 +87,30 @@ export function BeatDetailsPage({ beatId }: BeatDetailsPageProps) {
                 : await BeatService.likeBeat(beatId);
             setLiked(state.liked);
             setLikeCount(state.likeCount);
+        } catch {
+            toast.error("Could not update saved beats", { description: "Please try again in a moment." });
         } finally {
             setLikeLoading(false);
+        }
+    }
+
+    async function purchase(phoneNumber: string) {
+        const license = licenses.find((item) => item.id === selectedLicense);
+        if (!license) return;
+        if (!session) {
+            router.push(`/auth/signin?redirect=${encodeURIComponent(`/marketplace/${beatId}`)}`);
+            return;
+        }
+        setPurchaseLoading(true);
+        try {
+            const result = await BeatService.purchaseBeat(beatId, { licenseId: license.id, phoneNumber });
+            setPurchaseComplete({ purchaseId: result.purchaseId, transactionId: result.transactionId });
+            toast.success("M-Pesa prompt sent", { description: "Approve the payment on your phone to complete the beat purchase." });
+        } catch (cause) {
+            const message = (cause as { response?: { data?: { message?: string } } })?.response?.data?.message;
+            toast.error("Could not start purchase", { description: message || "Check the phone number and license availability, then try again." });
+        } finally {
+            setPurchaseLoading(false);
         }
     }
 
@@ -157,14 +189,69 @@ export function BeatDetailsPage({ beatId }: BeatDetailsPageProps) {
                     <section className="rounded-2xl border border-[#2b2925] bg-[#151412] p-4 sm:p-5">
                         <SectionHeading eyebrow="Choose your rights" title="Licenses" />
                         {licenses.length === 0 ? <p className="mt-4 rounded-xl border border-dashed border-[#3a3630] px-4 py-6 text-center text-xs text-[#777169]">Licenses are not available right now.</p> : <div className="mt-4 space-y-2">{licenses.map((license) => <LicenseOption key={license.id} license={license} selected={selectedLicense === license.id} onSelect={() => setSelectedLicense(license.id)} />)}</div>}
-                        <button type="button" disabled={!selectedLicense} className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-[#e8a33d] px-4 py-2.5 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:cursor-not-allowed disabled:opacity-40"><ShoppingBag size={14} /> Continue with license</button>
+                        <button type="button" disabled={!selectedLicense || sessionLoading || String(session?.userId ?? "") === String(beat.producerId)} onClick={() => {
+                            if (!session && !sessionLoading) {
+                                router.push(`/auth/signin?redirect=${encodeURIComponent(`/marketplace/${beatId}`)}`);
+                                return;
+                            }
+                            setPurchaseComplete(null);
+                            setCheckoutOpen(true);
+                        }} className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-[#e8a33d] px-4 py-2.5 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:cursor-not-allowed disabled:opacity-40"><ShoppingBag size={14} />{String(session?.userId ?? "") === String(beat.producerId) ? "Your beat" : "Continue with license"}<ArrowRight size={14} /></button>
+                        {!session && !sessionLoading && <p className="mt-2 text-center text-[10px] text-[#777169]">Sign in to purchase securely with M-Pesa.</p>}
                     </section>
                 </div>
 
                 <ReviewsSection reviews={reviews} rating={beat.averageRating ?? 0} reviewCount={beat.reviewCount ?? 0} />
             </div>
+            {checkoutOpen && selectedLicense && <BeatCheckoutDialog beat={beat} license={licenses.find((item) => item.id === selectedLicense)!} initialPhone={session?.phone ?? ""} submitting={purchaseLoading} result={purchaseComplete} onClose={() => setCheckoutOpen(false)} onPurchase={(phone) => void purchase(phone)} />}
         </main>
     );
+}
+
+function BeatCheckoutDialog({ beat, license, initialPhone, submitting, result, onClose, onPurchase }: {
+    beat: BeatSummary;
+    license: BeatLicense;
+    initialPhone: string;
+    submitting: boolean;
+    result: { purchaseId: string; transactionId: string } | null;
+    onClose: () => void;
+    onPurchase: (phoneNumber: string) => void;
+}) {
+    const [phone, setPhone] = useState(initialPhone);
+    const [accepted, setAccepted] = useState(false);
+    const [phoneError, setPhoneError] = useState("");
+
+    function submit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        const normalized = normalizeKenyanPhone(phone);
+        if (!normalized) {
+            setPhoneError("Enter a valid Kenyan number, for example +254 7XX XXX XXX.");
+            return;
+        }
+        setPhoneError("");
+        onPurchase(normalized);
+    }
+
+    return <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/75 px-4 py-6 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget && !submitting) onClose(); }}>
+        <section role="dialog" aria-modal="true" aria-labelledby="beat-checkout-title" className="max-h-full w-full max-w-md overflow-y-auto rounded-3xl border border-white/10 bg-[#171614] p-5 shadow-2xl sm:p-6">
+            {result ? <>
+                <div className="grid h-12 w-12 place-items-center rounded-2xl border border-emerald-300/20 bg-emerald-300/10 text-emerald-300"><Check size={22} /></div>
+                <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">Payment request sent</p>
+                <h2 id="beat-checkout-title" className="mt-2 text-xl font-bold text-white">Check your phone</h2>
+                <p className="mt-2 text-sm leading-6 text-[#99958d]">Approve the M-Pesa prompt to finish buying <span className="text-white">{beat.title}</span>. Your license and download will be available after payment is confirmed.</p>
+                <div className="mt-5 rounded-xl border border-white/[0.08] bg-black/20 p-3 text-[10px] text-[#777169]">Purchase reference <span className="ml-1 font-mono text-[#c9c5bd]">{result.purchaseId}</span><span className="mt-1 block">Payment reference <span className="font-mono text-[#c9c5bd]">{result.transactionId}</span></span></div>
+                <button type="button" onClick={onClose} className="mt-5 w-full rounded-xl bg-[#e8a33d] px-4 py-3 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458]">Continue browsing</button>
+            </> : <>
+                <div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">Secure checkout</p><h2 id="beat-checkout-title" className="mt-2 text-xl font-bold text-white">Review your purchase</h2></div><button type="button" aria-label="Close checkout" onClick={onClose} disabled={submitting} className="rounded-lg px-2 py-1 text-lg text-[#888] hover:bg-white/5 hover:text-white">×</button></div>
+                <div className="mt-5 flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-black/20 p-3"><div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-[#28241e]"><Image src={beat.thumbnailUrl || beat.coverUrl || "/images/beats.png"} alt="" fill sizes="56px" className="object-cover" /></div><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-white">{beat.title}</p><p className="mt-1 text-xs text-[#858078]">{beat.producerName || "StudioOS producer"} · {license.type} license</p></div><span className="shrink-0 font-mono text-sm font-bold text-[#e8a33d]">KSh {license.price.toLocaleString()}</span></div>
+                <div className="mt-4 flex gap-3 rounded-xl border border-[#e8a33d]/15 bg-[#e8a33d]/[0.04] p-3"><Shield size={15} className="mt-0.5 shrink-0 text-[#e8a33d]" /><div className="text-[11px] leading-5 text-[#aaa49a]">{license.exclusive ? "This license grants exclusive rights. Availability may change while checkout is in progress." : "Review the license terms before paying. Your purchase is completed only after M-Pesa confirms payment."}{license.maxStreams != null && <span className="block">Up to {license.maxStreams.toLocaleString()} streams.</span>}</div></div>
+                <form onSubmit={submit} className="mt-5 space-y-4"><label className="block text-xs font-semibold text-[#ccc7bd]">M-Pesa phone number<input autoComplete="tel" type="tel" value={phone} onChange={(event) => { setPhone(event.target.value); setPhoneError(""); }} placeholder="+254 7XX XXX XXX" className="mt-2 w-full rounded-xl border border-white/[0.1] bg-[#10100f] px-3.5 py-3 text-sm text-white outline-none focus:border-[#e8a33d]/50" />{phoneError && <span role="alert" className="mt-1.5 block text-[11px] text-red-300">{phoneError}</span>}<span className="mt-1.5 block text-[10px] text-[#777169]">We’ll send a payment prompt to this number.</span></label>
+                    <label className="flex cursor-pointer items-start gap-2.5 text-[11px] leading-5 text-[#aaa49a]"><input type="checkbox" checked={accepted} onChange={(event) => setAccepted(event.target.checked)} className="mt-1 accent-[#e8a33d]" />I have reviewed and agree to the selected license terms.</label>
+                    <button type="submit" disabled={submitting || !accepted} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-4 py-3 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:cursor-not-allowed disabled:opacity-50">{submitting ? <Loader2 size={15} className="animate-spin" /> : <ShoppingBag size={15} />}{submitting ? "Requesting payment..." : `Pay KSh ${license.price.toLocaleString()} with M-Pesa`}</button>
+                </form>
+            </>}
+        </section>
+    </div>;
 }
 
 function PreviewPlayer({ beat }: { beat: BeatSummary }) {
@@ -268,5 +355,12 @@ function DetailStat({ icon, value, label }: { icon: ReactNode; value: string; la
 function InfoPill({ label, value }: { label: string; value: string }) { return <span className="rounded-lg border border-[#302d28] bg-[#1c1a17] px-2.5 py-1.5"><span className="mr-1.5 text-[#706b63]">{label}</span><span className="font-semibold text-[#d4cec4]">{value}</span></span>; }
 function Feature({ icon, title, text }: { icon: ReactNode; title: string; text: string }) { return <div className="flex gap-2.5 rounded-xl border border-[#2d2a26] bg-[#1b1916] p-3"><span className="mt-0.5 text-[#e8a33d]">{icon}</span><div><h3 className="text-[11px] font-bold text-white">{title}</h3><p className="mt-1 text-[10px] leading-4 text-[#777169]">{text}</p></div></div>; }
 function formatDuration(seconds?: number | null) { if (!seconds || seconds < 0) return "--:--"; return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`; }
+function normalizeKenyanPhone(input: string) {
+    let phone = input.trim().replace(/[\s()-]/g, "");
+    if (phone.startsWith("+")) phone = phone.slice(1);
+    if (/^0[17]\d{8}$/.test(phone)) phone = `254${phone.slice(1)}`;
+    else if (/^[17]\d{8}$/.test(phone)) phone = `254${phone}`;
+    return /^254[17]\d{8}$/.test(phone) ? phone : "";
+}
 function DetailsLoading() { return <main className="min-h-screen bg-[#0f0f0f] px-4 py-10 sm:px-6"><div className="mx-auto max-w-[1180px] animate-pulse"><div className="h-5 w-28 rounded bg-[#292621]" /><div className="mt-7 grid gap-8 rounded-[28px] border border-[#2b2925] bg-[#171614] p-5 sm:p-10 lg:grid-cols-2"><div className="aspect-square rounded-2xl bg-[#292621]" /><div className="flex flex-col justify-center"><div className="h-4 w-28 rounded bg-[#292621]" /><div className="mt-5 h-12 w-3/4 rounded bg-[#292621]" /><div className="mt-4 h-4 w-1/2 rounded bg-[#292621]" /><div className="mt-8 h-24 rounded-2xl bg-[#292621]" /></div></div></div></main>; }
 function DetailsError({ onRetry }: { onRetry: () => void }) { return <main className="flex min-h-screen items-center justify-center bg-[#0f0f0f] px-6 text-center text-white"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">Beat unavailable</p><h1 className="mt-3 text-2xl font-bold">This beat could not be loaded</h1><p className="mt-2 text-sm text-[#888176]">It may have been archived or the marketplace is temporarily unavailable.</p><button type="button" onClick={onRetry} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#e8a33d] px-4 py-2.5 text-sm font-bold text-[#17130c]"><RefreshCw size={15} /> Try again</button></div></main>; }

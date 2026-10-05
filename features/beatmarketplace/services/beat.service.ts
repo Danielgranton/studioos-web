@@ -26,6 +26,9 @@ class BeatServiceClient {
     async getLikeState(beatId: string): Promise<BeatLikeState> { return (await api.get<BeatLikeState>(`/beats/${beatId}/like`)).data; }
     async likeBeat(beatId: string): Promise<BeatLikeState> { return (await api.post<BeatLikeState>(`/beats/${beatId}/like`)).data; }
     async unlikeBeat(beatId: string): Promise<BeatLikeState> { return (await api.delete<BeatLikeState>(`/beats/${beatId}/like`)).data; }
+    async purchaseBeat(beatId: string, request: { licenseId: string; phoneNumber: string }): Promise<{ purchaseId: string; transactionId: string; status: string }> {
+        return (await api.post(`/beats/${beatId}/purchase`, request)).data;
+    }
     async getOwnerAudioUrl(beatId: string): Promise<string> { return (await api.get<{ previewUrl: string }>(`/beats/${beatId}/owner-audio`)).data.previewUrl; }
     async updateBeat(beatId: string, request: { title: string; description?: string; genreId: string; bpm?: number; keySignature?: string; mood?: string; visibility: string }): Promise<void> {
         await api.put(`/beats/${beatId}`, request);
@@ -46,7 +49,7 @@ class BeatServiceClient {
     async archiveBeat(beatId: string): Promise<void> { await api.delete(`/beats/${beatId}`); }
     async deleteArchivedBeat(beatId: string): Promise<void> { await api.delete(`/beats/${beatId}/permanent`); }
     async retryProcessing(beatId: string): Promise<void> { await api.post(`/beats/${beatId}/processing/retry`); }
-    async getProcessingStatus(beatId: string): Promise<{ operation: string; status: string; errorMessage?: string | null }[]> {
+    async getProcessingStatus(beatId: string): Promise<{ operation: string; status: string; progressPercent: number; errorMessage?: string | null }[]> {
         return (await api.get(`/beats/${beatId}/processing`)).data;
     }
 }
