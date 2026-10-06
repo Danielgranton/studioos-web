@@ -13,6 +13,9 @@ export type ServiceProvider = {
     price?: number;
     currency?: string;
     verified: boolean;
+    listingId: string;
+    studioId?: string | null;
+    catalogServiceId?: string | null;
 };
 
 type ApiResponse<T> = { data?: T };

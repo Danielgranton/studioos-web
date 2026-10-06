@@ -3,3 +3,5 @@ export type { ServiceCatalogItem } from "./types/service";
 export type { ServiceProvider } from "./services/service-catalog.service";
 export { ServicesPage } from "./components/servicesPage";
 export { ServiceProvidersPage } from "./components/serviceProvidersPage";
+export { ServiceBookingsPanel } from "./components/serviceBookingsPanel";
+export { ServiceBookingService } from "./services/service-booking.service";

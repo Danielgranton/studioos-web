@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { useSession } from "@/features/auth";
 import { StudioService } from "@/features/studio";
+import { ServiceBookingsPanel } from "@/features/services";
 
 import { BookingService } from "../services/booking.service";
 import type { Booking, BookingStatus } from "../types/booking";
@@ -198,6 +199,8 @@ export function BookingsPage() {
                 <div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">StudioOS booking desk</p><h1 className="mt-2 text-3xl font-black tracking-[-0.04em]">Bookings</h1><p className="mt-2 max-w-xl text-sm leading-6 text-[#92908a]">{isProducer ? "Review studio requests, set the session price, and keep your schedule clear." : "Track studio requests, confirm your session, and manage payment."}</p></div>
                 <button type="button" onClick={() => void loadBookings()} disabled={loading} className="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-white/10 px-3.5 py-2.5 text-xs font-semibold text-[#c9c5bd] transition hover:border-white/20 hover:text-white disabled:opacity-50 sm:self-auto"><RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh</button>
             </header>
+
+            <ServiceBookingsPanel />
 
             <div className="mt-7 flex gap-2 overflow-x-auto border-b border-white/[0.08] pb-3">
                 {tabs.map((tab) => <button key={tab.id} type="button" onClick={() => setFilter(tab.id)} className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition ${filter === tab.id ? "bg-white/[0.09] text-white" : "text-[#77746e] hover:bg-white/[0.04] hover:text-[#ddd]"}`}>{tab.label}{tab.count !== undefined && <span className={`rounded-md px-1.5 py-0.5 font-mono text-[9px] ${filter === tab.id ? "bg-[#e8a33d]/15 text-[#e8a33d]" : "bg-white/[0.05] text-[#77746e]"}`}>{tab.count}</span>}</button>)}

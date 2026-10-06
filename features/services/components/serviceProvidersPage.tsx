@@ -1,18 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, BriefcaseBusiness, CheckCircle2, Search, Sparkles } from "lucide-react";
+import { ArrowLeft, BriefcaseBusiness, CheckCircle2, LoaderCircle, Search, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import { ProducerCard, type ProducerCardProps } from "@/features/home";
+import { useSession } from "@/features/auth";
 
 import { ServiceCatalogService, type ServiceProvider } from "../services/service-catalog.service";
+import { ServiceBookingService } from "../services/service-booking.service";
 import type { ServiceCatalogItem } from "../types/service";
 
 export function ServiceProvidersPage({ slug }: { slug: string }) {
     const [service, setService] = useState<ServiceCatalogItem | null>(null);
     const [providers, setProviders] = useState<ServiceProvider[] | null>(null);
     const [error, setError] = useState(false);
+    const [selectedProvider, setSelectedProvider] = useState<ServiceProvider | null>(null);
+    const [submitting, setSubmitting] = useState(false);
+    const [preferredDate, setPreferredDate] = useState("");
+    const [requestDetails, setRequestDetails] = useState("");
+    const { session } = useSession();
+    const router = useRouter();
 
     useEffect(() => {
         void Promise.all([ServiceCatalogService.getCatalog(), ServiceCatalogService.getProviders(slug)])
@@ -28,7 +38,7 @@ export function ServiceProvidersPage({ slug }: { slug: string }) {
 
         // A producer can own more than one studio. Show the person once and
         // keep the first matching service offer as the card's price anchor.
-        return Array.from(new Map(providers.map((provider) => [provider.providerId, provider])).values());
+        return Array.from(new Map(providers.map((provider) => [`${provider.providerType}:${provider.listingId}`, provider])).values());
     }, [providers]);
 
     if (error) return <State title="Service unavailable" text="We could not load providers for this service." />;
@@ -53,14 +63,56 @@ export function ServiceProvidersPage({ slug }: { slug: string }) {
 
                 {uniqueProviders.length === 0 ? <State title="No providers yet" text="This service is in the catalog. Check back as more professionals publish their offers." /> : <>
                     <div className="mt-8 flex items-center justify-between gap-4 border-b border-white/[0.08] pb-4"><div><h2 className="text-lg font-bold tracking-[-0.02em]">Available professionals</h2><p className="mt-1 text-xs text-[#77746e]">Artists and producers who can deliver {service?.name || "this service"}.</p></div><span className="hidden items-center gap-1.5 text-xs text-[#77746e] sm:flex"><Search size={13} /> Browse profiles</span></div>
-                    <div className="mt-5 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-5">{uniqueProviders.map((provider) => <ServiceProviderCard key={`${provider.providerType}-${provider.providerId}`} provider={provider} />)}</div>
+                    <div className="mt-5 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-5">{uniqueProviders.map((provider) => <ServiceProviderCard key={`${provider.providerType}-${provider.listingId}`} provider={provider} onRequest={() => {
+                        if (!session) {
+                            router.push(`/login?redirect=${encodeURIComponent(`/services/service/${slug}`)}`);
+                            return;
+                        }
+                        setSelectedProvider(provider);
+                        setPreferredDate(defaultServiceDate());
+                        setRequestDetails("");
+                    }} />)}</div>
                 </>}
             </div>
+            {selectedProvider && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget && !submitting) setSelectedProvider(null); }}>
+                <section role="dialog" aria-modal="true" aria-labelledby="service-request-title" className="max-h-full w-full max-w-lg overflow-y-auto rounded-3xl border border-white/10 bg-[#171614] p-5 shadow-2xl sm:p-7">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#e8a33d]">Service request</p>
+                    <h2 id="service-request-title" className="mt-2 text-xl font-bold text-white">Request {selectedProvider.serviceName}</h2>
+                    <p className="mt-2 text-sm leading-6 text-[#99958d]">{selectedProvider.providerName} will review your preferred date and details, then accept with a confirmed price or decline. You will only pay after acceptance.</p>
+                    <form className="mt-5 space-y-4" onSubmit={async (event) => {
+                        event.preventDefault();
+                        if (!selectedProvider || !preferredDate || requestDetails.trim().length < 10) return;
+                        setSubmitting(true);
+                        try {
+                            await ServiceBookingService.create({
+                                providerType: selectedProvider.providerType,
+                                providerId: Number(selectedProvider.providerId),
+                                listingId: selectedProvider.listingId,
+                                studioId: selectedProvider.studioId,
+                                catalogServiceId: selectedProvider.catalogServiceId,
+                                serviceName: selectedProvider.serviceName,
+                                preferredDate: `${preferredDate}:00`,
+                                requestDetails: requestDetails.trim(),
+                            });
+                            setSelectedProvider(null);
+                            toast.success("Request sent", { description: "Track the provider's response from Dashboard → Bookings." });
+                        } catch {
+                            toast.error("Could not send request", { description: "Check your connection and try again." });
+                        } finally {
+                            setSubmitting(false);
+                        }
+                    }}>
+                        <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">Preferred date and time</span><input type="datetime-local" required min={defaultServiceDate()} value={preferredDate} onChange={(event) => setPreferredDate(event.target.value)} className="mt-2 w-full rounded-xl border border-white/10 bg-[#10100f] px-3 py-3 text-sm text-white outline-none focus:border-[#e8a33d]/50 [color-scheme:dark]" /></label>
+                        <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">What do you need?</span><textarea required minLength={10} maxLength={2000} rows={4} value={requestDetails} onChange={(event) => setRequestDetails(event.target.value)} placeholder="Share your goals, references, and any details the provider should know." className="mt-2 w-full resize-y rounded-xl border border-white/10 bg-[#10100f] px-3 py-3 text-sm leading-5 text-white outline-none placeholder:text-[#625e57] focus:border-[#e8a33d]/50" /></label>
+                        <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end"><button type="button" disabled={submitting} onClick={() => setSelectedProvider(null)} className="rounded-xl border border-white/10 px-4 py-3 text-xs font-semibold text-[#aaa59c] hover:text-white">Cancel</button><button type="submit" disabled={submitting || requestDetails.trim().length < 10} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-4 py-3 text-xs font-bold text-[#17130c] disabled:opacity-50">{submitting && <LoaderCircle size={14} className="animate-spin" />}Send request</button></div>
+                    </form>
+                </section>
+            </div>}
         </main>
     );
 }
 
-function ServiceProviderCard({ provider }: { provider: ServiceProvider }) {
+function ServiceProviderCard({ provider, onRequest }: { provider: ServiceProvider; onRequest: () => void }) {
     const isArtist = provider.providerType === "ARTIST";
     const providerId = Number(provider.providerId);
     const priceLabel = provider.price == null ? "Contact for rates" : `From ${provider.currency || "KES"} ${provider.price.toLocaleString()}`;
@@ -90,7 +142,13 @@ function ServiceProviderCard({ provider }: { provider: ServiceProvider }) {
         showPrice: true,
     };
 
-    return <div className="relative"><ProducerCard {...card} /><span className="pointer-events-none absolute right-4 top-4 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#77746e]"><CheckCircle2 size={11} className={provider.verified ? "text-[#5eead4]" : "text-[#57534d]"} />{isArtist ? "Artist" : "Producer"}</span></div>;
+    return <div className="relative"><ProducerCard {...card} /><span className="pointer-events-none absolute right-4 top-4 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#77746e]"><CheckCircle2 size={11} className={provider.verified ? "text-[#5eead4]" : "text-[#57534d]"} />{isArtist ? "Artist" : "Producer"}</span><button type="button" onClick={onRequest} className="mt-2.5 w-full rounded-xl border border-[#e8a33d]/30 bg-[#e8a33d]/[0.09] px-3 py-2.5 text-[11px] font-bold text-[#f0bd65] transition hover:bg-[#e8a33d]/[0.16]">Request service</button></div>;
+}
+
+function defaultServiceDate() {
+    const date = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+    return local.toISOString().slice(0, 16);
 }
 
 function Loading() {

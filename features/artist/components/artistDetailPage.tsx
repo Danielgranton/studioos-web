@@ -2,11 +2,15 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { BadgeCheck, BriefcaseBusiness, CalendarCheck, Check, Disc3, MapPin, Sparkles, Star, Users, X } from "lucide-react";
+import { BadgeCheck, BriefcaseBusiness, CalendarCheck, Check, Disc3, LoaderCircle, MapPin, Sparkles, Star, Users, X } from "lucide-react";
+import { toast } from "sonner";
 
 import BackButton from "@/constants/BackButton";
+import { useSession } from "@/features/auth";
 import { ReviewList } from "@/features/reviews";
+import { ServiceBookingService } from "@/features/services";
 
 import { ArtistService } from "../services/artist.service";
 import type { Artist } from "../types/artist";
@@ -14,6 +18,12 @@ import type { Artist } from "../types/artist";
 export function ArtistDetailPage({ artistId }: { artistId: string }) {
     const [artist, setArtist] = useState<Artist | null>(null);
     const [error, setError] = useState(false);
+    const [requestedServiceId, setRequestedServiceId] = useState<string | null>(null);
+    const [preferredDate, setPreferredDate] = useState("");
+    const [requestDetails, setRequestDetails] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+    const { session } = useSession();
+    const router = useRouter();
 
     useEffect(() => {
         void ArtistService.getArtist(artistId).then(setArtist).catch(() => setError(true));
@@ -56,9 +66,51 @@ export function ArtistDetailPage({ artistId }: { artistId: string }) {
             </section>
             <section className="mx-auto mt-6 max-w-5xl rounded-3xl border border-[#2a2825] bg-[#161513] p-5 sm:p-8">
                 <div className="flex items-center gap-2"><BriefcaseBusiness size={17} className="text-[#e8a33d]" /><h2 className="text-lg font-semibold">Services</h2></div>
-                {artist.services.length > 0 ? <div className="mt-5 grid gap-3 sm:grid-cols-2">{artist.services.map((service) => <div key={service.id} className="rounded-2xl border border-[#2a2825] bg-[#1c1a17] p-4"><div className="flex items-start justify-between gap-4"><h3 className="font-medium">{service.name}</h3><span className="whitespace-nowrap rounded-full bg-[#e8a33d]/10 px-2.5 py-1 text-xs font-semibold text-[#f0bd65]">{service.currency} {service.price.toLocaleString()}</span></div>{service.description && <p className="mt-2 text-xs leading-6 text-[#9a978f]">{service.description}</p>}<div className="mt-4 flex items-center justify-between gap-3 border-t border-[#2a2825] pt-3"><span className="text-[10px] uppercase tracking-[0.12em] text-[#6b685f]">Booking flow</span><button type="button" disabled className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-lg border border-[#3a352d] bg-[#27231e] px-3 py-2 text-[10px] font-semibold text-[#8f887c]"><CalendarCheck size={13} />Coming soon</button></div></div>)}</div> : <p className="mt-4 text-sm text-[#888176]">Services will appear here as this artist adds them.</p>}
+                {artist.services.filter((service) => service.active).length > 0 ? <div className="mt-5 grid gap-3 sm:grid-cols-2">{artist.services.filter((service) => service.active).map((service) => <div key={service.id} className="rounded-2xl border border-[#2a2825] bg-[#1c1a17] p-4"><div className="flex items-start justify-between gap-4"><h3 className="font-medium">{service.name}</h3><span className="whitespace-nowrap rounded-full bg-[#e8a33d]/10 px-2.5 py-1 text-xs font-semibold text-[#f0bd65]">{service.currency} {service.price.toLocaleString()}</span></div>{service.description && <p className="mt-2 text-xs leading-6 text-[#9a978f]">{service.description}</p>}<div className="mt-4 flex items-center justify-between gap-3 border-t border-[#2a2825] pt-3"><span className="text-[10px] uppercase tracking-[0.12em] text-[#6b685f]">Starting price</span><button type="button" disabled={session?.userId === artist.id} onClick={() => {
+                    if (!session) {
+                        router.push(`/login?redirect=${encodeURIComponent(`/artists/${artistId}`)}`);
+                        return;
+                    }
+                    setRequestedServiceId(service.id);
+                    setPreferredDate(defaultArtistServiceDate());
+                    setRequestDetails("");
+                }} className="inline-flex items-center gap-1.5 rounded-lg bg-[#e8a33d] px-3 py-2 text-[10px] font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:cursor-not-allowed disabled:opacity-50"><CalendarCheck size={13} />{session?.userId === artist.id ? "Your service" : "Request service"}</button></div></div>)}</div> : <p className="mt-4 text-sm text-[#888176]">Services will appear here as this artist adds them.</p>}
             </section>
             <div className="mx-auto mt-6 max-w-5xl"><ReviewList target="ARTIST" targetId={artistId} /></div>
+            {requestedServiceId && artist && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget && !submitting) setRequestedServiceId(null); }}>
+                <section role="dialog" aria-modal="true" aria-labelledby="artist-service-request-title" className="max-h-full w-full max-w-lg overflow-y-auto rounded-3xl border border-white/10 bg-[#171614] p-5 shadow-2xl sm:p-7">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#e8a33d]">Service request · {artist.name}</p>
+                    <h2 id="artist-service-request-title" className="mt-2 text-xl font-bold text-white">Request {artist.services.find((service) => service.id === requestedServiceId)?.name}</h2>
+                    <p className="mt-2 text-sm leading-6 text-[#99958d]">Choose a preferred date and share what you need. The artist will accept with a confirmed price or decline. Payment is requested only after acceptance.</p>
+                    <form className="mt-5 space-y-4" onSubmit={async (event) => {
+                        event.preventDefault();
+                        const service = artist.services.find((item) => item.id === requestedServiceId);
+                        if (!service || !preferredDate || requestDetails.trim().length < 10) return;
+                        setSubmitting(true);
+                        try {
+                            await ServiceBookingService.create({
+                                providerType: "ARTIST",
+                                providerId: artist.id,
+                                listingId: service.id,
+                                catalogServiceId: service.catalogServiceId,
+                                serviceName: service.name,
+                                preferredDate: `${preferredDate}:00`,
+                                requestDetails: requestDetails.trim(),
+                            });
+                            setRequestedServiceId(null);
+                            toast.success("Request sent", { description: "Track the artist's response from Dashboard → Bookings." });
+                        } catch {
+                            toast.error("Could not send request", { description: "Check your connection and try again." });
+                        } finally {
+                            setSubmitting(false);
+                        }
+                    }}>
+                        <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">Preferred date and time</span><input type="datetime-local" required min={defaultArtistServiceDate()} value={preferredDate} onChange={(event) => setPreferredDate(event.target.value)} className="mt-2 w-full rounded-xl border border-white/10 bg-[#10100f] px-3 py-3 text-sm text-white outline-none focus:border-[#e8a33d]/50 [color-scheme:dark]" /></label>
+                        <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">What do you need?</span><textarea required minLength={10} maxLength={2000} rows={4} value={requestDetails} onChange={(event) => setRequestDetails(event.target.value)} placeholder="Share your goals, references, and any details the artist should know." className="mt-2 w-full resize-y rounded-xl border border-white/10 bg-[#10100f] px-3 py-3 text-sm leading-5 text-white outline-none placeholder:text-[#625e57] focus:border-[#e8a33d]/50" /></label>
+                        <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end"><button type="button" disabled={submitting} onClick={() => setRequestedServiceId(null)} className="rounded-xl border border-white/10 px-4 py-3 text-xs font-semibold text-[#aaa59c] hover:text-white">Cancel</button><button type="submit" disabled={submitting || requestDetails.trim().length < 10} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-4 py-3 text-xs font-bold text-[#17130c] disabled:opacity-50">{submitting && <LoaderCircle size={14} className="animate-spin" />}Send request</button></div>
+                    </form>
+                </section>
+            </div>}
         </main>
     );
 }
@@ -69,4 +121,10 @@ function ArtistFact({ icon, label, value, tone = "text-[#f5f4f1]" }: { icon: Rea
 
 function formatCount(value: number) {
     return new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(value ?? 0);
+}
+
+function defaultArtistServiceDate() {
+    const date = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+    return local.toISOString().slice(0, 16);
 }
