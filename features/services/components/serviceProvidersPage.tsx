@@ -115,7 +115,10 @@ export function ServiceProvidersPage({ slug }: { slug: string }) {
 function ServiceProviderCard({ provider, onRequest }: { provider: ServiceProvider; onRequest: () => void }) {
     const isArtist = provider.providerType === "ARTIST";
     const providerId = Number(provider.providerId);
-    const priceLabel = provider.price == null ? "Contact for rates" : `From ${provider.currency || "KES"} ${provider.price.toLocaleString()}`;
+    const priceLabel = provider.price == null ? "Contact for rates"
+        : provider.priceType === "PRODUCTION_PACKAGE" ? `Full package · ${provider.currency || "KES"} ${provider.price.toLocaleString()}`
+            : provider.priceType === "ADD_ON" ? `Add-on · ${provider.currency || "KES"} ${provider.price.toLocaleString()}`
+                : `From ${provider.currency || "KES"} ${provider.price.toLocaleString()}`;
     const card: ProducerCardProps = {
         id: Number.isFinite(providerId) ? providerId : 0,
         slug: provider.providerId,

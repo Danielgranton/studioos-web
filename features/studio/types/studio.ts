@@ -3,6 +3,7 @@ export type Studio = {
     studioName: string;
     location: string;
     pricing: number;
+    productionPackagePrice?: number | null;
     availability: string;
     description: string;
     badge?: string;
@@ -28,11 +29,21 @@ export type Studio = {
     ownerName: string;
     ownerProfileImageThumbnail?: string;
     services: string[];
+    serviceDetails?: StudioServiceOffering[];
     media?: StudioMedia[];
     averageRating?: number;
     totalRatings?: number;
     likeCount?: number;
     createdAt?: string;
+};
+
+export type StudioServiceOffering = {
+    id?: string;
+    name: string;
+    catalogServiceId?: string | null;
+    active: boolean;
+    includedInProductionPackage: boolean;
+    price?: number | null;
 };
 
 export type StudioMedia = {
@@ -49,9 +60,11 @@ export type StudioFormValues = {
     studioName: string;
     location: string;
     pricing: string;
+    productionPackagePrice: string;
     availability: string;
     description: string;
     services: string;
+    serviceDetails: StudioServiceOffering[];
     badge: string;
     genres: string;
     equipment: string;
@@ -67,9 +80,11 @@ export type CreateStudioRequest = {
     studioName: string;
     location: string;
     pricing: number;
+    productionPackagePrice?: number;
     availability: string;
     description: string;
     services: string[];
+    serviceDetails?: StudioServiceOffering[];
     badge?: string;
     genres?: string[];
     equipment?: string[];

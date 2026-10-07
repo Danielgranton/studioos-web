@@ -240,14 +240,13 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
                         </section>
 
                         <section>
-                            <SectionLabel>What this studio offers</SectionLabel>
-                            <div className="mt-3 flex flex-wrap gap-1.5">
-                                {[...studio.services, ...studio.genres].map((item) => (
-                                    <span key={item} className="rounded-full border border-[#302d28] bg-[#161513] px-2.5 py-1 text-[11px] text-[#c0bbb1]">
-                                        {item}
-                                    </span>
-                                ))}
+                            <SectionLabel>Music production package</SectionLabel>
+                            <div className="mt-3 rounded-2xl border border-[#3b352c] bg-[#1b1916] p-4 sm:p-5">
+                                <div className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-sm font-semibold text-[#f2eee7]">A release-ready song, stage by stage</h2><p className="mt-1 text-xs leading-5 text-[#88837b]">One package price for the production stages this studio provides.</p></div>{studio.productionPackagePrice != null && <span className="rounded-xl bg-[#e8a33d]/10 px-3 py-2 font-mono text-sm font-semibold text-[#f0bd65]">KES {studio.productionPackagePrice.toLocaleString()}</span>}</div>
+                                <div className="mt-4 grid gap-2 sm:grid-cols-2">{(studio.serviceDetails || []).filter((item) => item.active && item.includedInProductionPackage).map((item, index) => <div key={item.id || item.name} className="flex items-center gap-2.5 rounded-xl border border-white/[0.06] bg-black/15 px-3 py-2.5"><span className="grid h-6 w-6 place-items-center rounded-lg bg-[#e8a33d]/10 font-mono text-[9px] text-[#e8a33d]">0{index + 1}</span><span className="text-xs font-medium text-[#d4cfc5]">{item.name}</span></div>)}</div>
+                                {(studio.serviceDetails || []).some((item) => item.active && !item.includedInProductionPackage) && <div className="mt-5 border-t border-white/[0.07] pt-4"><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#777269]">Optional add-ons</p><div className="mt-2 space-y-2">{(studio.serviceDetails || []).filter((item) => item.active && !item.includedInProductionPackage).map((item) => <div key={item.id || item.name} className="flex items-center justify-between gap-3 text-xs"><span className="text-[#c0bbb1]">{item.name}</span><span className="font-mono text-[#d9d3c8]">{item.price != null ? `KES ${item.price.toLocaleString()}` : "Price on request"}</span></div>)}</div></div>}
                             </div>
+                            <div className="mt-4 flex flex-wrap gap-1.5">{studio.genres.map((item) => <span key={item} className="rounded-full border border-[#302d28] bg-[#161513] px-2.5 py-1 text-[11px] text-[#c0bbb1]">{item}</span>)}</div>
                         </section>
 
                         {studio.equipment.length > 0 && (

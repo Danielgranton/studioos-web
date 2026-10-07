@@ -12,16 +12,18 @@ import { ServiceCatalogService } from "@/features/services";
 import type { ServiceCatalogItem } from "@/features/services";
 
 import { useMyStudios } from "../hooks/useMyStudios";
-import type { Studio, StudioFormValues, StudioMedia } from "../types/studio";
+import type { Studio, StudioFormValues, StudioMedia, StudioServiceOffering } from "../types/studio";
 import { StudioService } from "../services/studio.service";
 
 const EMPTY_FORM: StudioFormValues = {
     studioName: "",
     location: "",
     pricing: "",
+    productionPackagePrice: "",
     availability: "",
     description: "",
     services: "",
+    serviceDetails: ["Beat creation", "Recording", "Mixing", "Mastering"].map((name) => ({ name, active: true, includedInProductionPackage: true, price: null })),
     badge: "",
     genres: "",
     equipment: "",
@@ -57,6 +59,20 @@ export function MyStudioPage() {
 
     async function save(values: StudioFormValues) {
         const { profileImage, ...details } = values;
+        const packagePrice = Number(details.productionPackagePrice);
+        if (!Number.isInteger(packagePrice) || packagePrice < 1) {
+            toast.error("Set your full-production package price", { description: "Enter the total price for the enabled package stages." });
+            return;
+        }
+        if (!details.serviceDetails.some((item) => item.active && item.includedInProductionPackage)) {
+            toast.error("Keep at least one stage in the package", { description: "You can disable stages you do not offer, but the package needs one included stage." });
+            return;
+        }
+        if (details.serviceDetails.some((item) => item.active && !item.includedInProductionPackage
+            && (!Number.isInteger(Number(item.price)) || Number(item.price) < 1))) {
+            toast.error("Add a price to each extra service", { description: "Every active add-on needs its own price." });
+            return;
+        }
         if (profileImage && !isSupportedImage(profileImage)) {
             toast.error("Unsupported studio image", { description: "Use a JPEG, PNG, or WebP image smaller than 5 MB." });
             return;
@@ -65,9 +81,17 @@ export function MyStudioPage() {
             studioName: details.studioName.trim(),
             location: details.location.trim(),
             pricing: Number(details.pricing),
+            productionPackagePrice: packagePrice,
             availability: details.availability.trim(),
             description: details.description.trim(),
-            services: details.services.split(",").map((item) => item.trim()).filter(Boolean),
+            services: details.serviceDetails.filter((item) => item.active).map((item) => item.name),
+            serviceDetails: details.serviceDetails.map((item) => ({
+                name: item.name,
+                catalogServiceId: item.catalogServiceId,
+                active: item.active,
+                includedInProductionPackage: item.includedInProductionPackage,
+                price: item.includedInProductionPackage ? null : Number(item.price) || null,
+            })),
             badge: details.badge.trim() || undefined,
             genres: details.genres.split(",").map((item) => item.trim()).filter(Boolean),
             equipment: details.equipment.split(",").map((item) => item.trim()).filter(Boolean),
@@ -148,7 +172,7 @@ function StudioManagementRow({ studio, onEdit, onRefresh }: { studio: Studio; on
         <StudioMediaManager studio={studio} onRefresh={onRefresh} />
             <div className="grid gap-6 border-t border-[#2b2b2b] px-5 py-6 sm:px-7 lg:grid-cols-[1.2fr_1fr]">
             <div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#666]">Listing overview</p><p className="mt-3 max-w-2xl text-sm leading-7 text-[#999]">{studio.description || "Add a description to help artists understand the space and its capabilities."}</p><div className="mt-5 flex flex-wrap gap-2">{studio.services.length > 0 ? studio.services.map((service) => <span key={service} className="rounded-full border border-[#303030] bg-[#101010] px-3 py-1.5 text-xs text-[#aaa]">{service}</span>) : <span className="text-xs text-[#666]">No services added yet.</span>}</div></div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2"><Metric label="From / hour" value={`KSh ${studio.pricing.toLocaleString()}`} /><Metric label="Next available" value={studio.nextAvailable || studio.availability} /><Metric label="Rating" value={studio.averageRating ? studio.averageRating.toFixed(1) : "New"} icon={<Star size={13} className="fill-[#e8a33d] text-[#e8a33d]" />} /><Metric label="Reviews" value={String(studio.totalRatings || 0)} /><Metric label="Likes" value={String(studio.likeCount || 0)} icon={<Heart size={13} className="text-red-300" />} /></div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2"><Metric label="Studio / hour" value={`KSh ${studio.pricing.toLocaleString()}`} /><Metric label="Full production" value={studio.productionPackagePrice ? `KSh ${studio.productionPackagePrice.toLocaleString()}` : "Set package price"} /><Metric label="Next available" value={studio.nextAvailable || studio.availability} /><Metric label="Rating" value={studio.averageRating ? studio.averageRating.toFixed(1) : "New"} icon={<Star size={13} className="fill-[#e8a33d] text-[#e8a33d]" />} /><Metric label="Reviews" value={String(studio.totalRatings || 0)} /><Metric label="Likes" value={String(studio.likeCount || 0)} icon={<Heart size={13} className="text-red-300" />} /></div>
         </div>
     </article>;
 }
@@ -321,9 +345,10 @@ function StudioForm({ initialValues, editing, saving, onCancel, onSubmit }: { in
             <div className="mt-6 grid gap-5 sm:grid-cols-2">
                 <Field label="Studio name" value={values.studioName} required onChange={(value) => updateField("studioName", value)} placeholder="e.g. Northside Audio" />
                 <Field label="Location" value={values.location} required onChange={(value) => updateField("location", value)} placeholder="e.g. Westlands, Nairobi" />
-                <Field label="Hourly price" type="number" value={values.pricing} required onChange={(value) => updateField("pricing", value)} placeholder="e.g. 2500" min="0" />
+                <Field label="Studio hourly rate" type="number" value={values.pricing} required onChange={(value) => updateField("pricing", value)} placeholder="e.g. 2500" min="0" />
+                <Field label="Full-production package price · KSh" type="number" value={values.productionPackagePrice} required onChange={(value) => updateField("productionPackagePrice", value)} placeholder="e.g. 25000" min="1" hint="One total price for the enabled stages." />
                 <Field label="Availability" value={values.availability} required onChange={(value) => updateField("availability", value)} placeholder="e.g. Mon-Sat, 8am-10pm" />
-                <div className="sm:col-span-2"><StudioServiceSelector value={values.services} onChange={(value) => updateField("services", value)} /></div>
+                <div className="sm:col-span-2"><StudioServicePackageEditor value={values.serviceDetails} onChange={(serviceDetails) => setValues((current) => ({ ...current, serviceDetails, services: serviceDetails.filter((item) => item.active).map((item) => item.name).join(", ") }))} /></div>
                 <Field label="Listing badge" value={values.badge} onChange={(value) => updateField("badge", value)} placeholder="e.g. Top Rated" />
                 <Field label="Genres" value={values.genres} onChange={(value) => updateField("genres", value)} placeholder="Afrobeats, Hip Hop, R&B" />
                 <div className="sm:col-span-2"><Field label="Equipment" value={values.equipment} onChange={(value) => updateField("equipment", value)} placeholder="Neumann U87, Apollo x8, Yamaha HS8" hint="Separate items with commas." /></div>
@@ -340,27 +365,40 @@ function StudioForm({ initialValues, editing, saving, onCancel, onSubmit }: { in
     );
 }
 
-function StudioServiceSelector({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+function StudioServicePackageEditor({ value, onChange }: { value: StudioServiceOffering[]; onChange: (value: StudioServiceOffering[]) => void }) {
     const [catalog, setCatalog] = useState<ServiceCatalogItem[]>([]);
     const [custom, setCustom] = useState("");
     const [adding, setAdding] = useState(false);
-    const selected = value.split(",").map((item) => item.trim()).filter(Boolean);
+    const defaultStages = ["Beat creation", "Recording", "Mixing", "Mastering"];
+    const isDefaultStage = (name: string) => defaultStages.some((stage) => stage.toLowerCase() === name.toLowerCase());
+    const stages = defaultStages.map((name) => value.find((item) => isDefaultStage(item.name) && item.name.toLowerCase() === name.toLowerCase())
+        ?? { name, active: true, includedInProductionPackage: true, price: null });
+    const extras = value.filter((item) => !isDefaultStage(item.name));
 
     useEffect(() => { void ServiceCatalogService.getCatalog().then((items) => setCatalog(items.filter((item) => item.studioAllowed))).catch(() => undefined); }, []);
 
-    function toggle(name: string) {
-        const next = selected.includes(name) ? selected.filter((item) => item !== name) : [...selected, name];
-        onChange(next.join(", "));
+    function updateStage(name: string, active: boolean) {
+        const current = value.filter((item) => !isDefaultStage(item.name));
+        onChange([...current, ...stages.map((item) => item.name === name
+            ? { ...item, active, includedInProductionPackage: true, price: null }
+            : item)]);
+    }
+
+    function toggleExtra(service: ServiceCatalogItem) {
+        const exists = extras.some((item) => item.catalogServiceId === service.id || item.name === service.name);
+        onChange(exists
+            ? value.filter((item) => !(item.catalogServiceId === service.id || item.name === service.name))
+            : [...value, { name: service.name, catalogServiceId: service.id, active: true, includedInProductionPackage: false, price: null }]);
     }
 
     async function addCustom() {
         const name = custom.trim();
-        if (!name || selected.includes(name)) return;
+        if (!name || value.some((item) => item.name.toLowerCase() === name.toLowerCase())) return;
         setAdding(true);
         try {
             const created = await ServiceCatalogService.addCustomService({ name, category: "Custom" });
             setCatalog((items) => items.some((item) => item.id === created.id) ? items : [created, ...items]);
-            onChange([...selected, created.name].join(", "));
+            onChange([...value, { name: created.name, catalogServiceId: created.id, active: true, includedInProductionPackage: false, price: null }]);
             setCustom("");
         } catch {
             toast.error("Could not add this service to StudioOS");
@@ -369,7 +407,15 @@ function StudioServiceSelector({ value, onChange }: { value: string; onChange: (
         }
     }
 
-    return <div><div className="flex items-end justify-between gap-3"><div><span className="text-xs font-medium text-[#aaa]">Services you deliver</span><p className="mt-1 text-[11px] text-[#666]">Select your capabilities. These appear on your public studio profile.</p></div><span className="text-[10px] text-[#777]">{selected.length} selected</span></div><div className="mt-3 flex flex-wrap gap-2">{catalog.map((service) => <button key={service.id} type="button" onClick={() => toggle(service.name)} className={`rounded-full border px-3 py-1.5 text-xs transition ${selected.includes(service.name) ? "border-[#3ea6ff]/50 bg-[#3ea6ff]/10 text-[#8acbff]" : "border-[#363636] bg-[#101010] text-[#888] hover:border-[#3ea6ff]/40 hover:text-white"}`}>{service.name}</button>)}</div><div className="mt-3 flex gap-2"><input value={custom} onChange={(event) => setCustom(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); void addCustom(); } }} placeholder="Add another service" className="min-w-0 flex-1 rounded-xl border border-[#363636] bg-[#101010] px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-[#5f5f5f] focus:border-[#3ea6ff]/70" /><button type="button" disabled={adding || !custom.trim()} onClick={() => void addCustom()} className="rounded-xl border border-[#3f3f3f] px-3.5 py-2.5 text-xs font-semibold text-[#aaa] hover:border-[#3ea6ff]/50 hover:text-white disabled:opacity-50">{adding ? "Adding..." : "Add"}</button></div>{selected.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{selected.map((item) => <button type="button" key={item} onClick={() => toggle(item)} className="rounded-full bg-[#3ea6ff]/10 px-2.5 py-1 text-[11px] text-[#8acbff]">{item} ×</button>)}</div>}</div>;
+    return <section className="rounded-2xl border border-[#343434] bg-[#101010] p-4 sm:p-5">
+        <div className="flex flex-wrap items-end justify-between gap-2"><div><p className="text-xs font-semibold text-[#eee]">Full-production package</p><p className="mt-1 text-[11px] leading-5 text-[#777]">These four stages are the standard path to a release-ready song. Toggle off any stage you do not provide; the package price covers the stages left on.</p></div><span className="rounded-full border border-[#3ea6ff]/20 bg-[#3ea6ff]/[0.06] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-[#8acbff]">One package price</span></div>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">{stages.map((stage, index) => <label key={stage.name} className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3.5 py-3 transition ${stage.active ? "border-[#3ea6ff]/30 bg-[#3ea6ff]/[0.06]" : "border-[#292929] bg-[#151515] opacity-65"}`}><input type="checkbox" checked={stage.active} onChange={(event) => updateStage(stage.name, event.target.checked)} className="h-4 w-4 accent-[#3ea6ff]" /><span className="grid h-7 w-7 place-items-center rounded-lg bg-black/25 font-mono text-[10px] text-[#8acbff]">0{index + 1}</span><span className="text-xs font-semibold text-[#ddd]">{stage.name}</span><span className="ml-auto text-[9px] uppercase tracking-[0.1em] text-[#666]">{stage.active ? "Included" : "Not offered"}</span></label>)}</div>
+        <div className="mt-6 border-t border-[#292929] pt-5"><div className="flex items-end justify-between gap-3"><div><p className="text-xs font-semibold text-[#eee]">Additional services</p><p className="mt-1 text-[11px] text-[#777]">Select extras and set a separate fee for each one.</p></div><span className="text-[10px] text-[#777]">{extras.filter((item) => item.active).length} active</span></div>
+            <div className="mt-3 flex flex-wrap gap-2">{catalog.filter((service) => !isDefaultStage(service.name)).map((service) => { const selected = extras.some((item) => item.catalogServiceId === service.id || item.name === service.name); return <button key={service.id} type="button" onClick={() => toggleExtra(service)} className={`rounded-full border px-3 py-1.5 text-[11px] transition ${selected ? "border-[#3ea6ff]/50 bg-[#3ea6ff]/10 text-[#8acbff]" : "border-[#363636] bg-[#151515] text-[#888] hover:border-[#3ea6ff]/40 hover:text-white"}`}>{selected ? "✓ " : "+ "}{service.name}</button>; })}</div>
+            {extras.map((item) => <div key={item.catalogServiceId || item.name} className="mt-2 flex flex-wrap items-center gap-3 rounded-xl border border-[#2c2c2c] bg-[#151515] px-3.5 py-3"><div className="min-w-0 flex-1"><p className="text-xs font-semibold text-[#ddd]">{item.name}</p><p className="mt-1 text-[10px] text-[#777]">Offered separately from the production package</p></div><label className="flex items-center gap-2 text-[10px] text-[#888]"><input type="checkbox" checked={item.active} onChange={(event) => onChange(value.map((current) => current.name === item.name ? { ...current, active: event.target.checked } : current))} className="h-3.5 w-3.5 accent-[#3ea6ff]" />Active</label><label className="flex items-center gap-1.5 text-[10px] text-[#888]">KES<input aria-label={`${item.name} price in KES`} type="number" min="1" value={item.price ?? ""} onChange={(event) => onChange(value.map((current) => current.name === item.name ? { ...current, price: event.target.value ? Number(event.target.value) : null } : current))} placeholder="Price" className="w-24 rounded-lg border border-[#363636] bg-[#0d0d0d] px-2.5 py-2 text-xs text-white outline-none focus:border-[#3ea6ff]/60" /></label><button type="button" onClick={() => onChange(value.filter((current) => current.name !== item.name))} aria-label={`Remove ${item.name}`} className="rounded-md p-1.5 text-[#777] hover:bg-white/[0.05] hover:text-white"><Trash2 size={13} /></button></div>)}
+            <div className="mt-3 flex gap-2"><input value={custom} onChange={(event) => setCustom(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); void addCustom(); } }} placeholder="Add a custom service" className="min-w-0 flex-1 rounded-xl border border-[#363636] bg-[#151515] px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-[#5f5f5f] focus:border-[#3ea6ff]/70" /><button type="button" disabled={adding || !custom.trim()} onClick={() => void addCustom()} className="rounded-xl border border-[#3f3f3f] px-3.5 py-2.5 text-xs font-semibold text-[#aaa] hover:border-[#3ea6ff]/50 hover:text-white disabled:opacity-50">{adding ? "Adding..." : "Add service"}</button></div>
+        </div>
+    </section>;
 }
 
 function Field({ label, value, onChange, placeholder, required = false, type = "text", min, hint }: { label: string; value: string; onChange: (value: string) => void; placeholder: string; required?: boolean; type?: string; min?: string; hint?: string }) {
@@ -393,5 +439,11 @@ function EmptyStudioState({ onCreate }: { onCreate: () => void }) {
 }
 
 function toFormValues(studio: Studio): StudioFormValues {
-    return { studioName: studio.studioName, location: studio.location, pricing: String(studio.pricing), availability: studio.availability, description: studio.description, services: studio.services.join(", "), badge: studio.badge || "", genres: studio.genres.join(", "), equipment: studio.equipment.join(", "), rooms: studio.rooms == null ? "" : String(studio.rooms), yearsActive: studio.yearsActive == null ? "" : String(studio.yearsActive), responseTime: studio.responseTime || "", available: studio.available, nextAvailable: studio.nextAvailable || "" };
+    const stages = ["Beat creation", "Recording", "Mixing", "Mastering"].map((name) => ({ name, active: true, includedInProductionPackage: true, price: null }));
+    const serviceDetails = studio.serviceDetails?.length ? studio.serviceDetails : [
+        ...stages,
+        ...studio.services.filter((name) => !stages.some((stage) => stage.name.toLowerCase() === name.toLowerCase()))
+            .map((name) => ({ name, active: true, includedInProductionPackage: false, price: null })),
+    ];
+    return { studioName: studio.studioName, location: studio.location, pricing: String(studio.pricing), productionPackagePrice: studio.productionPackagePrice ? String(studio.productionPackagePrice) : "", availability: studio.availability, description: studio.description, services: studio.services.join(", "), serviceDetails, badge: studio.badge || "", genres: studio.genres.join(", "), equipment: studio.equipment.join(", "), rooms: studio.rooms == null ? "" : String(studio.rooms), yearsActive: studio.yearsActive == null ? "" : String(studio.yearsActive), responseTime: studio.responseTime || "", available: studio.available, nextAvailable: studio.nextAvailable || "" };
 }

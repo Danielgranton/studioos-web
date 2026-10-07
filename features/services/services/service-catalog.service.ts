@@ -16,6 +16,7 @@ export type ServiceProvider = {
     listingId: string;
     studioId?: string | null;
     catalogServiceId?: string | null;
+    priceType?: "SERVICE" | "PRODUCTION_PACKAGE" | "ADD_ON";
 };
 
 type ApiResponse<T> = { data?: T };
