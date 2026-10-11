@@ -8,7 +8,7 @@ export interface BeatLikeState {
 }
 
 class BeatServiceClient {
-    async browse(params: { page?: number; size?: number; sortBy?: string } = {}): Promise<BeatPage> {
+    async browse(params: { page?: number; size?: number; sortBy?: string; producerId?: string } = {}): Promise<BeatPage> {
         const response = await api.get<BeatPage>("/beats", {
             params: { page: 0, size: 50, sortBy: "TRENDING", ...params },
         });

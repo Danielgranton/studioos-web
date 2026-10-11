@@ -6,6 +6,7 @@ import {
     ArrowRight,
     BadgeCheck,
     Heart,
+    Layers3,
     MapPin,
     Star,
     Users,
@@ -33,6 +34,33 @@ interface FeaturedStudioCardProps {
     loading?: "eager" | "lazy";
 }
 
+const PRODUCTION_SERVICE_ORDER = [
+    ["beat creation", "beat production", "beat making"],
+    ["recording", "vocal recording"],
+    ["mixing", "mix and"],
+    ["mastering", "master"],
+];
+
+function orderPackageServices(services: string[]) {
+    return services
+        .map((service, index) => ({ service, index }))
+        .sort((a, b) => {
+            const normalizedA = a.service.trim().toLowerCase();
+            const normalizedB = b.service.trim().toLowerCase();
+            const orderA = PRODUCTION_SERVICE_ORDER.findIndex((aliases) =>
+                aliases.some((alias) => normalizedA === alias || normalizedA.startsWith(`${alias} `)),
+            );
+            const orderB = PRODUCTION_SERVICE_ORDER.findIndex((aliases) =>
+                aliases.some((alias) => normalizedB === alias || normalizedB.startsWith(`${alias} `)),
+            );
+
+            return (orderA < 0 ? PRODUCTION_SERVICE_ORDER.length : orderA)
+                - (orderB < 0 ? PRODUCTION_SERVICE_ORDER.length : orderB)
+                || a.index - b.index;
+        })
+        .map(({ service }) => service);
+}
+
 export function FeaturedStudioCard({
     id,
     slug,
@@ -54,6 +82,7 @@ export function FeaturedStudioCard({
     const [liked, setLiked] = useState(false);
     const [likeCount, setLikeCount] = useState(likes);
     const [likeLoading, setLikeLoading] = useState(false);
+    const orderedServices = orderPackageServices(services);
 
     useEffect(() => {
         setLikeCount(likes);
@@ -246,15 +275,20 @@ export function FeaturedStudioCard({
                     {reviews > 0 && <span className="hidden text-[#a19d92] sm:inline">({reviews})</span>}
                 </div>
 
-                {/* Price and like action */}
+                {/* Package price and like action */}
                 <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-end justify-between gap-2 sm:bottom-3 sm:left-3 sm:right-3 lg:bottom-2.5 lg:left-2.5 lg:right-2.5">
-                    <div className="rounded-lg bg-black/60 px-2 py-1 backdrop-blur-md sm:rounded-xl sm:px-3 sm:py-1.5 lg:rounded-lg lg:px-2.5 lg:py-1">
-                        <p className="hidden font-mono text-[9px] uppercase tracking-wide text-[#c4c0b6] sm:block lg:text-[8px]">
-                            Production package
-                        </p>
-                        <p className="font-mono text-xs font-bold leading-tight text-white sm:text-sm lg:text-xs">
-                            {priceLabel}
-                        </p>
+                    <div className="flex min-w-0 items-center gap-2 rounded-xl border border-white/15 bg-[#11100e]/90 px-2 py-1.5 shadow-lg shadow-black/20 backdrop-blur-xl sm:gap-2.5 sm:px-3 sm:py-2 lg:gap-2 lg:px-2.5 lg:py-1.5">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#e8a33d]/25 bg-[#e8a33d]/10 text-[#e8a33d] sm:h-8 sm:w-8 lg:h-7 lg:w-7">
+                            <Layers3 size={14} aria-hidden="true" />
+                        </span>
+                        <span className="min-w-0">
+                            <span className="block truncate font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-[#b7b1a5] sm:text-[9px] lg:text-[8px]">
+                                Production package
+                            </span>
+                            <span className="block truncate font-mono text-[12px] font-bold leading-tight tracking-tight text-white sm:text-sm lg:text-xs">
+                                {priceLabel}
+                            </span>
+                        </span>
                     </div>
                     <button
                         type="button"
@@ -349,9 +383,9 @@ export function FeaturedStudioCard({
                 </div>
 
                 {/* Services — desktop/tablet only, too cramped on 2-up mobile */}
-                {services.length > 0 && (
+                {orderedServices.length > 0 && (
                     <p className="mt-3 hidden line-clamp-2 text-sm leading-6 text-[#a19d92] sm:block lg:mt-2 lg:text-xs lg:leading-5">
-                        {services.join(" • ")}
+                        {orderedServices.join(" • ")}
                     </p>
                 )}
 

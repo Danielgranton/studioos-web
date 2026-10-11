@@ -47,7 +47,7 @@ export type ProducerProfile = {
     profileImageMedium?: string;
     profileImageThumbnail?: string;
     followerCount?: number;
-    releaseCount?: number;
+    producedCount?: number;
     beatCount?: number;
     instagram?: string;
     youtube?: string;

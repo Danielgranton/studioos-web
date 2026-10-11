@@ -133,11 +133,7 @@ function DirectoryMessage({ icon, title, message, action }: { icon: React.ReactN
 }
 
 function toProducerCard(producer: ProducerSearchResult): ProducerCardProps {
-    const services = producer.services?.length
-        ? producer.services
-        : producer.genre
-            ? [producer.genre]
-            : ["Music production"];
+    const services = producer.services || [];
 
     return {
         id: producer.id,
@@ -158,8 +154,8 @@ function toProducerCard(producer: ProducerSearchResult): ProducerCardProps {
         featured: producer.featured ?? false,
         responseTime: producer.responseTime || "Response time varies",
         priceLabel: producer.startingPrice != null
-            ? `From KSh ${producer.startingPrice.toLocaleString()}`
-            : "Contact for rates",
+            ? `KSh ${producer.startingPrice.toLocaleString()}`
+            : "Price on request",
         badge: producer.verified ? "Verified" : "Producer",
         services,
     };
@@ -172,7 +168,7 @@ function ProducersLoading() {
                 <div className="h-4 w-32 rounded-full bg-[#24211d]" />
                 <div className="mt-5 h-10 w-2/3 max-w-xl rounded-xl bg-[#24211d]" />
                 <div className="mt-4 h-5 w-full max-w-2xl rounded bg-[#24211d]" />
-                <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+                <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
                     {Array.from({ length: 5 }).map((_, index) => (
                         <div key={index} className="min-h-[250px] rounded-xl border border-[#2a2825] bg-[#161513] p-3.5">
                             <div className="h-14 w-14 rounded-full bg-[#24211d]" />

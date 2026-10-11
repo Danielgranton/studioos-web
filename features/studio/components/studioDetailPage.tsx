@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
     ArrowUpRight,
+    AudioLines,
     BadgeCheck,
     Building2,
     CalendarCheck,
@@ -254,9 +255,33 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
 
                         <section>
                             <SectionLabel>Music production package</SectionLabel>
-                            <div className="mt-3 rounded-2xl border border-[#3b352c] bg-[#1b1916] p-4 sm:p-5">
-                                <div className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-sm font-semibold text-[#f2eee7]">A release-ready song, stage by stage</h2><p className="mt-1 text-xs leading-5 text-[#88837b]">One package price for the production stages this studio provides.</p></div>{studio.productionPackagePrice != null && <span className="rounded-xl bg-[#e8a33d]/10 px-3 py-2 font-mono text-sm font-semibold text-[#f0bd65]">KES {studio.productionPackagePrice.toLocaleString()}</span>}</div>
-                                <div className="mt-4 grid gap-2 sm:grid-cols-2">{packageServices.map((item, index) => { const stageIndex = PRODUCTION_STAGE_ORDER.findIndex((name) => name.toLowerCase() === item.name.toLowerCase()); const isStage = stageIndex >= 0; const number = isStage ? stageIndex + 1 : PRODUCTION_STAGE_ORDER.length + packageServices.slice(0, index).filter((service) => !PRODUCTION_STAGE_ORDER.some((name) => name.toLowerCase() === service.name.toLowerCase())).length + 1; return <div key={item.id || item.name} className="flex items-center gap-2.5 rounded-xl border border-white/[0.06] bg-black/15 px-3 py-2.5"><span className="grid h-6 w-6 place-items-center rounded-lg bg-[#e8a33d]/10 font-mono text-[9px] text-[#e8a33d]">{String(number).padStart(2, "0")}</span><span className="text-xs font-medium text-[#d4cfc5]">{item.name}</span></div>; })}</div>
+                            <div className="relative mt-3 overflow-hidden rounded-2xl border border-[#3b352c] bg-[#151411]">
+                                <div aria-hidden="true" className="absolute -right-16 -top-24 h-64 w-64 rounded-full bg-[#e8a33d]/[0.07] blur-3xl" />
+                                <div className="relative flex flex-col gap-4 border-b border-[#302c25] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+                                    <div className="flex items-start gap-3">
+                                        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#e8a33d]/20 bg-[#e8a33d]/[0.08] text-[#e8a33d]"><AudioLines size={17} /></span>
+                                        <div><p className="text-[9px] font-semibold uppercase tracking-[0.19em] text-[#e8a33d]">From first idea to final master</p><h2 className="mt-1 text-base font-semibold tracking-tight text-[#f2eee7]">A release-ready production</h2><p className="mt-1 max-w-md text-[11px] leading-5 text-[#898378]">One clear price for every selected stage. No separate per-service charges.</p></div>
+                                    </div>
+                                    <div className="flex items-center justify-between gap-4 rounded-xl border border-[#e8a33d]/20 bg-[#e8a33d]/[0.06] px-3.5 py-2.5 sm:min-w-[190px] sm:flex-col sm:items-start sm:gap-0">
+                                        <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#a89b84]">Package total</span>
+                                        <span className="font-mono text-lg font-bold tracking-tight text-[#f0bd65]">{studio.productionPackagePrice != null && studio.productionPackagePrice > 0 ? `KSh ${studio.productionPackagePrice.toLocaleString()}` : "Price on request"}</span>
+                                    </div>
+                                </div>
+                                {packageServices.length > 0 ? <div className="relative p-4 sm:p-5">
+                                    <div className="mb-3 flex items-center justify-between"><p className="text-[9px] font-semibold uppercase tracking-[0.17em] text-[#8d867b]">Included in this package</p><span className="rounded-full border border-[#302c25] bg-[#1b1916] px-2 py-1 font-mono text-[9px] text-[#aaa195]">{String(packageServices.length).padStart(2, "0")} services</span></div>
+                                    <ol className="grid gap-2 sm:grid-cols-2">
+                                        {packageServices.map((item, index) => {
+                                            const stageIndex = PRODUCTION_STAGE_ORDER.findIndex((name) => name.toLowerCase() === item.name.toLowerCase());
+                                            const isCoreStage = stageIndex >= 0;
+                                            const number = isCoreStage ? stageIndex + 1 : PRODUCTION_STAGE_ORDER.length + packageServices.slice(0, index).filter((service) => !PRODUCTION_STAGE_ORDER.some((name) => name.toLowerCase() === service.name.toLowerCase())).length + 1;
+                                            return <li key={item.id || item.name} className="group flex min-w-0 items-center gap-3 rounded-xl border border-[#302c25] bg-[#1a1916] px-3 py-3 transition-colors hover:border-[#514431]">
+                                                <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg font-mono text-[10px] font-semibold ${isCoreStage ? "border border-[#e8a33d]/20 bg-[#e8a33d]/[0.08] text-[#e8a33d]" : "border border-[#37332c] bg-[#24221e] text-[#a9a196]"}`}>{String(number).padStart(2, "0")}</span>
+                                                <span className="min-w-0 flex-1"><span className="block truncate text-xs font-semibold text-[#e5dfd5]">{item.name}</span><span className="mt-0.5 block text-[9px] uppercase tracking-[0.12em] text-[#777168]">{isCoreStage ? `Stage ${stageIndex + 1} · Production` : "Additional service"}</span></span>
+                                                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#75d6c6]/[0.09] text-[#75d6c6]"><CheckCircle2 size={12} /></span>
+                                            </li>;
+                                        })}
+                                    </ol>
+                                </div> : <div className="px-5 py-8 text-center"><p className="text-xs font-medium text-[#c7c0b5]">Package details are being updated</p><p className="mt-1 text-[10px] text-[#777168]">Contact the studio to confirm which production stages are included.</p></div>}
                             </div>
                             <div className="mt-4 flex flex-wrap gap-1.5">{studio.genres.map((item) => <span key={item} className="rounded-full border border-[#302d28] bg-[#161513] px-2.5 py-1 text-[11px] text-[#c0bbb1]">{item}</span>)}</div>
                         </section>

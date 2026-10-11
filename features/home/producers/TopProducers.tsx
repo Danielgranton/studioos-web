@@ -342,7 +342,7 @@ export function TopProducers({
                 </div>
 
                 {isLoading ? (
-                    <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-5">
+                    <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
                         {Array.from({ length: 5 }).map((_, index) => (
                             <div key={index} className="animate-pulse rounded-xl border border-[#2a2825] bg-[#161513] p-3.5">
                                 <div className="h-14 w-14 rounded-full bg-[#24211d]" />
@@ -415,7 +415,8 @@ export function TopProducers({
                         gap-4
                         sm:gap-6
                         md:grid-cols-3
-                        lg:grid-cols-5
+                        lg:grid-cols-4
+                        2xl:grid-cols-5
                     "
                 >
 
@@ -472,8 +473,8 @@ function toProducerCard(producer: ProducerSearchResult): ProducerCardProps {
         featured: producer.featured ?? false,
         responseTime: producer.responseTime || "Response time varies",
         priceLabel: producer.startingPrice != null
-            ? `From KSh ${producer.startingPrice.toLocaleString()}`
-            : "Contact for rates",
+            ? `KSh ${producer.startingPrice.toLocaleString()}`
+            : "Price on request",
         badge: producer.verified ? "Verified" : "Producer",
         services: producer.services || [],
     };
