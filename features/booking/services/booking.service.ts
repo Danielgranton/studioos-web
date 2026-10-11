@@ -30,7 +30,7 @@ class BookingServiceClient {
         return response.data.data as Booking;
     }
 
-    async updateBooking(bookingId: string, request: Pick<CreateBookingRequest, "sessionDate" | "durationHours" | "notes">): Promise<Booking> {
+    async updateBooking(bookingId: string, request: Pick<CreateBookingRequest, "sessionDate" | "notes">): Promise<Booking> {
         const response = await api.patch<ApiResponse<Booking>>(`/bookings/${encodeURIComponent(bookingId)}`, request);
         return response.data.data as Booking;
     }

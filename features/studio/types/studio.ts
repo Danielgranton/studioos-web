@@ -29,6 +29,7 @@ export type Studio = {
     ownerName: string;
     ownerProfileImageThumbnail?: string;
     services: string[];
+    rules?: string[];
     serviceDetails?: StudioServiceOffering[];
     media?: StudioMedia[];
     averageRating?: number;
@@ -88,6 +89,7 @@ export type CreateStudioRequest = {
     badge?: string;
     genres?: string[];
     equipment?: string[];
+    rules?: string[];
     rooms?: number;
     yearsActive?: number;
     responseTime?: string;

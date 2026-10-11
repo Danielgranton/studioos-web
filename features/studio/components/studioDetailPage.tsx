@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import {
     ArrowUpRight,
+    AlertCircle,
     AudioLines,
     BadgeCheck,
     Building2,
@@ -15,6 +17,7 @@ import {
     Heart,
     MapPin,
     Play,
+    ShieldCheck,
     Star,
     Users,
     X,
@@ -52,6 +55,9 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
     const [loading, setLoading] = useState(true);
     const [selectedMediaId, setSelectedMediaId] = useState<string | null>(null);
     const [bookingOpen, setBookingOpen] = useState(false);
+    const [rulesAccepted, setRulesAccepted] = useState(false);
+    const [rulesNeedAttention, setRulesNeedAttention] = useState(false);
+    const rulesSectionRef = useRef<HTMLElement>(null);
 
     useEffect(() => {
         let active = true;
@@ -83,6 +89,20 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
     const imageCount = gallery.filter((media) => media.type === "IMAGE").length;
     const videoCount = gallery.filter((media) => media.type === "VIDEO").length;
     const packageServices = orderedPackageServices(studio);
+    const studioRules = studio.rules || [];
+
+    function openBooking() {
+        if (studioRules.length > 0 && !rulesAccepted) {
+            setRulesNeedAttention(true);
+            toast.error("Read and accept the studio rules first", {
+                description: "Review the rules section on this page, then try booking again.",
+            });
+            rulesSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+            return;
+        }
+        setRulesNeedAttention(false);
+        setBookingOpen(true);
+    }
 
     return (
         <main className="min-h-screen bg-[#0f0f0f] text-[#f5f4f1]">
@@ -286,6 +306,15 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
                             <div className="mt-4 flex flex-wrap gap-1.5">{studio.genres.map((item) => <span key={item} className="rounded-full border border-[#302d28] bg-[#161513] px-2.5 py-1 text-[11px] text-[#c0bbb1]">{item}</span>)}</div>
                         </section>
 
+                        {studioRules.length > 0 && <section ref={rulesSectionRef} className="scroll-mt-24">
+                            <SectionLabel>Studio rules</SectionLabel>
+                            <div className={`mt-3 rounded-2xl border bg-[#151411] p-4 transition-all duration-300 sm:p-5 ${rulesNeedAttention ? "border-[#e8a33d]/70 ring-2 ring-[#e8a33d]/60 shadow-[0_0_32px_rgba(232,163,61,0.16)]" : "border-[#302d28]"}`}>
+                                <div className="flex items-start gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#e8a33d]/20 bg-[#e8a33d]/[0.08] text-[#e8a33d]"><ShieldCheck size={17} /></span><div><h2 className="text-sm font-semibold text-[#f0ece5]">A few things to know before your visit</h2><p className="mt-1 text-[11px] leading-5 text-[#898378]">Please follow these guidelines while using the studio.</p></div></div>
+                                <ol className="mt-4 grid gap-2 sm:grid-cols-2">{studioRules.map((rule, index) => <li key={`${index}-${rule}`} className="flex items-start gap-3 rounded-xl border border-[#302c25] bg-[#1a1916] px-3 py-3"><span className="grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-[#e8a33d]/[0.08] font-mono text-[9px] text-[#e8a33d]">{String(index + 1).padStart(2, "0")}</span><span className="text-xs leading-5 text-[#c7c0b5]">{rule}</span></li>)}</ol>
+                                <label className="mt-4 flex cursor-pointer items-start gap-2.5 border-t border-[#302c25] pt-3.5"><input type="checkbox" checked={rulesAccepted} onChange={(event) => { setRulesAccepted(event.target.checked); if (event.target.checked) setRulesNeedAttention(false); }} className="mt-0.5 h-4 w-4 shrink-0 accent-[#e8a33d]" /><span className="text-[11px] leading-5 text-[#d8d1c5]">I have read and agree to follow these studio rules.</span></label>
+                            </div>
+                        </section>}
+
                         {studio.equipment.length > 0 && (
                             <section>
                                 <SectionLabel>Equipment and capabilities</SectionLabel>
@@ -323,19 +352,18 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
                             <Heart size={15} className="text-red-300" />
                             {studio.likeCount?.toLocaleString() ?? "0"} likes
                         </p>
-                        {!isAuthenticated ? <Link href={`/auth/signin?next=${encodeURIComponent(`/studios/${studioId}`)}`} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-3 py-2.5 text-xs font-semibold text-[#17130d] transition hover:bg-[#f0b458]"><CalendarCheck size={16} />Sign in to book package</Link> : session?.role === "ARTIST" ? <button type="button" disabled={!studio.available || !studio.productionPackagePrice} onClick={() => setBookingOpen(true)} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-3 py-2.5 text-xs font-semibold text-[#17130d] transition hover:bg-[#f0b458] disabled:cursor-not-allowed disabled:opacity-50"><CalendarCheck size={16} />{!studio.productionPackagePrice ? "Package price unavailable" : studio.available ? "Book production package" : "Studio unavailable"}</button> : <p className="mt-5 rounded-xl border border-white/[0.08] px-3 py-2.5 text-center text-[11px] text-[#888176]">Studio bookings are available to artist accounts.</p>}
+                        {!isAuthenticated ? <Link href={`/auth/signin?next=${encodeURIComponent(`/studios/${studioId}`)}`} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-3 py-2.5 text-xs font-semibold text-[#17130d] transition hover:bg-[#f0b458]"><CalendarCheck size={16} />Sign in to book package</Link> : session?.role === "ARTIST" ? <button type="button" disabled={!studio.available || !studio.productionPackagePrice} onClick={openBooking} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-3 py-2.5 text-xs font-semibold text-[#17130d] transition hover:bg-[#f0b458] disabled:cursor-not-allowed disabled:opacity-50"><CalendarCheck size={16} />{!studio.productionPackagePrice ? "Package price unavailable" : studio.available ? "Book production package" : "Studio unavailable"}</button> : <p className="mt-5 rounded-xl border border-white/[0.08] px-3 py-2.5 text-center text-[11px] text-[#888176]">Studio bookings are available to artist accounts.</p>}
                     </aside>
                 </div>
                 <div className="mt-7"><ReviewList target="STUDIO" targetId={studioId} /></div>
             </div>
-            {bookingOpen && <StudioBookingDialog studio={studio} onClose={() => setBookingOpen(false)} />}
+            {bookingOpen && <StudioBookingDialog studio={studio} rulesAccepted={rulesAccepted} onClose={() => setBookingOpen(false)} />}
         </main>
     );
 }
 
-function StudioBookingDialog({ studio, onClose }: { studio: Studio; onClose: () => void }) {
+function StudioBookingDialog({ studio, rulesAccepted, onClose }: { studio: Studio; rulesAccepted: boolean; onClose: () => void }) {
     const [sessionDate, setSessionDate] = useState("");
-    const [durationHours, setDurationHours] = useState(2);
     const [notes, setNotes] = useState("");
     const [error, setError] = useState("");
     const [sending, setSending] = useState(false);
@@ -355,7 +383,7 @@ function StudioBookingDialog({ studio, onClose }: { studio: Studio; onClose: () 
             await BookingService.createBooking({
                 studioId: studio.id,
                 sessionDate: toLocalDateTime(sessionDate),
-                durationHours,
+                rulesAccepted,
                 notes: notes.trim() || undefined,
             });
             setCreated(true);
@@ -366,21 +394,44 @@ function StudioBookingDialog({ studio, onClose }: { studio: Studio; onClose: () 
         }
     }
 
-    return <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 px-4 py-6 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-        <section role="dialog" aria-modal="true" aria-labelledby="studio-booking-title" className="max-h-full w-full max-w-lg overflow-y-auto rounded-3xl border border-white/10 bg-[#171614] p-5 shadow-2xl sm:p-7">
-            {created ? <div className="py-5 text-center"><span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-300/20 bg-emerald-300/[0.08] text-emerald-200"><CheckCircle2 size={22} /></span><p className="mt-5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">Request sent</p><h2 id="studio-booking-title" className="mt-2 text-2xl font-bold">The studio has your request</h2><p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-[#99958d]">The producer will confirm your package booking. The listed package price is the total, regardless of the booked studio time. You can follow updates in your dashboard bookings.</p><div className="mt-6 flex justify-center gap-2"><Link href="/dashboard/bookings" onClick={onClose} className="rounded-xl bg-[#e8a33d] px-4 py-2.5 text-xs font-bold text-[#17130c]">View bookings</Link><button type="button" onClick={onClose} className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-semibold text-[#c9c5bd]">Close</button></div></div> : <>
-                <div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">Production package request</p><h2 id="studio-booking-title" className="mt-2 text-2xl font-bold">Book {studio.studioName}</h2><p className="mt-2 text-xs text-[#888176]">One package · KSh {studio.productionPackagePrice?.toLocaleString()}</p></div><button type="button" onClick={onClose} aria-label="Close booking form" className="rounded-lg p-2 text-[#888] hover:bg-white/[0.06] hover:text-white"><X size={18} /></button></div>
-                <form onSubmit={(event) => void submit(event)} className="mt-6 space-y-4">
-                    <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">Session date and start time</span><input type="datetime-local" min={localDateTimeMinimum()} value={sessionDate} onChange={(event) => setSessionDate(event.target.value)} required className="mt-2 w-full rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm text-white outline-none focus:border-[#e8a33d]/50 [color-scheme:dark]" /></label>
-                    <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">Studio time to reserve</span><div className="mt-2 flex items-center gap-3"><select value={durationHours} onChange={(event) => setDurationHours(Number(event.target.value))} className="w-full rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm text-white outline-none focus:border-[#e8a33d]/50">{Array.from({ length: 12 }, (_, index) => index + 1).map((hours) => <option key={hours} value={hours}>{hours} {hours === 1 ? "hour" : "hours"}</option>)}</select><span className="shrink-0 text-xs text-[#99958d]">Package total <strong className="ml-1 text-[#f0bd65]">KSh {studio.productionPackagePrice?.toLocaleString()}</strong></span></div><p className="mt-1.5 text-[10px] text-[#77746e]">Time is used only to reserve the studio; it does not change the package price.</p></label>
-                    <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">What are you working on? <span className="font-normal text-[#77746e]">Optional</span></span><textarea value={notes} onChange={(event) => setNotes(event.target.value)} maxLength={1000} rows={4} placeholder="Tell the producer about your session, setup needs, or project..." className="mt-2 w-full resize-y rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm leading-5 text-white outline-none placeholder:text-[#5f5c57] focus:border-[#e8a33d]/50" /></label>
-                    {error && <p role="alert" className="rounded-xl border border-red-300/20 bg-red-300/[0.06] px-3 py-2.5 text-xs leading-5 text-red-200">{error}</p>}
-                    <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] px-3.5 py-3 text-[11px] leading-5 text-[#88847c]">No payment is taken now. After approval, you can pay the listed package total. Studio time does not change the price.</div>
-                    <button type="submit" disabled={sending} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-4 py-3 text-sm font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:cursor-wait disabled:opacity-60">{sending && <LoaderCircle size={16} className="animate-spin" />}{sending ? "Sending request..." : "Send booking request"}</button>
+    return <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 px-3 py-4 backdrop-blur-sm sm:px-5 sm:py-6" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+        <section role="dialog" aria-modal="true" aria-labelledby="studio-booking-title" className="flex max-h-[calc(100dvh-2rem)] w-full max-w-xl flex-col overflow-hidden rounded-[26px] border border-white/[0.1] bg-[#151411] shadow-[0_32px_100px_rgba(0,0,0,0.65)] sm:max-h-[calc(100dvh-3rem)]">
+            {created ? <div className="overflow-y-auto p-6 sm:p-9">
+                <div className="mx-auto max-w-sm text-center"><span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-300/20 bg-emerald-300/[0.08] text-emerald-200"><CheckCircle2 size={24} /></span><p className="mt-5 text-[9px] font-bold uppercase tracking-[0.22em] text-emerald-300">Request received</p><h2 id="studio-booking-title" className="mt-2 text-2xl font-bold tracking-tight text-[#f5f1e9]">You’re on the studio’s calendar</h2><p className="mt-3 text-sm leading-6 text-[#99958d]">{studio.studioName} will review your request. You won’t be charged unless the producer approves it and you continue to payment.</p>
+                    <div className="mt-6 rounded-2xl border border-[#302c25] bg-[#1b1916] p-4 text-left"><p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#837b6e]">Requested start</p><p className="mt-2 text-sm font-semibold text-[#e9e3d8]">{formatBookingDate(sessionDate)}</p><p className="mt-1 text-xs text-[#938b7f]">Fixed package total · KSh {studio.productionPackagePrice?.toLocaleString()}</p></div>
+                    <div className="mt-6 grid gap-2 sm:grid-cols-2"><Link href="/dashboard/bookings" onClick={onClose} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-4 py-3 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458]">Track request <ArrowUpRight size={14} /></Link><button type="button" onClick={onClose} className="rounded-xl border border-white/10 px-4 py-3 text-xs font-semibold text-[#c9c5bd] transition hover:bg-white/[0.04]">Back to studio</button></div>
+                </div>
+            </div> : <>
+                <header className="relative border-b border-white/[0.07] px-5 pb-4 pt-5 sm:px-7 sm:pb-5 sm:pt-6">
+                    <div aria-hidden="true" className="pointer-events-none absolute right-0 top-0 h-32 w-48 bg-[radial-gradient(ellipse_at_top_right,rgba(232,163,61,0.12),transparent_70%)]" />
+                    <div className="relative flex items-start justify-between gap-4"><div><p className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]"><span className="h-1.5 w-1.5 rounded-full bg-[#e8a33d]" />Booking request <span className="text-[#625b50]">/</span> Step 1 of 1</p><h2 id="studio-booking-title" className="mt-2 text-xl font-bold tracking-tight text-[#f5f1e9] sm:text-2xl">Plan your studio session</h2><p className="mt-1 text-xs text-[#928b80]">Choose a time and share anything the producer should know.</p></div><button type="button" onClick={onClose} aria-label="Close booking form" className="relative rounded-xl border border-white/[0.07] p-2 text-[#888176] transition hover:bg-white/[0.05] hover:text-white"><X size={17} /></button></div>
+                    <div className="relative mt-4 flex items-center justify-between gap-3 rounded-xl border border-[#3a342a] bg-[#1c1a16] px-3.5 py-3"><div className="min-w-0"><p className="truncate text-xs font-semibold text-[#e8e2d8]">{studio.studioName}</p><p className="mt-1 flex items-center gap-1.5 truncate text-[10px] text-[#8b8479]"><MapPin size={11} className="shrink-0 text-[#e8a33d]" />{studio.location}</p></div><div className="shrink-0 text-right"><p className="font-mono text-sm font-bold text-[#f0bd65]">KSh {studio.productionPackagePrice?.toLocaleString()}</p><p className="mt-0.5 text-[9px] uppercase tracking-[0.12em] text-[#777168]">Full package</p></div></div>
+                </header>
+
+                <form onSubmit={(event) => void submit(event)} className="flex min-h-0 flex-1 flex-col">
+                    <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-5 sm:px-7">
+                        <section aria-labelledby="booking-time-heading"><div className="mb-2.5 flex items-center gap-2"><span className="grid h-6 w-6 place-items-center rounded-lg bg-[#e8a33d]/[0.09] font-mono text-[9px] text-[#e8a33d]">01</span><div><h3 id="booking-time-heading" className="text-xs font-semibold text-[#e8e2d8]">When works for you?</h3><p className="text-[10px] text-[#777168]">Pick your preferred start date and time.</p></div></div>
+                            <label className="block"><span className="sr-only">Session date and start time</span><input type="datetime-local" min={localDateTimeMinimum()} value={sessionDate} onChange={(event) => setSessionDate(event.target.value)} required aria-describedby="booking-time-help" className="w-full rounded-xl border border-white/[0.1] bg-[#0d0d0c] px-3.5 py-3 text-sm text-white outline-none transition focus:border-[#e8a33d]/60 focus:ring-2 focus:ring-[#e8a33d]/10 [color-scheme:dark]" /><span id="booking-time-help" className="mt-1.5 block text-[10px] text-[#777168]">Choose a time at least 30 minutes from now.</span></label>
+                        </section>
+
+                        <section aria-labelledby="booking-notes-heading"><div className="mb-2.5 flex items-center gap-2"><span className="grid h-6 w-6 place-items-center rounded-lg bg-[#e8a33d]/[0.09] font-mono text-[9px] text-[#e8a33d]">02</span><div><h3 id="booking-notes-heading" className="text-xs font-semibold text-[#e8e2d8]">Anything to prepare? <span className="font-normal text-[#777168]">Optional</span></h3><p className="text-[10px] text-[#777168]">Share project needs, setup details, or context.</p></div></div>
+                            <textarea value={notes} onChange={(event) => setNotes(event.target.value)} maxLength={1000} rows={3} placeholder="A short note for the producer..." className="w-full resize-y rounded-xl border border-white/[0.1] bg-[#0d0d0c] px-3.5 py-3 text-sm leading-5 text-white outline-none transition placeholder:text-[#5f5c57] focus:border-[#e8a33d]/50 focus:ring-2 focus:ring-[#e8a33d]/10" /><p className="mt-1 text-right text-[9px] text-[#666158]">{notes.length}/1000</p>
+                        </section>
+
+                        <div className="flex items-start gap-2.5 rounded-xl border border-[#30302b] bg-[#1b1a16] px-3.5 py-3"><CheckCircle2 size={14} className="mt-0.5 shrink-0 text-[#75d6c6]" /><p className="text-[10px] leading-4 text-[#928b80]">No payment is taken with this request. If approved, you can pay the <strong className="font-semibold text-[#d8d0c2]">full package price of KSh {studio.productionPackagePrice?.toLocaleString()}</strong>.</p></div>
+                        {error && <p role="alert" className="flex items-start gap-2 rounded-xl border border-red-300/20 bg-red-300/[0.06] px-3.5 py-3 text-xs leading-5 text-red-200"><AlertCircle size={15} className="mt-0.5 shrink-0" />{error}</p>}
+                    </div>
+                    <footer className="border-t border-white/[0.07] bg-[#151411] px-5 py-4 sm:px-7"><div className="flex items-center justify-between gap-4"><div className="min-w-0"><p className="text-[9px] font-semibold uppercase tracking-[0.13em] text-[#777168]">You’ll request</p><p className="mt-0.5 truncate text-xs font-semibold text-[#eee6d9]">{sessionDate ? formatBookingDate(sessionDate) : "Choose a session time"}</p></div><button type="submit" disabled={sending} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-4 py-3 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a33d] focus-visible:ring-offset-2 focus-visible:ring-offset-[#151411] disabled:cursor-wait disabled:opacity-60 sm:px-5">{sending ? <><LoaderCircle size={15} className="animate-spin" />Sending</> : <>Send request <ArrowUpRight size={14} /></>}</button></div></footer>
                 </form>
             </>}
         </section>
     </div>;
+}
+
+function formatBookingDate(value: string) {
+    const date = new Date(value);
+    if (!value || Number.isNaN(date.getTime())) return "Choose a session time";
+    return new Intl.DateTimeFormat("en-KE", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }).format(date);
 }
 
 function localDateTimeMinimum() {

@@ -16,6 +16,7 @@ import type { Notification } from "../types/notification";
 const visualMap: Record<string, { icon: LucideIcon; color: string; tint: string }> = {
     BOOKING_REQUEST: { icon: CalendarCheck, color: "text-amber-300", tint: "bg-amber-300/10" },
     BOOKING_CONFIRMED: { icon: CalendarCheck, color: "text-emerald-300", tint: "bg-emerald-300/10" },
+    BOOKING_PAYMENT_FAILED: { icon: CalendarCheck, color: "text-rose-300", tint: "bg-rose-300/10" },
     BOOKING_CANCELLED: { icon: CalendarCheck, color: "text-rose-300", tint: "bg-rose-300/10" },
     PAYMENT_REQUEST: { icon: CreditCard, color: "text-sky-300", tint: "bg-sky-300/10" },
     WALLET_TRANSACTION: { icon: CreditCard, color: "text-emerald-300", tint: "bg-emerald-300/10" },

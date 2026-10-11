@@ -23,7 +23,7 @@ export function DashboardSidebar() {
         return counts;
     }, {});
     const pageCounts: Record<string, number> = {
-        "/dashboard/bookings": sumTypes(unreadByType, ["BOOKING_REQUEST", "BOOKING_CONFIRMED", "BOOKING_CANCELLED", "BOOKING_EXPIRED"]),
+        "/dashboard/bookings": sumTypes(unreadByType, ["BOOKING_REQUEST", "BOOKING_CONFIRMED", "BOOKING_PAYMENT_FAILED", "BOOKING_CANCELLED", "BOOKING_EXPIRED"]),
         "/dashboard/beat-marketplace": sumTypes(unreadByType, ["BEAT_SOLD", "BEAT_PURCHASED", "BEAT_PURCHASE_FAILED", "BEAT_PROCESSING_COMPLETED", "BEAT_PROCESSING_FAILED"]),
         "/dashboard/wallet": sumTypes(unreadByType, ["PAYMENT_REQUEST", "WALLET_TRANSACTION", "ESCROW_ACTIVITY", "TOPUP_REQUEST"]),
         "/dashboard/notifications": unreadCount,

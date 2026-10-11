@@ -8,7 +8,7 @@ export type Booking = {
     artistId: number;
     artistName?: string;
     sessionDate: string;
-    durationHours: number;
+    packageServices: string[];
     attemptCount?: number;
     productionPackagePrice?: number | null;
     totalPrice?: number | null;
@@ -31,6 +31,6 @@ export type BookingPage = {
 export type CreateBookingRequest = {
     studioId: string;
     sessionDate: string;
-    durationHours: number;
+    rulesAccepted: boolean;
     notes?: string;
 };

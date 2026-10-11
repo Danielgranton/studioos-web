@@ -12,7 +12,7 @@ import { ServiceBookingsPanel } from "@/features/services";
 import { BookingService } from "../services/booking.service";
 import type { Booking, BookingStatus } from "../types/booking";
 
-type Filter = "ALL" | "ACTION" | "UPCOMING" | "PAST";
+type Filter = "ALL" | "ACTION" | "UPCOMING" | "PAST" | "CANCELLED" | "APPROVED" | "EXPIRED";
 
 export function BookingsPage() {
     const { session, isLoading: sessionLoading } = useSession();
@@ -100,13 +100,23 @@ export function BookingsPage() {
             ? booking.status === "PENDING"
             : booking.status === "APPROVED" && booking.paymentStatus !== "PAID").length;
         const upcoming = bookings.filter((booking) => new Date(booking.sessionDate).getTime() >= now && booking.status !== "CANCELLED" && booking.status !== "EXPIRED").length;
-        return { all: bookings.length, action: needsAction, upcoming };
+        return {
+            all: bookings.length,
+            action: needsAction,
+            upcoming,
+            cancelled: bookings.filter((booking) => booking.status === "CANCELLED").length,
+            approved: bookings.filter((booking) => booking.status === "APPROVED").length,
+            expired: bookings.filter((booking) => booking.status === "EXPIRED").length,
+        };
     }, [bookings, isProducer, now]);
 
     const visible = bookings.filter((booking) => {
         if (filter === "ACTION") return isProducer ? booking.status === "PENDING" : booking.status === "APPROVED" && booking.paymentStatus !== "PAID";
         if (filter === "UPCOMING") return new Date(booking.sessionDate).getTime() >= now && booking.status !== "CANCELLED" && booking.status !== "EXPIRED";
         if (filter === "PAST") return booking.status === "CANCELLED" || booking.status === "EXPIRED" || new Date(booking.sessionDate).getTime() < now;
+        if (filter === "CANCELLED") return booking.status === "CANCELLED";
+        if (filter === "APPROVED") return booking.status === "APPROVED";
+        if (filter === "EXPIRED") return booking.status === "EXPIRED";
         return true;
     });
 
@@ -159,7 +169,7 @@ export function BookingsPage() {
         }
     }
 
-    async function saveBookingEdit(values: { sessionDate: string; durationHours: number; notes: string }) {
+    async function saveBookingEdit(values: { sessionDate: string; notes: string }) {
         if (!editingBooking) return;
         const booking = editingBooking;
         setBusyId(booking.id);
@@ -188,6 +198,9 @@ export function BookingsPage() {
         { id: "ACTION", label: "Needs action", count: counts.action },
         { id: "UPCOMING", label: "Upcoming", count: counts.upcoming },
         { id: "PAST", label: "Past" },
+        { id: "CANCELLED", label: "Cancelled", count: counts.cancelled },
+        { id: "APPROVED", label: "Approved", count: counts.approved },
+        { id: "EXPIRED", label: "Expired", count: counts.expired },
     ];
 
     return (
@@ -200,7 +213,7 @@ export function BookingsPage() {
 
             <ServiceBookingsPanel />
 
-            <div className="mt-7 flex gap-2 overflow-x-auto border-b border-white/[0.08] pb-3">
+            <div className="mt-7 flex flex-wrap gap-2 border-b border-white/[0.08] pb-3">
                 {tabs.map((tab) => <button key={tab.id} type="button" onClick={() => setFilter(tab.id)} className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition ${filter === tab.id ? "bg-white/[0.09] text-white" : "text-[#77746e] hover:bg-white/[0.04] hover:text-[#ddd]"}`}>{tab.label}{tab.count !== undefined && <span className={`rounded-md px-1.5 py-0.5 font-mono text-[9px] ${filter === tab.id ? "bg-[#e8a33d]/15 text-[#e8a33d]" : "bg-white/[0.05] text-[#77746e]"}`}>{tab.count}</span>}</button>)}
             </div>
 
@@ -210,11 +223,12 @@ export function BookingsPage() {
                     <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2"><h2 className="text-base font-bold">{booking.studioName || "Studio session"}</h2><StatusBadge status={booking.status} paymentStatus={booking.paymentStatus} /></div>
                         <p className="mt-1 text-xs text-[#77746e]">{isProducer ? `Requested by ${booking.artistName || "artist"}` : "Studio booking request"}</p>
-                        <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-[#aaa69d]"><span className="inline-flex items-center gap-1.5"><CalendarDays size={13} className="text-[#e8a33d]" />{formatDate(booking.sessionDate)}</span><span className="inline-flex items-center gap-1.5"><Clock3 size={13} className="text-[#e8a33d]" />{formatTime(booking.sessionDate)} · {booking.durationHours} {booking.durationHours === 1 ? "hour" : "hours"}</span>{booking.totalPrice != null && <span className="inline-flex items-center gap-1.5"><CreditCard size={13} className="text-[#e8a33d]" />KSh {booking.totalPrice.toLocaleString()}</span>}</div>
+                        <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-[#aaa69d]"><span className="inline-flex items-center gap-1.5"><CalendarDays size={13} className="text-[#e8a33d]" />{formatDate(booking.sessionDate)}</span><span className="inline-flex items-center gap-1.5"><Clock3 size={13} className="text-[#e8a33d]" />{formatTime(booking.sessionDate)}</span>{booking.totalPrice != null && <span className="inline-flex items-center gap-1.5"><CreditCard size={13} className="text-[#e8a33d]" />KSh {booking.totalPrice.toLocaleString()}</span>}</div>
+                        {booking.packageServices?.length > 0 && <div className="mt-4"><p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#77746e]">Package services included</p><ol className="mt-2 flex flex-wrap gap-2">{booking.packageServices.map((service, index) => <li key={`${service}-${index}`} className="inline-flex items-center gap-1.5 rounded-lg border border-[#e8a33d]/15 bg-[#e8a33d]/[0.045] px-2.5 py-1.5 text-[10px] font-medium text-[#d8c8aa]"><span className="font-mono text-[9px] text-[#e8a33d]">{String(index + 1).padStart(2, "0")}</span>{service}</li>)}</ol></div>}
                         {booking.notes && <p className="mt-4 max-w-2xl rounded-xl border border-white/[0.06] bg-black/15 px-3 py-2.5 text-xs leading-5 text-[#aaa69d]">{booking.notes}</p>}
                     </div>
                     <div className="w-full lg:max-w-[310px]">
-                        {isProducer && booking.status === "PENDING" && <div className="rounded-xl border border-white/[0.08] bg-black/15 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#77746e]">Fixed package total</p><p className="mt-2 text-lg font-semibold text-[#f0bd65]">{booking.productionPackagePrice ? `KSh ${booking.productionPackagePrice.toLocaleString()}` : "Package price not set"}</p><p className="mt-1 text-[10px] leading-4 text-[#77746e]">The selected package services share one price; session duration does not change it.</p><button type="button" disabled={busyId === booking.id || !booking.productionPackagePrice} onClick={() => void confirm(booking)} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#e8a33d] px-3 py-2.5 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:opacity-50">{busyId === booking.id ? <LoaderCircle size={14} className="animate-spin" /> : <Check size={14} />}Approve at package price</button></div>}
+                        {isProducer && booking.status === "PENDING" && <div className="rounded-xl border border-white/[0.08] bg-black/15 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#77746e]">Fixed package total</p><p className="mt-2 text-lg font-semibold text-[#f0bd65]">{booking.productionPackagePrice ? `KSh ${booking.productionPackagePrice.toLocaleString()}` : "Package price not set"}</p><p className="mt-1 text-[10px] leading-4 text-[#77746e]">One fixed price covers the services listed in this request.</p><button type="button" disabled={busyId === booking.id || !booking.productionPackagePrice} onClick={() => void confirm(booking)} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#e8a33d] px-3 py-2.5 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:opacity-50">{busyId === booking.id ? <LoaderCircle size={14} className="animate-spin" /> : <Check size={14} />}Approve at package price</button></div>}
                         {!isProducer && booking.status === "APPROVED" && booking.paymentStatus !== "PAID" && <div className="rounded-xl border border-[#e8a33d]/20 bg-[#e8a33d]/[0.05] p-3"><p className="text-xs font-semibold text-[#e5d2ac]">Your session is approved</p><label className="mt-3 block text-[10px] font-semibold uppercase tracking-[0.14em] text-[#77746e]">M-Pesa phone</label><input type="tel" autoComplete="tel" value={phoneDrafts[booking.id] ?? session?.phone ?? ""} onChange={(event) => setPhoneDrafts((current) => ({ ...current, [booking.id]: event.target.value }))} placeholder="+254 7XX XXX XXX or 07XX XXX XXX" className="mt-2 w-full rounded-lg border border-white/[0.1] bg-[#10100f] px-3 py-2.5 text-sm text-white outline-none focus:border-[#e8a33d]/50"/><p className="mt-1.5 text-[10px] leading-4 text-[#77746e]">You can enter +254 or local format; we convert it for M-Pesa.</p><button type="button" disabled={busyId === booking.id} onClick={() => void pay(booking)} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#e8a33d] px-3 py-2.5 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:opacity-50">{busyId === booking.id ? <LoaderCircle size={14} className="animate-spin" /> : <CreditCard size={14} />}Pay KSh {booking.totalPrice?.toLocaleString()}</button></div>}
                         {!isProducer && (booking.status === "PENDING" || booking.status === "EXPIRED" && (booking.attemptCount ?? 1) < 2) && <button type="button" disabled={busyId === booking.id} onClick={() => setEditingBooking(booking)} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#e8a33d]/25 bg-[#e8a33d]/[0.06] px-3 py-2.5 text-xs font-semibold text-[#e8bd7a] transition hover:bg-[#e8a33d]/[0.12] disabled:opacity-50">{booking.status === "EXPIRED" ? "Edit & request again" : "Edit booking details"}</button>}
                         {!isProducer && booking.status === "EXPIRED" && (booking.attemptCount ?? 1) >= 2 && <p className="mt-2 rounded-lg border border-white/[0.06] px-3 py-2 text-[10px] leading-4 text-[#77746e]">Both request attempts have expired. This booking can’t be requested again.</p>}
@@ -233,21 +247,19 @@ function BookingEditDialog({ booking, saving, onClose, onSave }: {
     booking: Booking;
     saving: boolean;
     onClose: () => void;
-    onSave: (values: { sessionDate: string; durationHours: number; notes: string }) => void;
+    onSave: (values: { sessionDate: string; notes: string }) => void;
 }) {
     const isRetry = booking.status === "EXPIRED";
     const [sessionDate, setSessionDate] = useState(toLocalInput(booking.sessionDate));
-    const [durationHours, setDurationHours] = useState(booking.durationHours);
     const [notes, setNotes] = useState(booking.notes ?? "");
     return <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 px-4 py-6 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget && !saving) onClose(); }}>
         <section role="dialog" aria-modal="true" aria-labelledby="booking-edit-title" className="max-h-full w-full max-w-lg overflow-y-auto rounded-3xl border border-white/10 bg-[#171614] p-5 shadow-2xl sm:p-7">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">{isRetry ? "Final request attempt" : "Update request"}</p>
             <h2 id="booking-edit-title" className="mt-2 text-xl font-bold text-[#f1eee8]">{isRetry ? "Choose a new session time" : "Edit booking details"}</h2>
-            <p className="mt-2 text-sm leading-6 text-[#99958d]">{isRetry ? "Adjust the time, length, or notes, then send this request back to the producer. The 15-minute payment window starts only after approval." : "You can update the session while it is waiting for the producer to review it."}</p>
+            <p className="mt-2 text-sm leading-6 text-[#99958d]">{isRetry ? "Adjust the requested date, start time, or notes, then send this request back to the producer. The payment window starts only after approval." : "You can update the requested date, start time, or notes while the producer reviews it."}</p>
             {isRetry && <p className="mt-4 rounded-xl border border-amber-200/15 bg-amber-200/[0.05] px-3.5 py-3 text-xs leading-5 text-amber-100/80">This is your one remaining request attempt. It will need producer approval again.</p>}
-            <form onSubmit={(event) => { event.preventDefault(); onSave({ sessionDate, durationHours, notes }); }} className="mt-5 space-y-4">
+            <form onSubmit={(event) => { event.preventDefault(); onSave({ sessionDate, notes }); }} className="mt-5 space-y-4">
                 <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">Session date and start time</span><input type="datetime-local" min={localDateTimeMinimum()} required value={sessionDate} onChange={(event) => setSessionDate(event.target.value)} className="mt-2 w-full rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm text-white outline-none focus:border-[#e8a33d]/50 [color-scheme:dark]" /></label>
-                <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">Session length</span><select value={durationHours} onChange={(event) => setDurationHours(Number(event.target.value))} className="mt-2 w-full rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm text-white outline-none focus:border-[#e8a33d]/50">{Array.from({ length: 12 }, (_, index) => index + 1).map((hours) => <option key={hours} value={hours}>{hours} {hours === 1 ? "hour" : "hours"}</option>)}</select></label>
                 <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">Session notes</span><textarea value={notes} onChange={(event) => setNotes(event.target.value)} maxLength={1000} rows={4} className="mt-2 w-full resize-y rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm leading-5 text-white outline-none focus:border-[#e8a33d]/50" /></label>
                 <div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end"><button type="button" disabled={saving} onClick={onClose} className="rounded-xl border border-white/10 px-4 py-3 text-xs font-semibold text-[#c9c5bd] transition hover:bg-white/[0.04] disabled:opacity-50">Keep as is</button><button type="submit" disabled={saving || !sessionDate} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-4 py-3 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:opacity-50">{saving && <LoaderCircle size={14} className="animate-spin" />}{isRetry ? "Update & send request" : "Save booking changes"}</button></div>
             </form>
@@ -262,13 +274,22 @@ function StatusBadge({ status, paymentStatus }: { status: BookingStatus; payment
 }
 
 function EmptyBookings({ producer, filter, hasBookings }: { producer: boolean; filter: Filter; hasBookings: boolean }) {
-    const title = filter === "ACTION" ? "You’re all caught up" : filter === "UPCOMING" ? "No upcoming sessions" : filter === "PAST" ? "No past sessions" : producer ? "Your studio desk is clear" : "Your next session starts here";
+    const title = filter === "ACTION" ? "You’re all caught up"
+        : filter === "UPCOMING" ? "No upcoming sessions"
+            : filter === "PAST" ? "No past sessions"
+                : filter === "CANCELLED" ? "No cancelled bookings"
+                    : filter === "APPROVED" ? "No approved bookings"
+                        : filter === "EXPIRED" ? "No expired bookings"
+                            : producer ? "Your studio desk is clear" : "Your next session starts here";
     const copy = filter === "ACTION"
         ? producer ? "New artist requests will appear here when a producer needs to review them." : "Approved sessions waiting for your payment will appear here."
         : filter === "UPCOMING" ? "Confirmed sessions will show here with their time and payment status."
             : filter === "PAST" ? "Completed, cancelled, and expired bookings will collect here."
-                : producer ? "When an artist requests a session at one of your studios, you can review the time and send a quote here."
-                    : "Explore recording spaces, choose a time that works, and manage your request from this page.";
+                : filter === "CANCELLED" ? "Bookings cancelled by you or the studio will appear here."
+                    : filter === "APPROVED" ? "Bookings approved by the producer will appear here, including those awaiting payment."
+                        : filter === "EXPIRED" ? "Bookings that passed their payment or approval window will appear here."
+                            : producer ? "When an artist requests a session at one of your studios, you can review the time and package here."
+                                : "Explore recording spaces, choose a time that works, and manage your request from this page.";
     const showDiscover = !producer && !hasBookings && filter === "ALL";
     return <div className="relative mt-6 overflow-hidden rounded-[26px] border border-white/[0.09] bg-[radial-gradient(ellipse_at_50%_0%,rgba(232,163,61,0.10),transparent_58%),#151514] px-5 py-12 text-center sm:py-16">
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-1/4 top-0 h-px bg-gradient-to-r from-transparent via-[#e8a33d]/50 to-transparent" />

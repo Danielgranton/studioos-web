@@ -4,7 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
-import { BadgeCheck, Building2, Check, Film, Heart, ImagePlus, Loader2, MapPin, Pencil, Plus, Sparkles, Star, Trash2 } from "lucide-react";
+import { BadgeCheck, Building2, Check, Film, Heart, ImagePlus, Loader2, MapPin, Pencil, Plus, Save, ShieldCheck, Sparkles, Star, Trash2, X } from "lucide-react";
 
 import { DashboardErrorState, useDashboardSession } from "@/features/dashboard";
 import { VerificationGuide } from "@/features/verification";
@@ -12,7 +12,7 @@ import { ServiceCatalogService } from "@/features/services";
 import type { ServiceCatalogItem } from "@/features/services";
 
 import { useMyStudios } from "../hooks/useMyStudios";
-import type { Studio, StudioFormValues, StudioMedia, StudioServiceOffering } from "../types/studio";
+import type { Studio, StudioFormValues, StudioMedia, StudioServiceOffering, UpdateStudioRequest } from "../types/studio";
 import { StudioService } from "../services/studio.service";
 
 const EMPTY_FORM: StudioFormValues = {
@@ -160,7 +160,7 @@ export function MyStudioPage() {
             ) : studios.length === 0 ? (
                 <EmptyStudioState onCreate={openCreate} />
             ) : (
-                <StudioManagementList studios={studios} onEdit={openEdit} onEditPackage={openPackageEdit} onRefresh={refresh} />
+                <StudioManagementList studios={studios} onEdit={openEdit} onEditPackage={openPackageEdit} onRefresh={refresh} onUpdate={update} />
             )}
         </div>
     );
@@ -171,11 +171,11 @@ function isSupportedImage(file: File) {
         && ["image/jpeg", "image/png", "image/webp"].includes(file.type);
 }
 
-function StudioManagementList({ studios, onEdit, onEditPackage, onRefresh }: { studios: Studio[]; onEdit: (studio: Studio) => void; onEditPackage: (studio: Studio) => void; onRefresh: () => Promise<void> }) {
-    return <section className="mt-8 space-y-8" aria-label="Studio listings">{studios.map((studio) => <StudioManagementRow key={studio.id} studio={studio} onEdit={() => onEdit(studio)} onEditPackage={() => onEditPackage(studio)} onRefresh={onRefresh} />)}</section>;
+function StudioManagementList({ studios, onEdit, onEditPackage, onRefresh, onUpdate }: { studios: Studio[]; onEdit: (studio: Studio) => void; onEditPackage: (studio: Studio) => void; onRefresh: () => Promise<void>; onUpdate: (studioId: string, request: UpdateStudioRequest) => Promise<Studio> }) {
+    return <section className="mt-8 space-y-8" aria-label="Studio listings">{studios.map((studio) => <StudioManagementRow key={studio.id} studio={studio} onEdit={() => onEdit(studio)} onEditPackage={() => onEditPackage(studio)} onRefresh={onRefresh} onUpdate={onUpdate} />)}</section>;
 }
 
-function StudioManagementRow({ studio, onEdit, onEditPackage, onRefresh }: { studio: Studio; onEdit: () => void; onEditPackage: () => void; onRefresh: () => Promise<void> }) {
+function StudioManagementRow({ studio, onEdit, onEditPackage, onRefresh, onUpdate }: { studio: Studio; onEdit: () => void; onEditPackage: () => void; onRefresh: () => Promise<void>; onUpdate: (studioId: string, request: UpdateStudioRequest) => Promise<Studio> }) {
     const gallery = getStudioGallery(studio);
 
     return <article className="overflow-hidden rounded-[26px] border border-[#2b2b2b] bg-[#151515] shadow-[0_20px_70px_rgba(0,0,0,0.18)]">
@@ -189,7 +189,54 @@ function StudioManagementRow({ studio, onEdit, onEditPackage, onRefresh }: { stu
             <div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#666]">Listing overview</p><p className="mt-3 max-w-2xl text-sm leading-7 text-[#999]">{studio.description || "Add a description to help artists understand the space and its capabilities."}</p><StudioServicesOverview studio={studio} onEdit={onEditPackage} /></div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2"><Metric label="Package price" value={studio.productionPackagePrice ? `KSh ${studio.productionPackagePrice.toLocaleString()}` : "Set package price"} /><Metric label="Next available" value={studio.nextAvailable || studio.availability} /><Metric label="Rating" value={studio.averageRating ? studio.averageRating.toFixed(1) : "New"} icon={<Star size={13} className="fill-[#e8a33d] text-[#e8a33d]" />} /><Metric label="Reviews" value={String(studio.totalRatings || 0)} /><Metric label="Likes" value={String(studio.likeCount || 0)} icon={<Heart size={13} className="text-red-300" />} /></div>
         </div>
+        <StudioRulesEditor studio={studio} onUpdate={onUpdate} />
     </article>;
+}
+
+function StudioRulesEditor({ studio, onUpdate }: { studio: Studio; onUpdate: (studioId: string, request: UpdateStudioRequest) => Promise<Studio> }) {
+    const [editing, setEditing] = useState(false);
+    const [draft, setDraft] = useState((studio.rules || []).join("\n"));
+    const [savingRules, setSavingRules] = useState(false);
+    const rules = (studio.rules || []).filter((rule) => rule.trim());
+
+    function startEditing() {
+        setDraft(rules.join("\n"));
+        setEditing(true);
+    }
+
+    async function saveRules(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        const nextRules = draft.split("\n").map((rule) => rule.trim()).filter(Boolean).slice(0, 30);
+        setSavingRules(true);
+        try {
+            await onUpdate(studio.id, { rules: nextRules });
+            setDraft(nextRules.join("\n"));
+            setEditing(false);
+            toast.success("Studio rules saved");
+        } catch {
+            toast.error("Could not save studio rules", { description: "Check your connection and try again." });
+        } finally {
+            setSavingRules(false);
+        }
+    }
+
+    return <section aria-labelledby={`studio-rules-${studio.id}`} className="border-t border-[#2b2b2b] px-5 py-6 sm:px-7">
+        <div className="rounded-2xl border border-[#30302f] bg-[radial-gradient(ellipse_at_0%_0%,rgba(62,166,255,0.08),transparent_48%),#101010] p-4 sm:p-5">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="flex items-start gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#3ea6ff]/20 bg-[#3ea6ff]/[0.08] text-[#8acbff]"><ShieldCheck size={18} /></span>
+                    <div><p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#8acbff]">Before anyone walks in</p><h3 id={`studio-rules-${studio.id}`} className="mt-1 text-base font-semibold text-[#f1f1f1]">Studio rules</h3><p className="mt-1 max-w-xl text-xs leading-5 text-[#888]">Set expectations for artists and visitors. These rules will appear on your public studio page.</p></div>
+                </div>
+                {!editing && <button type="button" onClick={startEditing} className="inline-flex items-center gap-1.5 rounded-lg border border-[#383838] bg-[#191919] px-3 py-2 text-xs font-semibold text-[#d8d8d8] transition hover:border-[#3ea6ff]/50 hover:text-white"><Pencil size={13} />{rules.length ? "Edit rules" : "Add rules"}</button>}
+            </div>
+
+            {editing ? <form onSubmit={saveRules} className="mt-5">
+                <label htmlFor={`studio-rules-input-${studio.id}`} className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-[#888]">One rule per line</label>
+                <textarea id={`studio-rules-input-${studio.id}`} value={draft} onChange={(event) => setDraft(event.target.value)} rows={Math.min(8, Math.max(4, draft.split("\n").length))} maxLength={6000} placeholder={"Arrive on time for your session\nNo smoking inside the studio\nTreat equipment with care"} className="mt-2 w-full resize-y rounded-xl border border-[#333] bg-[#0b0b0b] px-3.5 py-3 text-sm leading-6 text-[#eee] outline-none transition placeholder:text-[#555] focus:border-[#3ea6ff]/60 focus:ring-2 focus:ring-[#3ea6ff]/10" />
+                <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><p className="text-[10px] text-[#707070]">Up to 30 rules. Blank lines are ignored; each rule is shown separately.</p><div className="flex items-center gap-2"><button type="button" disabled={savingRules} onClick={() => { setDraft(rules.join("\n")); setEditing(false); }} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-[#999] transition hover:bg-white/[0.05] hover:text-white disabled:opacity-50"><X size={13} />Cancel</button><button type="submit" disabled={savingRules} className="inline-flex items-center gap-1.5 rounded-lg bg-[#3ea6ff] px-3.5 py-2 text-xs font-semibold text-[#0e1114] transition hover:bg-[#65b8ff] disabled:cursor-wait disabled:opacity-60">{savingRules ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}{savingRules ? "Saving" : "Save rules"}</button></div></div>
+            </form> : rules.length ? <ol className="mt-5 grid gap-2 sm:grid-cols-2">{rules.map((rule, index) => <li key={`${index}-${rule}`} className="flex items-start gap-3 rounded-xl border border-[#292929] bg-[#151515]/80 px-3 py-3"><span className="mt-px grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-[#3ea6ff]/[0.08] font-mono text-[9px] text-[#8acbff]">{String(index + 1).padStart(2, "0")}</span><span className="text-xs leading-5 text-[#c7c7c7]">{rule}</span></li>)}</ol> : <div className="mt-5 flex flex-col items-start gap-3 rounded-xl border border-dashed border-[#333] bg-black/20 px-4 py-4 sm:flex-row sm:items-center sm:justify-between"><p className="text-xs leading-5 text-[#858585]">No studio rules yet. Add a few clear guidelines so guests know what to expect.</p><button type="button" onClick={startEditing} className="shrink-0 text-xs font-semibold text-[#8acbff] transition hover:text-white">Write your first rules <span aria-hidden="true">→</span></button></div>}
+        </div>
+    </section>;
 }
 
 function StudioServicesOverview({ studio, onEdit }: { studio: Studio; onEdit: () => void }) {
