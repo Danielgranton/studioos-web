@@ -33,6 +33,18 @@ type GalleryItem = {
     thumbnailUrl: string;
 };
 
+const PRODUCTION_STAGE_ORDER = ["Beat creation", "Recording", "Mixing", "Mastering"];
+
+function orderedPackageServices(studio: Studio) {
+    return (studio.serviceDetails || [])
+        .filter((item) => item.active)
+        .sort((a, b) => {
+            const aIndex = PRODUCTION_STAGE_ORDER.findIndex((name) => name.toLowerCase() === a.name.toLowerCase());
+            const bIndex = PRODUCTION_STAGE_ORDER.findIndex((name) => name.toLowerCase() === b.name.toLowerCase());
+            return (aIndex < 0 ? PRODUCTION_STAGE_ORDER.length : aIndex) - (bIndex < 0 ? PRODUCTION_STAGE_ORDER.length : bIndex);
+        });
+}
+
 export function StudioDetailPage({ studioId }: { studioId: string }) {
     const { session, isAuthenticated } = useSession();
     const [studio, setStudio] = useState<Studio | null>(null);
@@ -69,6 +81,7 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
     const selectedMedia = gallery.find((media) => media.id === selectedMediaId) || gallery[0];
     const imageCount = gallery.filter((media) => media.type === "IMAGE").length;
     const videoCount = gallery.filter((media) => media.type === "VIDEO").length;
+    const packageServices = orderedPackageServices(studio);
 
     return (
         <main className="min-h-screen bg-[#0f0f0f] text-[#f5f4f1]">
@@ -243,8 +256,7 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
                             <SectionLabel>Music production package</SectionLabel>
                             <div className="mt-3 rounded-2xl border border-[#3b352c] bg-[#1b1916] p-4 sm:p-5">
                                 <div className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-sm font-semibold text-[#f2eee7]">A release-ready song, stage by stage</h2><p className="mt-1 text-xs leading-5 text-[#88837b]">One package price for the production stages this studio provides.</p></div>{studio.productionPackagePrice != null && <span className="rounded-xl bg-[#e8a33d]/10 px-3 py-2 font-mono text-sm font-semibold text-[#f0bd65]">KES {studio.productionPackagePrice.toLocaleString()}</span>}</div>
-                                <div className="mt-4 grid gap-2 sm:grid-cols-2">{(studio.serviceDetails || []).filter((item) => item.active && item.includedInProductionPackage).map((item, index) => <div key={item.id || item.name} className="flex items-center gap-2.5 rounded-xl border border-white/[0.06] bg-black/15 px-3 py-2.5"><span className="grid h-6 w-6 place-items-center rounded-lg bg-[#e8a33d]/10 font-mono text-[9px] text-[#e8a33d]">0{index + 1}</span><span className="text-xs font-medium text-[#d4cfc5]">{item.name}</span></div>)}</div>
-                                {(studio.serviceDetails || []).some((item) => item.active && !item.includedInProductionPackage) && <div className="mt-5 border-t border-white/[0.07] pt-4"><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#777269]">Optional add-ons</p><div className="mt-2 space-y-2">{(studio.serviceDetails || []).filter((item) => item.active && !item.includedInProductionPackage).map((item) => <div key={item.id || item.name} className="flex items-center justify-between gap-3 text-xs"><span className="text-[#c0bbb1]">{item.name}</span><span className="font-mono text-[#d9d3c8]">{item.price != null ? `KES ${item.price.toLocaleString()}` : "Price on request"}</span></div>)}</div></div>}
+                                <div className="mt-4 grid gap-2 sm:grid-cols-2">{packageServices.map((item, index) => { const stageIndex = PRODUCTION_STAGE_ORDER.findIndex((name) => name.toLowerCase() === item.name.toLowerCase()); const isStage = stageIndex >= 0; const number = isStage ? stageIndex + 1 : PRODUCTION_STAGE_ORDER.length + packageServices.slice(0, index).filter((service) => !PRODUCTION_STAGE_ORDER.some((name) => name.toLowerCase() === service.name.toLowerCase())).length + 1; return <div key={item.id || item.name} className="flex items-center gap-2.5 rounded-xl border border-white/[0.06] bg-black/15 px-3 py-2.5"><span className="grid h-6 w-6 place-items-center rounded-lg bg-[#e8a33d]/10 font-mono text-[9px] text-[#e8a33d]">{String(number).padStart(2, "0")}</span><span className="text-xs font-medium text-[#d4cfc5]">{item.name}</span></div>; })}</div>
                             </div>
                             <div className="mt-4 flex flex-wrap gap-1.5">{studio.genres.map((item) => <span key={item} className="rounded-full border border-[#302d28] bg-[#161513] px-2.5 py-1 text-[11px] text-[#c0bbb1]">{item}</span>)}</div>
                         </section>
@@ -267,7 +279,7 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
 
                     <aside className="h-fit rounded-2xl border border-[#3b352c] bg-[#1b1916] p-4 sm:p-5 lg:sticky lg:top-24">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs uppercase tracking-[0.16em] text-[#777]">Starting from</span>
+                            <span className="text-xs uppercase tracking-[0.16em] text-[#777]">Full-production package</span>
                             <span className="flex items-center gap-1 font-mono text-sm text-[#eee]">
                                 <Star size={14} className="fill-[#e8a33d] text-[#e8a33d]" />
                                 {studio.averageRating ? studio.averageRating.toFixed(1) : "New"}
@@ -275,8 +287,8 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
                             </span>
                         </div>
                         <p className="mt-3 font-mono text-2xl font-semibold text-[#f5f4f1]">
-                            KSh {studio.pricing.toLocaleString()}
-                            <span className="ml-1 text-xs font-normal text-[#777]">/ hour</span>
+                            {studio.productionPackagePrice && studio.productionPackagePrice > 0 ? `KSh ${studio.productionPackagePrice.toLocaleString()}` : "Price not set"}
+                            <span className="ml-1 text-xs font-normal text-[#777]">/ production package</span>
                         </p>
                         <p className="mt-3 flex items-center gap-2 text-xs text-[#aaa69d]">
                             <Users size={15} className="text-[#e8a33d]" />
@@ -286,7 +298,7 @@ export function StudioDetailPage({ studioId }: { studioId: string }) {
                             <Heart size={15} className="text-red-300" />
                             {studio.likeCount?.toLocaleString() ?? "0"} likes
                         </p>
-                        {!isAuthenticated ? <Link href={`/auth/signin?next=${encodeURIComponent(`/studios/${studioId}`)}`} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-3 py-2.5 text-xs font-semibold text-[#17130d] transition hover:bg-[#f0b458]"><CalendarCheck size={16} />Sign in to request a session</Link> : session?.role === "ARTIST" ? <button type="button" disabled={!studio.available} onClick={() => setBookingOpen(true)} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-3 py-2.5 text-xs font-semibold text-[#17130d] transition hover:bg-[#f0b458] disabled:cursor-not-allowed disabled:opacity-50"><CalendarCheck size={16} />{studio.available ? "Request a session" : "Studio unavailable"}</button> : <p className="mt-5 rounded-xl border border-white/[0.08] px-3 py-2.5 text-center text-[11px] text-[#888176]">Studio bookings are available to artist accounts.</p>}
+                        {!isAuthenticated ? <Link href={`/auth/signin?next=${encodeURIComponent(`/studios/${studioId}`)}`} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-3 py-2.5 text-xs font-semibold text-[#17130d] transition hover:bg-[#f0b458]"><CalendarCheck size={16} />Sign in to book package</Link> : session?.role === "ARTIST" ? <button type="button" disabled={!studio.available || !studio.productionPackagePrice} onClick={() => setBookingOpen(true)} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-3 py-2.5 text-xs font-semibold text-[#17130d] transition hover:bg-[#f0b458] disabled:cursor-not-allowed disabled:opacity-50"><CalendarCheck size={16} />{!studio.productionPackagePrice ? "Package price unavailable" : studio.available ? "Book production package" : "Studio unavailable"}</button> : <p className="mt-5 rounded-xl border border-white/[0.08] px-3 py-2.5 text-center text-[11px] text-[#888176]">Studio bookings are available to artist accounts.</p>}
                     </aside>
                 </div>
                 <div className="mt-7"><ReviewList target="STUDIO" targetId={studioId} /></div>
@@ -331,14 +343,14 @@ function StudioBookingDialog({ studio, onClose }: { studio: Studio; onClose: () 
 
     return <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 px-4 py-6 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
         <section role="dialog" aria-modal="true" aria-labelledby="studio-booking-title" className="max-h-full w-full max-w-lg overflow-y-auto rounded-3xl border border-white/10 bg-[#171614] p-5 shadow-2xl sm:p-7">
-            {created ? <div className="py-5 text-center"><span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-300/20 bg-emerald-300/[0.08] text-emerald-200"><CheckCircle2 size={22} /></span><p className="mt-5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">Request sent</p><h2 id="studio-booking-title" className="mt-2 text-2xl font-bold">The studio has your request</h2><p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-[#99958d]">The producer will review the time and confirm the total price. You can follow updates in your dashboard bookings.</p><div className="mt-6 flex justify-center gap-2"><Link href="/dashboard/bookings" onClick={onClose} className="rounded-xl bg-[#e8a33d] px-4 py-2.5 text-xs font-bold text-[#17130c]">View bookings</Link><button type="button" onClick={onClose} className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-semibold text-[#c9c5bd]">Close</button></div></div> : <>
-                <div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">Studio session request</p><h2 id="studio-booking-title" className="mt-2 text-2xl font-bold">Book {studio.studioName}</h2><p className="mt-2 text-xs text-[#888176]">KSh {studio.pricing.toLocaleString()} per hour · producer confirms final price</p></div><button type="button" onClick={onClose} aria-label="Close booking form" className="rounded-lg p-2 text-[#888] hover:bg-white/[0.06] hover:text-white"><X size={18} /></button></div>
+            {created ? <div className="py-5 text-center"><span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-300/20 bg-emerald-300/[0.08] text-emerald-200"><CheckCircle2 size={22} /></span><p className="mt-5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">Request sent</p><h2 id="studio-booking-title" className="mt-2 text-2xl font-bold">The studio has your request</h2><p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-[#99958d]">The producer will confirm your package booking. The listed package price is the total, regardless of the booked studio time. You can follow updates in your dashboard bookings.</p><div className="mt-6 flex justify-center gap-2"><Link href="/dashboard/bookings" onClick={onClose} className="rounded-xl bg-[#e8a33d] px-4 py-2.5 text-xs font-bold text-[#17130c]">View bookings</Link><button type="button" onClick={onClose} className="rounded-xl border border-white/10 px-4 py-2.5 text-xs font-semibold text-[#c9c5bd]">Close</button></div></div> : <>
+                <div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">Production package request</p><h2 id="studio-booking-title" className="mt-2 text-2xl font-bold">Book {studio.studioName}</h2><p className="mt-2 text-xs text-[#888176]">One package · KSh {studio.productionPackagePrice?.toLocaleString()}</p></div><button type="button" onClick={onClose} aria-label="Close booking form" className="rounded-lg p-2 text-[#888] hover:bg-white/[0.06] hover:text-white"><X size={18} /></button></div>
                 <form onSubmit={(event) => void submit(event)} className="mt-6 space-y-4">
                     <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">Session date and start time</span><input type="datetime-local" min={localDateTimeMinimum()} value={sessionDate} onChange={(event) => setSessionDate(event.target.value)} required className="mt-2 w-full rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm text-white outline-none focus:border-[#e8a33d]/50 [color-scheme:dark]" /></label>
-                    <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">Session length</span><div className="mt-2 flex items-center gap-3"><select value={durationHours} onChange={(event) => setDurationHours(Number(event.target.value))} className="w-full rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm text-white outline-none focus:border-[#e8a33d]/50">{Array.from({ length: 12 }, (_, index) => index + 1).map((hours) => <option key={hours} value={hours}>{hours} {hours === 1 ? "hour" : "hours"}</option>)}</select><span className="shrink-0 text-xs text-[#99958d]">Estimate <strong className="ml-1 text-[#f0bd65]">KSh {(studio.pricing * durationHours).toLocaleString()}</strong></span></div></label>
+                    <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">Studio time to reserve</span><div className="mt-2 flex items-center gap-3"><select value={durationHours} onChange={(event) => setDurationHours(Number(event.target.value))} className="w-full rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm text-white outline-none focus:border-[#e8a33d]/50">{Array.from({ length: 12 }, (_, index) => index + 1).map((hours) => <option key={hours} value={hours}>{hours} {hours === 1 ? "hour" : "hours"}</option>)}</select><span className="shrink-0 text-xs text-[#99958d]">Package total <strong className="ml-1 text-[#f0bd65]">KSh {studio.productionPackagePrice?.toLocaleString()}</strong></span></div><p className="mt-1.5 text-[10px] text-[#77746e]">Time is used only to reserve the studio; it does not change the package price.</p></label>
                     <label className="block"><span className="text-xs font-semibold text-[#ccc7bd]">What are you working on? <span className="font-normal text-[#77746e]">Optional</span></span><textarea value={notes} onChange={(event) => setNotes(event.target.value)} maxLength={1000} rows={4} placeholder="Tell the producer about your session, setup needs, or project..." className="mt-2 w-full resize-y rounded-xl border border-white/[0.1] bg-[#10100f] px-3 py-3 text-sm leading-5 text-white outline-none placeholder:text-[#5f5c57] focus:border-[#e8a33d]/50" /></label>
                     {error && <p role="alert" className="rounded-xl border border-red-300/20 bg-red-300/[0.06] px-3 py-2.5 text-xs leading-5 text-red-200">{error}</p>}
-                    <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] px-3.5 py-3 text-[11px] leading-5 text-[#88847c]">No payment is taken now. The producer reviews your request and sets the final total; you pay after approval.</div>
+                    <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] px-3.5 py-3 text-[11px] leading-5 text-[#88847c]">No payment is taken now. After approval, you can pay the listed package total. Studio time does not change the price.</div>
                     <button type="submit" disabled={sending} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8a33d] px-4 py-3 text-sm font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:cursor-wait disabled:opacity-60">{sending && <LoaderCircle size={16} className="animate-spin" />}{sending ? "Sending request..." : "Send booking request"}</button>
                 </form>
             </>}

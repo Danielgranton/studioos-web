@@ -250,7 +250,7 @@ export function FeaturedStudioCard({
                 <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-end justify-between gap-2 sm:bottom-3 sm:left-3 sm:right-3 lg:bottom-2.5 lg:left-2.5 lg:right-2.5">
                     <div className="rounded-lg bg-black/60 px-2 py-1 backdrop-blur-md sm:rounded-xl sm:px-3 sm:py-1.5 lg:rounded-lg lg:px-2.5 lg:py-1">
                         <p className="hidden font-mono text-[9px] uppercase tracking-wide text-[#c4c0b6] sm:block lg:text-[8px]">
-                            From
+                            Production package
                         </p>
                         <p className="font-mono text-xs font-bold leading-tight text-white sm:text-sm lg:text-xs">
                             {priceLabel}

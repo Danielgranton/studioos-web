@@ -25,8 +25,8 @@ class BookingServiceClient {
         return response.data.data as Booking;
     }
 
-    async confirmBooking(bookingId: string, totalPrice: number): Promise<Booking> {
-        const response = await api.patch<ApiResponse<Booking>>(`/bookings/${encodeURIComponent(bookingId)}/confirm`, { totalPrice });
+    async confirmBooking(bookingId: string): Promise<Booking> {
+        const response = await api.patch<ApiResponse<Booking>>(`/bookings/${encodeURIComponent(bookingId)}/confirm`, {});
         return response.data.data as Booking;
     }
 

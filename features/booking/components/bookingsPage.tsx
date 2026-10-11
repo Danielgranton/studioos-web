@@ -21,7 +21,6 @@ export function BookingsPage() {
     const [error, setError] = useState("");
     const [filter, setFilter] = useState<Filter>("ALL");
     const [busyId, setBusyId] = useState<string | null>(null);
-    const [priceDrafts, setPriceDrafts] = useState<Record<string, string>>({});
     const [phoneDrafts, setPhoneDrafts] = useState<Record<string, string>>({});
     const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
     const [now, setNow] = useState(0);
@@ -112,14 +111,13 @@ export function BookingsPage() {
     });
 
     async function confirm(booking: Booking) {
-        const totalPrice = Number(priceDrafts[booking.id]);
-        if (!Number.isInteger(totalPrice) || totalPrice < 1) {
-            toast.error("Enter a valid booking price", { description: "Enter a total price in KSh before approving." });
+        if (!booking.productionPackagePrice || booking.productionPackagePrice < 1) {
+            toast.error("Package price is unavailable", { description: "Update the studio package price before approving this booking." });
             return;
         }
         setBusyId(booking.id);
         try {
-            await BookingService.confirmBooking(booking.id, totalPrice);
+            await BookingService.confirmBooking(booking.id);
             toast.success("Booking approved", { description: "The artist can now complete payment." });
             await loadBookings();
         } catch (cause) {
@@ -196,7 +194,7 @@ export function BookingsPage() {
         <>
         <div className="mx-auto max-w-6xl px-4 py-7 text-[#f1f1f1] sm:px-6 sm:py-9">
             <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-                <div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">StudioOS booking desk</p><h1 className="mt-2 text-3xl font-black tracking-[-0.04em]">Bookings</h1><p className="mt-2 max-w-xl text-sm leading-6 text-[#92908a]">{isProducer ? "Review studio requests, set the session price, and keep your schedule clear." : "Track studio requests, confirm your session, and manage payment."}</p></div>
+                <div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e8a33d]">StudioOS booking desk</p><h1 className="mt-2 text-3xl font-black tracking-[-0.04em]">Bookings</h1><p className="mt-2 max-w-xl text-sm leading-6 text-[#92908a]">{isProducer ? "Review production package requests and keep your studio schedule clear." : "Track studio requests, confirm your package, and manage payment."}</p></div>
                 <button type="button" onClick={() => void loadBookings()} disabled={loading} className="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-white/10 px-3.5 py-2.5 text-xs font-semibold text-[#c9c5bd] transition hover:border-white/20 hover:text-white disabled:opacity-50 sm:self-auto"><RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh</button>
             </header>
 
@@ -216,7 +214,7 @@ export function BookingsPage() {
                         {booking.notes && <p className="mt-4 max-w-2xl rounded-xl border border-white/[0.06] bg-black/15 px-3 py-2.5 text-xs leading-5 text-[#aaa69d]">{booking.notes}</p>}
                     </div>
                     <div className="w-full lg:max-w-[310px]">
-                        {isProducer && booking.status === "PENDING" && <div className="rounded-xl border border-white/[0.08] bg-black/15 p-3"><label className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-[#77746e]">Set total price · KSh</label><input inputMode="numeric" min="1" value={priceDrafts[booking.id] ?? ""} onChange={(event) => setPriceDrafts((current) => ({ ...current, [booking.id]: event.target.value }))} placeholder="Enter amount" className="mt-2 w-full rounded-lg border border-white/[0.1] bg-[#10100f] px-3 py-2.5 text-sm text-white outline-none focus:border-[#e8a33d]/50"/><button type="button" disabled={busyId === booking.id} onClick={() => void confirm(booking)} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#e8a33d] px-3 py-2.5 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:opacity-50">{busyId === booking.id ? <LoaderCircle size={14} className="animate-spin" /> : <Check size={14} />}Approve booking</button></div>}
+                        {isProducer && booking.status === "PENDING" && <div className="rounded-xl border border-white/[0.08] bg-black/15 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#77746e]">Fixed package total</p><p className="mt-2 text-lg font-semibold text-[#f0bd65]">{booking.productionPackagePrice ? `KSh ${booking.productionPackagePrice.toLocaleString()}` : "Package price not set"}</p><p className="mt-1 text-[10px] leading-4 text-[#77746e]">The selected package services share one price; session duration does not change it.</p><button type="button" disabled={busyId === booking.id || !booking.productionPackagePrice} onClick={() => void confirm(booking)} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#e8a33d] px-3 py-2.5 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:opacity-50">{busyId === booking.id ? <LoaderCircle size={14} className="animate-spin" /> : <Check size={14} />}Approve at package price</button></div>}
                         {!isProducer && booking.status === "APPROVED" && booking.paymentStatus !== "PAID" && <div className="rounded-xl border border-[#e8a33d]/20 bg-[#e8a33d]/[0.05] p-3"><p className="text-xs font-semibold text-[#e5d2ac]">Your session is approved</p><label className="mt-3 block text-[10px] font-semibold uppercase tracking-[0.14em] text-[#77746e]">M-Pesa phone</label><input type="tel" autoComplete="tel" value={phoneDrafts[booking.id] ?? session?.phone ?? ""} onChange={(event) => setPhoneDrafts((current) => ({ ...current, [booking.id]: event.target.value }))} placeholder="+254 7XX XXX XXX or 07XX XXX XXX" className="mt-2 w-full rounded-lg border border-white/[0.1] bg-[#10100f] px-3 py-2.5 text-sm text-white outline-none focus:border-[#e8a33d]/50"/><p className="mt-1.5 text-[10px] leading-4 text-[#77746e]">You can enter +254 or local format; we convert it for M-Pesa.</p><button type="button" disabled={busyId === booking.id} onClick={() => void pay(booking)} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#e8a33d] px-3 py-2.5 text-xs font-bold text-[#17130c] transition hover:bg-[#f0b458] disabled:opacity-50">{busyId === booking.id ? <LoaderCircle size={14} className="animate-spin" /> : <CreditCard size={14} />}Pay KSh {booking.totalPrice?.toLocaleString()}</button></div>}
                         {!isProducer && (booking.status === "PENDING" || booking.status === "EXPIRED" && (booking.attemptCount ?? 1) < 2) && <button type="button" disabled={busyId === booking.id} onClick={() => setEditingBooking(booking)} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#e8a33d]/25 bg-[#e8a33d]/[0.06] px-3 py-2.5 text-xs font-semibold text-[#e8bd7a] transition hover:bg-[#e8a33d]/[0.12] disabled:opacity-50">{booking.status === "EXPIRED" ? "Edit & request again" : "Edit booking details"}</button>}
                         {!isProducer && booking.status === "EXPIRED" && (booking.attemptCount ?? 1) >= 2 && <p className="mt-2 rounded-lg border border-white/[0.06] px-3 py-2 text-[10px] leading-4 text-[#77746e]">Both request attempts have expired. This booking can’t be requested again.</p>}

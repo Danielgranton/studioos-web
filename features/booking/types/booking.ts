@@ -10,6 +10,7 @@ export type Booking = {
     sessionDate: string;
     durationHours: number;
     attemptCount?: number;
+    productionPackagePrice?: number | null;
     totalPrice?: number | null;
     status: BookingStatus;
     paymentStatus: BookingPaymentStatus;
